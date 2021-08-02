@@ -1,0 +1,23 @@
+/* Language testbench */
+
+BoundedContext CodeInfrastructure in TestingDomain {
+    description is "Components in the automated instrumentation pipeline"
+    classifiers {
+        roleClassifier is Executing
+
+    }
+}
+
+BoundedContext Test in TestingDomain {
+    terminology {
+        term UnitTest means "A test that verifies a single aspect of a unit",
+        term IntegrationTest means "A test that verifies the integration of multiple units"        
+    }
+}
+
+Domain TestingDomain {
+    description is "The collective responsibility of carrying out quality assurance"
+}
+
+/* A specific role for frontend-facing executing components */
+Role Executing
