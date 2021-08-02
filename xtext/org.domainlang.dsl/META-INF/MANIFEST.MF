@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.domainlang.dsl
+Bundle-ManifestVersion: 2
+Bundle-Name: org.domainlang.dsl
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.domainlang.dsl; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: org.domainlang.dsl.domainLang.impl,
+ org.domainlang.dsl,
+ org.domainlang.dsl.serializer,
+ org.domainlang.dsl.domainLang.util,
+ org.domainlang.dsl.parser.antlr.internal,
+ org.domainlang.dsl.domainLang,
+ org.domainlang.dsl.parser.antlr,
+ org.domainlang.dsl.scoping,
+ org.domainlang.dsl.services,
+ org.domainlang.dsl.validation,
+ org.domainlang.dsl.generator
+Import-Package: org.apache.log4j

@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.domainlang.dsl.tests
+Bundle-ManifestVersion: 2
+Bundle-Name: org.domainlang.dsl.tests
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.domainlang.dsl.tests; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.domainlang.dsl,
+ org.junit.jupiter.api;bundle-version="[5.1.0,6.0.0)",
+ org.eclipse.xtext.testing,
+ org.eclipse.xtext.xbase.testing,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: org.domainlang.dsl.tests;x-internal=true
