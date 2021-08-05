@@ -1,6 +1,6 @@
 # The DomainLang idea
 
-Inspired by the [ContextMapper DSL](https://github.com/ContextMapper/context-mapper-dsl), I wanted to try crafting a more complete DDD specification language, one that can be used for diagrams-as-code for DDD and at the same time serve as an explorable, *compilable*, model of a domain-driven architecture.
+Inspired by the [ContextMapper DSL](https://github.com/ContextMapper/context-mapper-dsl), I wanted to try crafting a more complete DDD specification language, one that can be used for diagrams-as-code for DDD and at the same time serve as a semantic and *compilable*, model of a domain-driven architecture.
 
 ## Goals
 
@@ -9,6 +9,8 @@ I want to provide a great IDE experience with code-completion and everything els
 On top of this, I plan to provide diagramming-support through GraphViz or similar, and an exploration UI to inspect your model, probably through a browser.
 
 ## Status so far
+
+This project is still in it's infancy. Feedback is much appreciated 🤩
 
 I am currently exploring three paths:
 - `/xtext` is the original DSL platform and the one used by ContextMapper. This seems quite entangled in [Eclipse/Java](https://www.eclipse.org/Xtext/), which I don't like, but I'll keep an open mind
