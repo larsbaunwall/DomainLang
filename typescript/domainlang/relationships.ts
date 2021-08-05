@@ -1,16 +1,20 @@
 import { BoundedContext } from ".";
 
-interface me {}
-export const me: me = {};
+type Me = {}
+
+/**
+ * Represents the current structure element
+ */
+export const me: Me = {};
 
 export interface CustomerSupplier {
-  customer: BoundedContext | me;
-  supplier: BoundedContext | me;
+  customer: BoundedContext | Me;
+  supplier: BoundedContext | Me;
 }
 
 export interface UpstreamDownstream {
-  upstream: BoundedContext | me;
-  downstream: BoundedContext | me;
+  upstream: BoundedContext | Me;
+  downstream: BoundedContext | Me;
 }
 
 export type Relationship = CustomerSupplier | UpstreamDownstream;

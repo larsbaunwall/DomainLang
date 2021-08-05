@@ -1,9 +1,11 @@
-import { Domain, BoundedContext, me } from "./domainlang";
+import { BoundedContext, me, ContextMap, Domain } from "./domainlang";
 
 /* Examples */
 
 const LoginContext: BoundedContext = {
   description: "Credential management",
+  type:"",
+  name:""
 };
 
 const ProfileContext: BoundedContext = {
@@ -16,6 +18,13 @@ const ProfileContext: BoundedContext = {
   ],
 };
 
-const UserDomain: Domain = {
+const UserDomain = new Domain({
   contains: [LoginContext, ProfileContext],
-};
+});
+
+const map: ContextMap = {
+  contains: [UserDomain, LoginContext]
+}
+
+const a = map.contains[0];
+a.constructor.name
