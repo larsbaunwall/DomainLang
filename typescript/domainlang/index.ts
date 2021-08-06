@@ -1,5 +1,0 @@
-export * from './contextMap'
-export * from './domain'
-export * from './boundedContext'
-export * from './relationships'
-export * from './structureElement'
