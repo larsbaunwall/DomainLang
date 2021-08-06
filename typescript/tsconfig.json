@@ -1,21 +1,20 @@
 {
-    "compilerOptions": {
-        "outDir": "bin",
-        "target": "es6",
-        "lib": [
-            "es6"
-        ],
-        "module": "commonjs",
-        "sourceMap": true,
-        "experimentalDecorators": true,
-        "pretty": true,
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "forceConsistentCasingInFileNames": true,
-        "strictNullChecks": true
-    },
-    "files": [
-        "example.ts"
-    ]
+  "compilerOptions": {
+    "outDir": "bin",
+    "declaration": true,
+    "strict": true,
+    "target": "es6",
+    "lib": ["es6"],
+    "module": "commonjs",
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "pretty": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictNullChecks": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/__tests__/*"]
 }
