@@ -1,84 +1,69 @@
-grammar DomainLang hidden(WS, SL_COMMENT, ML_COMMENT)
-
-terminal WS: /\s+/;
-terminal ID returns string: /[_a-zA-Z][\w_]*/;
-terminal INT returns number: /[0-9]+/;
-terminal STRING: /"[^"]*"|'[^']*'/;
-
-terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
-terminal SL_COMMENT: /\/\/[^\n\r]*/;
+grammar DomainLang
+hidden(WS, SL_COMMENT, ML_COMMENT)
 
 DomainLang: (
         (fileComment=SL_COMMENT | fileComment=ML_COMMENT)?
-        /*(imports+=Import)**/
+        (imports+=Import)*
         (definitions+=StructureElement)*
-        /*
-        (boundedContexts+=BoundedContext)*
-        (domains+=Domain)*
-        (contextMaps+=ContextMap)*
-        (roles+=Role)*
-        */
     )
 ;
 
-/*
 Import:
     'import' importURI=STRING;
-*/
 
 StructureElement: 
-    ContextMap | 
-    BoundedContext | 
-    Domain | 
-    Role |
-    AbstractDecision;
+    ContextMapRule | 
+    BoundedContextRule | 
+    DomainRule | 
+    RoleRule |
+    AbstractDecisionRule;
 
-ContextMap:
+ContextMapRule:
     (comment=SL_COMMENT | comment=ML_COMMENT)?
     'ContextMap' name=ID
     '{'
-        ('contains' boundedContexts += [BoundedContext] ("," boundedContexts += [BoundedContext])*)*
+        ('contains' boundedContexts += [BoundedContextRule] ("," boundedContexts += [BoundedContextRule])*)*
     '}'
 ;
 
-BoundedContext:
+BoundedContextRule:
     (comment=SL_COMMENT | comment=ML_COMMENT)?
-    'BoundedContext' name=ID ('in' (inDomain+=[Domain]) ("," inDomain+=[Domain])*)?
+    'BoundedContext' name=ID ('in' (inDomain+=[DomainRule]) ("," inDomain+=[DomainRule])*)?
     '{'
         ('description' ('is')? description=STRING)?
         ('classifiers' '{'
-            ('roleClassifier' ('is')? roleClassifier=[Role])?
-            ('domainClassifier' ('is')? domainClassifier=[Classification])?
-            ('businessModel' ('is')? businessModel=[Classification])?
-            ('evolution' ('is')? evolution=[Classification])?
+            ('role' ('is')? roleClassifier=[RoleRule])?
+            ('domain' ('is')? domainClassifier=[ClassificationRule])?
+            ('business' ('is')? businessModel=[ClassificationRule])?
+            ('evolution' ('is')? evolution=[ClassificationRule])?
         '}')?
         ('terminology' '{' 
             domainTerminology += DomainTerm ("," domainTerminology += DomainTerm)* 
         '}')?
         ('decisions' '{' 
-            decisions += AbstractDecision ("," decisions += AbstractDecision)* 
+            decisions += AbstractDecisionRule ("," decisions += AbstractDecisionRule)* 
         '}')?
     '}'
 ;
 
-Domain:
+DomainRule:
     (comment=SL_COMMENT | comment=ML_COMMENT)?
-    'Domain' name=ID ('partof' parentDomain=[Domain])?
+    'Domain' name=ID ('partof' parentDomain=[DomainRule])?
     '{'
         ('description' ('is')? description=STRING)?
-        ('classifier' ('is')? classifier=[Classification])?
+        ('classifier' ('is')? classifier=[ClassificationRule])?
     '}'
 ;
 
 /*
 Classifications
 */
-Classification:
+ClassificationRule:
     (comment=SL_COMMENT | comment=ML_COMMENT)?
     'Classification' name=ID
 ;
 
-Role:
+RoleRule:
     (comment=SL_COMMENT | comment=ML_COMMENT)?
     'Role' name=ID
 ;
@@ -87,7 +72,7 @@ Role:
 /* 
 Ubiquitous language definitions
 */
-AbstractDecision:
+AbstractDecisionRule:
     Decision |
     Policy |
     BusinessRule;
@@ -106,3 +91,13 @@ BusinessRule:
 DomainTerm:
     'term' name=ID ('means' meaning=STRING)
 ;
+
+
+
+terminal WS: /\s+/;
+terminal ID: /[_a-zA-Z][\w_]*/;
+terminal INT returns number: /[0-9]+/;
+terminal STRING: /"[^"]*"|'[^']*'/;
+
+terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
+terminal SL_COMMENT: /\/\/[^\n\r]*/;

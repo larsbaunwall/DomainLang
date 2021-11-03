@@ -6,11 +6,8 @@
   ],
   "patterns": [
     {
-      "include": "#comments"
-    },
-    {
       "name": "keyword.control.domain-lang",
-      "match": "\\b(BoundedContext|business|Classification|classifier|classifiers|contains|ContextMap|decision|decisions|description|Domain|domain|evolution|import|in|is|means|partof|policy|Role|role|rule|term|terminology|where)\\b"
+      "match": "\\b(BoundedContext|businessModel|Classification|classifier|classifiers|contains|ContextMap|decision|decisions|description|Domain|domainClassifier|evolution|in|is|means|partof|policy|Role|roleClassifier|rule|term|terminology|where)\\b"
     },
     {
       "name": "keyword.symbol.domain-lang",
@@ -36,10 +33,10 @@
           }
         },
         {
-          "begin": "//",
+          "begin": "(^\\s+)?(?=//)",
           "beginCaptures": {
             "1": {
-              "name": "punctuation.whitespace.comment.leading.domain-lang"
+              "name": "punctuation.whitespace.comment.leading.cs"
             }
           },
           "end": "(?=$)",

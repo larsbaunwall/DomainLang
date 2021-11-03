@@ -1,0 +1,9 @@
+{
+    "languageId": "domain-lang",
+    "grammar": "src/language-server/domain-lang.langium",
+    "fileExtensions": [".dlang"],
+    "out": "src/language-server/generated",
+    "textMate": {
+        "out": "syntaxes/domain-lang.tmLanguage.json"
+    }
+}
