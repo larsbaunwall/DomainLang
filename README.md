@@ -21,7 +21,7 @@ I am new to designing DSLs, the Language Server Protocol in VSCode, and GraphViz
 
 ### Discarded ideas
 
-- The xtext-based approach is heavily entangled in the Eclipse/java ecosystem. I am aiming at providing a modern and integrated experience with newer IDEs (e.g. VSCode), why this approach has been discarded
+- The xtext-based approach is heavily entangled in the Eclipse/java ecosystem. I am aiming at providing a modern and integrated experience with simpler IDEs (e.g. VSCode), why this approach has been discarded
 - A pure typescript approach, though attractive at first, is discarded due to complexity in package management and dependency management. This idea might be revisited in the future
 
 ## Get in touch
