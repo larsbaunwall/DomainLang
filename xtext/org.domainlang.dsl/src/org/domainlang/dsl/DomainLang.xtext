@@ -1,9 +1,0 @@
-grammar org.domainlang.dsl.DomainLang with org.eclipse.xtext.common.Terminals
-
-generate domainLang "http://www.domainlang.io/dsl/DomainLang"
-
-Model:
-	greetings+=Greeting*;
-	
-Greeting:
-	'Hello' name=ID '!';

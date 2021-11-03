@@ -13,11 +13,16 @@ On top of this, I plan to provide diagramming-support through GraphViz or simila
 This project is still in it's infancy. Feedback is much appreciated 🤩
 
 I am currently exploring three paths:
-- `/xtext` is the original DSL platform and the one used by ContextMapper. This seems quite entangled in [Eclipse/Java](https://www.eclipse.org/Xtext/), which I don't like, but I'll keep an open mind
 - `/dsl/dlang` is based on the recently started [langium project](https://github.com/langium/langium) by the great folks @ TypeFox and looks really interesting. It's purely TypeScript-based and seems very modern, however still in it's infancy
-- `/typescript` is a different approach, inspired by [Pulumi](https://github.com/pulumi), based on a type system and just plain-old-typescript
+~~- `/xtext` is the original DSL platform and the one used by ContextMapper. This seems quite entangled in [Eclipse/Java](https://www.eclipse.org/Xtext/), which I don't like, but I'll keep an open mind~~
+~~- `/typescript` is a different approach, inspired by [Pulumi](https://github.com/pulumi), based on a type system and just plain-old-typescript~~
 
 I am new to designing DSLs, the Language Server Protocol in VSCode, and GraphViz, so this is probably going to be a fun ride :)
+
+### Discarded ideas
+
+- The xtext-based approach is heavily entangled in the Eclipse/java ecosystem. I am aiming at providing a modern and integrated experience with newer IDEs (e.g. VSCode), why this approach has been discarded
+- A pure typescript approach, though attractive at first, is discarded due to complexity in package management and dependency management. This idea might be revisited in the future
 
 ## Get in touch
 
