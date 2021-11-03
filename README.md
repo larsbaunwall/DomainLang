@@ -4,7 +4,7 @@ Inspired by the [ContextMapper DSL](https://github.com/ContextMapper/context-map
 
 ## The language
 
-Go directly to the language implementation [here](/dsl/dlang).
+Go directly to the language implementation [here](dsl/dlang).
 
 ## Goals
 

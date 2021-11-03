@@ -11,4 +11,4 @@ The language is centered around a few central concepts:
 
 ## Usage
 
-Find more example usage in the [/examples](/examples) folder
+Find more example usage in the [examples](examples) folder
