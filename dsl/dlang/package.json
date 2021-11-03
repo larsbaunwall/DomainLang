@@ -10,17 +10,26 @@
         "Programming Languages"
     ],
     "contributes": {
-        "languages": [{
-            "id": "domain-lang",
-            "aliases": ["DomainLang", "domain-lang"],
-            "extensions": [".dlang"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "domain-lang",
-            "scopeName": "source.domain-lang",
-            "path": "./syntaxes/domain-lang.tmLanguage.json"
-        }]
+        "languages": [
+            {
+                "id": "domain-lang",
+                "aliases": [
+                    "DomainLang",
+                    "domain-lang"
+                ],
+                "extensions": [
+                    ".dlang"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "domain-lang",
+                "scopeName": "source.domain-lang",
+                "path": "./syntaxes/domain-lang.tmLanguage.json"
+            }
+        ]
     },
     "activationEvents": [
         "onLanguage:domain-lang"
@@ -39,7 +48,8 @@
         "build": "tsc -b tsconfig.json",
         "watch": "tsc -b tsconfig.json --watch",
         "lint": "eslint src --ext ts",
-        "langium:generate": "langium generate"
+        "langium:generate": "langium generate",
+        "gen:build": "npm run langium:generate && npm run build"
     },
     "dependencies": {
         "colors": "^1.4.0",
