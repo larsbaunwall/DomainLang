@@ -2,6 +2,10 @@
 
 Inspired by the [ContextMapper DSL](https://github.com/ContextMapper/context-mapper-dsl), I wanted to try crafting a more complete DDD specification language, one that can be used for diagrams-as-code for DDD and at the same time serve as a semantic and *compilable*, model of a domain-driven architecture.
 
+## The language
+
+Go directly to the language implementation [here](/dsl/dlang).
+
 ## Goals
 
 I want to provide a great IDE experience with code-completion and everything else you might be used to from coding. Preferably, this is going to work quite easy with VSCode.
@@ -27,3 +31,5 @@ I am new to designing DSLs, the Language Server Protocol in VSCode, and GraphViz
 ## Get in touch
 
 I would love to hear from you! Please submit an issue here, and I will try to get back to you as soon as possible.
+
+Feedback is very welcomed - especially if you have experience from language design or domain-driven design.
