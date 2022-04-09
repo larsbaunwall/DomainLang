@@ -1,4 +1,7 @@
 /* Language testbench */
+Domain TestingDomain {
+    description is "The collective responsibility of carrying out quality assurance"
+}
 
 package DomainModel {
 
@@ -40,4 +43,5 @@ package Roles {
     ContextMap AnotherMap {
         contains DomainModel.CodeInfrastructure
     }
+}
 }
