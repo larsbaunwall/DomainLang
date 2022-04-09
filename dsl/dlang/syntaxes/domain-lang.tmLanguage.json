@@ -6,12 +6,21 @@
   ],
   "patterns": [
     {
-      "name": "keyword.control.domain-lang",
-      "match": "\\b(BoundedContext|businessModel|Classification|classifier|classifiers|contains|ContextMap|decision|decisions|description|Domain|domainClassifier|evolution|in|is|means|partof|policy|Role|roleClassifier|rule|term|terminology|where)\\b"
+      "include": "#comments"
     },
     {
-      "name": "keyword.symbol.domain-lang",
-      "match": "(\\,|\\{|\\})"
+      "name": "keyword.control.domain-lang",
+      "match": "\\b(BoundedContext|businessModel|Classification|classifier|classifiers|contains|ContextMap|decision|decisions|description|Domain|domain|evolution|in|is|means|package|partof|policy|Role|role|rule|term|terminology|where)\\b"
+    },
+    {
+      "name": "string.quoted.double.domain-lang",
+      "begin": "\"",
+      "end": "\""
+    },
+    {
+      "name": "string.quoted.single.domain-lang",
+      "begin": "'",
+      "end": "'"
     }
   ],
   "repository": {
@@ -33,10 +42,10 @@
           }
         },
         {
-          "begin": "(^\\s+)?(?=//)",
+          "begin": "//",
           "beginCaptures": {
             "1": {
-              "name": "punctuation.whitespace.comment.leading.cs"
+              "name": "punctuation.whitespace.comment.leading.domain-lang"
             }
           },
           "end": "(?=$)",

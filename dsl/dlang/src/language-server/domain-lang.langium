@@ -1,54 +1,42 @@
-grammar DomainLang hidden(WS, SL_COMMENT, ML_COMMENT)
+grammar DomainLang
 
-terminal WS: /\s+/;
-terminal ID returns string: /[_a-zA-Z][\w_]*/;
-terminal INT returns number: /[0-9]+/;
-terminal STRING: /"[^"]*"|'[^']*'/;
-
-terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
-terminal SL_COMMENT: /\/\/[^\n\r]*/;
-
-DomainLang: (
-        (fileComment=SL_COMMENT | fileComment=ML_COMMENT)?
-        /*(imports+=Import)**/
-        (definitions+=StructureElement)*
-        /*
-        (boundedContexts+=BoundedContext)*
-        (domains+=Domain)*
-        (contextMaps+=ContextMap)*
-        (roles+=Role)*
-        */
-    )
+entry Model: 
+        (elements+=StructureElement)*
 ;
 
-/*
-Import:
-    'import' importURI=STRING;
-*/
-
 StructureElement: 
+    Type |
+    PackageDeclaration
+;
+
+Type:
     ContextMap | 
     BoundedContext | 
     Domain | 
     Role |
-    AbstractDecision;
+    Classification
+;
+
+PackageDeclaration:
+    'package' name=QualifiedName '{'
+        (elements+=StructureElement)*
+    '}'
+;
 
 ContextMap:
-    (comment=SL_COMMENT | comment=ML_COMMENT)?
     'ContextMap' name=ID
     '{'
-        ('contains' boundedContexts += [BoundedContext] ("," boundedContexts += [BoundedContext])*)*
+        ('contains' boundedContexts += [BoundedContext:QualifiedName] ("," boundedContexts += [BoundedContext:QualifiedName])*)*
     '}'
 ;
 
 BoundedContext:
-    (comment=SL_COMMENT | comment=ML_COMMENT)?
-    'BoundedContext' name=ID ('in' (inDomain+=[Domain]) ("," inDomain+=[Domain])*)?
+    'BoundedContext' name=QualifiedName ('in' (inDomain+=[Domain]) ("," inDomain+=[Domain])*)?
     '{'
         ('description' ('is')? description=STRING)?
         ('classifiers' '{'
-            ('roleClassifier' ('is')? roleClassifier=[Role])?
-            ('domainClassifier' ('is')? domainClassifier=[Classification])?
+            ('role' ('is')? roleClassifier=[Role])?
+            ('domain' ('is')? domainClassifier=[Classification])?
             ('businessModel' ('is')? businessModel=[Classification])?
             ('evolution' ('is')? evolution=[Classification])?
         '}')?
@@ -56,13 +44,12 @@ BoundedContext:
             domainTerminology += DomainTerm ("," domainTerminology += DomainTerm)* 
         '}')?
         ('decisions' '{' 
-            decisions += AbstractDecision ("," decisions += AbstractDecision)* 
+            decisions += AbstractDecision
         '}')?
     '}'
 ;
 
 Domain:
-    (comment=SL_COMMENT | comment=ML_COMMENT)?
     'Domain' name=ID ('partof' parentDomain=[Domain])?
     '{'
         ('description' ('is')? description=STRING)?
@@ -74,22 +61,19 @@ Domain:
 Classifications
 */
 Classification:
-    (comment=SL_COMMENT | comment=ML_COMMENT)?
     'Classification' name=ID
 ;
 
 Role:
-    (comment=SL_COMMENT | comment=ML_COMMENT)?
     'Role' name=ID
 ;
-
 
 /* 
 Ubiquitous language definitions
 */
-AbstractDecision:
-    Decision |
-    Policy |
+AbstractDecision: 
+    Decision | 
+    Policy | 
     BusinessRule;
 
 Decision:
@@ -102,7 +86,18 @@ BusinessRule:
     'rule' name=ID 'where' value=STRING
 ;
 
-
 DomainTerm:
     'term' name=ID ('means' meaning=STRING)
 ;
+
+QualifiedName returns string:
+    ID ('.' ID)*
+;
+
+hidden terminal WS: /\s+/;
+terminal ID: /[_a-zA-Z][\w_]*/;
+terminal INT returns number: /[0-9]+/;
+terminal STRING: /"[^"]*"|'[^']*'/;
+
+hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
+hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;

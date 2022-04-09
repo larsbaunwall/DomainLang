@@ -1,0 +1,12 @@
+{
+    "projectName": "DomainLang",
+    "languages": [{
+        "id": "domain-lang",
+        "grammar": "src/language-server/domain-lang.langium",
+        "fileExtensions": [".dlang"],
+        "textMate": {
+            "out": "syntaxes/domain-lang.tmLanguage.json"
+        }
+    }],
+    "out": "src/language-server/generated"
+}

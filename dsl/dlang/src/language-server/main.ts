@@ -5,8 +5,8 @@ import { createDomainLangServices } from './domain-lang-module';
 // Create a connection to the client
 const connection = createConnection(ProposedFeatures.all);
 
-// Inject the language services
-const services = createDomainLangServices({ connection });
+// Inject the shared services and language-specific services
+const { shared } = createDomainLangServices({ connection });
 
-// Start the language server with the language-specific services
-startLanguageServer(services);
+// Start the language server with the shared services
+startLanguageServer(shared);

@@ -1,23 +1,43 @@
 /* Language testbench */
 
-BoundedContext CodeInfrastructure in TestingDomain {
-    description is "Components in the automated instrumentation pipeline"
-    classifiers {
-        roleClassifier is Executing
+package DomainModel {
 
+    ContextMap TestMap {
+        contains DomainModel.CodeInfrastructure, DomainModel.Test 
+    }
+
+    /* The structures under test */
+    BoundedContext CodeInfrastructure in TestingDomain {
+        description is "Components in the automated instrumentation pipeline"
+        classifiers {
+            role is Executing 
+        }
+        decisions {
+            policy FailFast where "Failing tests must fail the entire suite"
+        }
+    }
+
+    /* Where the tests run */
+    BoundedContext Test in TestingDomain {
+        terminology {
+            term UnitTest means "A test that verifies a single aspect of a unit",
+            term IntegrationTest means "A test that verifies the integration of multiple units"        
+        }
+    }
+
+    Domain TestingDomain {
+        description is "The collective responsibility of carrying out quality assurance"
+    }
+
+    /* A specific role for frontend-facing executing components */
+    Role Executing
+    Classification Canary
+}
+
+package Roles {
+    Role Executing
+
+    ContextMap AnotherMap {
+        contains DomainModel.CodeInfrastructure
     }
 }
-
-BoundedContext Test in TestingDomain {
-    terminology {
-        term UnitTest means "A test that verifies a single aspect of a unit",
-        term IntegrationTest means "A test that verifies the integration of multiple units"        
-    }
-}
-
-Domain TestingDomain {
-    description is "The collective responsibility of carrying out quality assurance"
-}
-
-/* A specific role for frontend-facing executing components */
-Role Executing
