@@ -6,7 +6,7 @@ Domain TestingDomain {
 package DomainModel {
 
     ContextMap TestMap {
-        contains DomainModel.CodeInfrastructure, DomainModel.Test 
+        contains CodeInfrastructure, DomainModel.nested.Test
     }
 
     /* The structures under test */
@@ -20,22 +20,25 @@ package DomainModel {
         }
     }
 
-    /* Where the tests run */
-    BoundedContext Test in TestingDomain {
-        terminology {
-            term UnitTest means "A test that verifies a single aspect of a unit",
-            term IntegrationTest means "A test that verifies the integration of multiple units"        
+
+    package nested {
+        /* Where the tests run */
+        BoundedContext Test in TestingDomain {
+            terminology {
+                term UnitTest means "A test that verifies a single aspect of a unit",
+                term IntegrationTest means "A test that verifies the integration of multiple units"        
+            }
+        }
+
+        Domain TestingDomain {
+            description is "The collective responsibility of carrying out quality assurance"
         }
     }
-
-    Domain TestingDomain {
-        description is "The collective responsibility of carrying out quality assurance"
-    }
-
     /* A specific role for frontend-facing executing components */
     Role Executing
     Classification Canary
 }
+
 
 package Roles {
     Role Executing

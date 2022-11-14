@@ -31,7 +31,7 @@ ContextMap:
 ;
 
 BoundedContext:
-    'BoundedContext' name=QualifiedName ('in' (inDomain+=[Domain]) ("," inDomain+=[Domain])*)?
+    'BoundedContext' name=ID ('in' (inDomain+=[Domain:QualifiedName]))?
     '{'
         ('description' ('is')? description=STRING)?
         ('classifiers' '{'
@@ -50,7 +50,7 @@ BoundedContext:
 ;
 
 Domain:
-    'Domain' name=ID ('partof' parentDomain=[Domain])?
+    'Domain' name=ID ('partof' parentDomain=[Domain:QualifiedName])?
     '{'
         ('description' ('is')? description=STRING)?
         ('classifier' ('is')? classifier=[Classification])?

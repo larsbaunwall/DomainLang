@@ -4,7 +4,10 @@ import {
 } from 'langium';
 import { DomainLangGeneratedModule, DomainLangGeneratedSharedModule } from './generated/module';
 import { DomainLangValidationRegistry, DomainLangValidator } from './domain-lang-validator';
-
+import { DomainLangScopeComputation } from './features/domain-lang-scope';
+import { DomainLangNameProvider } from './features/domain-lang-naming';
+import { DomainLangFormatter } from './features/domain-lang-formatter';
+import { DomainLangRenameProvider } from './features/domain-lang-rename-refactoring';
 /**
  * Declaration of custom services - add your own service classes here.
  */
@@ -26,9 +29,17 @@ export type DomainLangServices = LangiumServices & DomainLangAddedServices
  * selected services, while the custom services must be fully specified.
  */
 export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices & DomainLangAddedServices> = {
+    references: {
+        ScopeComputation: (services) => new DomainLangScopeComputation(services),
+        NameProvider: () => new DomainLangNameProvider()
+    },
     validation: {
         ValidationRegistry: (services) => new DomainLangValidationRegistry(services),
         DomainLangValidator: () => new DomainLangValidator()
+    },
+    lsp: {
+        Formatter: () => new DomainLangFormatter(),
+        RenameProvider: (services) => new DomainLangRenameProvider(services)
     }
 };
 
