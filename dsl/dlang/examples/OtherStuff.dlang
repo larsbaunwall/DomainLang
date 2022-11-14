@@ -1,0 +1,11 @@
+/* To illustrate multifile support (Langium indexes the entire workspace) */
+
+package OtherStuff {
+    Role Executing
+
+    ContextMap AnotherMap {
+        contains DomainModel.CodeInfrastructure
+    }
+
+    BoundedContext AnotherBC {}
+}

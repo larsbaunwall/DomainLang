@@ -6,7 +6,7 @@ Domain TestingDomain {
 package DomainModel {
 
     ContextMap TestMap {
-        contains CodeInfrastructure, DomainModel.nested.Test
+        contains CodeInfrastructure, OtherStuff.AnotherBC
     }
 
     /* The structures under test */
@@ -37,13 +37,4 @@ package DomainModel {
     /* A specific role for frontend-facing executing components */
     Role Executing
     Classification Canary
-}
-
-
-package Roles {
-    Role Executing
-
-    ContextMap AnotherMap {
-        contains DomainModel.CodeInfrastructure
-    }
 }
