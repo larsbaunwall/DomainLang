@@ -47,7 +47,7 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
  * @param context Optional module context with the LSP connection
  * @returns An object wrapping the shared services and the language-specific services
  */
-export function createDomainLangServices(context?: DefaultSharedModuleContext): {
+export function createDomainLangServices(context: DefaultSharedModuleContext): {
     shared: LangiumSharedServices,
     DomainLang: DomainLangServices
 } {
