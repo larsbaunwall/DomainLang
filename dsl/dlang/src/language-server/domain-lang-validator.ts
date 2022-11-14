@@ -1,5 +1,5 @@
 import { ValidationAcceptor, ValidationChecks, ValidationRegistry } from 'langium';
-import { DomainLangAstType, Person } from './generated/ast';
+import { DomainLangAstType, Domain } from './generated/ast';
 import type { DomainLangServices } from './domain-lang-module';
 
 /**
@@ -10,7 +10,7 @@ export class DomainLangValidationRegistry extends ValidationRegistry {
         super(services);
         const validator = services.validation.DomainLangValidator;
         const checks: ValidationChecks<DomainLangAstType> = {
-            Person: validator.checkPersonStartsWithCapital
+            Domain: validator.noopValidation
         };
         this.register(checks, validator);
     }
@@ -21,13 +21,15 @@ export class DomainLangValidationRegistry extends ValidationRegistry {
  */
 export class DomainLangValidator {
 
-    checkPersonStartsWithCapital(person: Person, accept: ValidationAcceptor): void {
-        if (person.name) {
-            const firstChar = person.name.substring(0, 1);
-            if (firstChar.toUpperCase() !== firstChar) {
-                accept('warning', 'Person name should start with a capital.', { node: person, property: 'name' });
-            }
-        }
+    noopValidation(domain: Domain, accept: ValidationAcceptor): void{
     }
+//   checkPersonStartsWithCapital(person: Person, accept: ValidationAcceptor): void {
+//         if (person.name) {
+//             const firstChar = person.name.substring(0, 1);
+//             if (firstChar.toUpperCase() !== firstChar) {
+//                 accept('warning', 'Person name should start with a capital.', { node: person, property: 'name' });
+//             }
+//         }
+//     }
 
 }
