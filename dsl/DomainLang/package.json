@@ -5,47 +5,37 @@
     "files": [
         "bin"
     ],
+    "type": "module",
     "scripts": {
-        "build": "tsc -b tsconfig.json",
-        "watch": "tsc -b tsconfig.json --watch",
+        "build": "tsc -b tsconfig.json && node esbuild.mjs",
+        "watch": "concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.json --watch\" \"node esbuild.mjs --watch\"",
         "lint": "eslint src --ext ts",
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
-        "vscode:prepublish": "npm run build && npm run lint",
-        "build:worker": "esbuild --minify ./out/language/main-browser.js --bundle --format=iife --outfile=./public/domain-lang-server-worker.js",
-        "prepare:public": "shx mkdir -p ./public && shx cp -fr ./src/static/* ./public/",
-        "copy:monaco-editor-wrapper": "shx cp -fr ./node_modules/monaco-editor-wrapper/bundle ./public/monaco-editor-wrapper",
-        "copy:monaco-workers": "shx cp -fr ./node_modules/monaco-editor-workers/dist/ ./public/monaco-editor-workers",
-        "copy:monarch-syntax": "shx cp -fr ./out/syntaxes/ ./public/syntaxes",
-        "build:web": "npm run build && npm run build:monarch && npm run prepare:public && npm run build:worker && npm run copy:monaco-editor-wrapper && npm run copy:monaco-workers && npm run copy:monarch-syntax",
-        "build:monarch": "tsc -b tsconfig.monarch.json",
-        "serve": "node ./out/web/app.js"
+        "vscode:prepublish": "npm run build && npm run lint"
     },
     "dependencies": {
-        "langium": "~1.2.0",
-        "vscode-languageclient": "~8.0.2",
-        "chalk": "~4.1.2",
-        "commander": "~10.0.0",
-        "express": "~4.18.2",
-        "monaco-editor-workers": "~0.34.2",
-        "monaco-editor-wrapper": "~1.6.0"
+        "langium": "~2.1.0",
+        "vscode-languageclient": "~9.0.1",
+        "vscode-languageserver": "~9.0.1",
+        "chalk": "~5.3.0",
+        "commander": "~11.0.0"
     },
     "devDependencies": {
-        "@types/node": "~16.18.11",
-        "@typescript-eslint/eslint-plugin": "~5.51.0",
-        "@typescript-eslint/parser": "~5.51.0",
-        "eslint": "~8.33.0",
-        "langium-cli": "~1.2.0",
-        "typescript": "~4.9.5",
+        "@types/node": "~16.18.41",
+        "@typescript-eslint/parser": "~6.4.1",
+        "@typescript-eslint/eslint-plugin": "~6.4.1",
+        "eslint": "~8.47.0",
+        "langium-cli": "~2.1.0",
+        "typescript": "~5.1.6",
         "@types/vscode": "~1.67.0",
-        "@types/express": "^4.17.17",
-        "shx": "^0.3.4",
-        "esbuild": "^0.16.14"
+        "concurrently": "~8.2.1",
+        "esbuild": "~0.19.2"
     },
     "displayName": "DomainLang",
     "engines": {
         "vscode": "^1.67.0",
-        "node": ">=14.0.0"
+        "node": ">=16.0.0"
     },
     "categories": [
         "Programming Languages"
@@ -66,15 +56,15 @@
             {
                 "language": "domain-lang",
                 "scopeName": "source.domain-lang",
-                "path": "./syntaxes/domain-lang.tmLanguage.json"
+                "path": "syntaxes/domain-lang.tmLanguage.json"
             }
         ]
     },
     "activationEvents": [
         "onLanguage:domain-lang"
     ],
-    "main": "./out/extension/main.js",
+    "main": "./out/extension/main.cjs",
     "bin": {
-        "domain-lang-cli": "./bin/cli"
+        "domain-lang-cli": "./bin/cli.js"
     }
 }

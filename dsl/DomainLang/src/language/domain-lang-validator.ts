@@ -1,6 +1,6 @@
-import { ValidationAcceptor, ValidationChecks } from 'langium';
-import { DomainLangAstType, Domain } from './generated/ast';
-import type { DomainLangServices } from './domain-lang-module';
+import type { ValidationAcceptor, ValidationChecks } from 'langium';
+import type { DomainLangAstType, Domain } from './generated/ast.js';
+import type { DomainLangServices } from './domain-lang-module.js';
 
 /**
  * Register custom validation checks.

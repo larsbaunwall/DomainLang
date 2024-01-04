@@ -1,6 +1,6 @@
 import type { AstNode } from "langium";
 import { AbstractFormatter, Formatting } from "langium";
-import * as ast from './generated/ast';
+import * as ast from './generated/ast.js';
 
 export class DomainLangFormatter extends AbstractFormatter {
 
