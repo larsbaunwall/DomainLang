@@ -1,0 +1,33 @@
+package CustomerFacing {
+
+    BoundedContext ApplicationFramework {
+        description: "The framework that allows micro-frontends to co-exist in our e-commerce channel"
+        terminology {
+            term micro-frontend : "a small, self-contained frontend application"
+        }
+    }
+
+    BoundedContext Listings implements Inventory {
+        description: "The product listings"
+        classifiers {
+            role: Executing
+        }
+        terminology {
+            term product    : "a product that is for sale"
+            term SKU        : "a stock keeping unit"
+        }
+        decisions {
+            // test
+            policy do_not_allow_orders_without_stock : "do not allow orders for products that are out of stock"
+            
+            //other stuff
+            rule   product_has_a_sku : "a product has a SKU"
+        }
+        
+    }
+
+    /**
+     * Directly involved in executing transactions with the customer
+     */
+    Role Executing
+}
