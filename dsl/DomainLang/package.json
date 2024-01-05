@@ -1,7 +1,23 @@
 {
-    "name": "DomainLang",
-    "description": "Please enter a brief description here",
+    "name": "domain-lang",
     "version": "0.0.1",
+    "displayName": "DomainLang",
+    "description": "A DSL for Domain-Driven Design",
+    "publisher": "larslb",
+    "license": "MIT",
+    "keywords": [
+        "ddd",
+        "domain-driven design",
+        "langium",
+        "dlang"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/larslb/DomainLang"
+    },
+    "bugs": {
+        "url": "https://github.com/larslb/DomainLang/issues"
+    },
     "files": [
         "bin"
     ],
@@ -12,27 +28,28 @@
         "lint": "eslint src --ext ts",
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
-        "vscode:prepublish": "npm run build && npm run lint"
+        "vscode:prepublish-old": "npm run build && npm run lint",
+        "vscode:prepublish": "npm run esbuild-base -- --minify && npm run lint",
+        "esbuild-base": "esbuild ./src/extension/main.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node"
     },
     "dependencies": {
+        "chalk": "~5.3.0",
+        "commander": "~11.0.0",
         "langium": "~2.1.0",
         "vscode-languageclient": "~9.0.1",
-        "vscode-languageserver": "~9.0.1",
-        "chalk": "~5.3.0",
-        "commander": "~11.0.0"
+        "vscode-languageserver": "~9.0.1"
     },
     "devDependencies": {
         "@types/node": "~16.18.41",
-        "@typescript-eslint/parser": "~6.4.1",
+        "@types/vscode": "~1.67.0",
         "@typescript-eslint/eslint-plugin": "~6.4.1",
+        "@typescript-eslint/parser": "~6.4.1",
+        "concurrently": "~8.2.1",
+        "esbuild": "^0.19.11",
         "eslint": "~8.47.0",
         "langium-cli": "~2.1.0",
-        "typescript": "~5.1.6",
-        "@types/vscode": "~1.67.0",
-        "concurrently": "~8.2.1",
-        "esbuild": "~0.19.2"
+        "typescript": "~5.1.6"
     },
-    "displayName": "DomainLang",
     "engines": {
         "vscode": "^1.67.0",
         "node": ">=16.0.0"
@@ -48,7 +65,9 @@
                     "DomainLang",
                     "domain-lang"
                 ],
-                "extensions": [".dlang"],
+                "extensions": [
+                    ".dlang"
+                ],
                 "configuration": "./language-configuration.json"
             }
         ],
