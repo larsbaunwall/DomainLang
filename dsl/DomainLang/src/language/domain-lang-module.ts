@@ -4,6 +4,7 @@ import { DomainLangGeneratedModule, DomainLangGeneratedSharedModule } from './ge
 import { DomainLangValidator, registerValidationChecks } from './domain-lang-validator.js';
 import { QualifiedNameProvider } from './domain-lang-naming.js';
 import { DomainLangScopeComputation } from './domain-lang-scope.js';
+import { DomainLangFormatter } from './domain-lang-formatter.js';
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -14,6 +15,9 @@ export type DomainLangAddedServices = {
     },
     validation: {
         DomainLangValidator: DomainLangValidator
+    },
+    lsp: {
+        Formatter: DomainLangFormatter
     }
 }
 
@@ -35,6 +39,9 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
     references: {
         ScopeComputation: (services) => new DomainLangScopeComputation(services),
         QualifiedNameProvider: () => new QualifiedNameProvider()
+    },
+    lsp: {
+        Formatter: () => new DomainLangFormatter()
     }
 };
 
