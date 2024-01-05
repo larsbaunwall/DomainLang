@@ -26,25 +26,28 @@ PackageDeclaration:
 ContextMap:
     'ContextMap' name=ID
     '{'
-        ('contains' boundedContexts += [BoundedContext:QualifiedName] ("," boundedContexts += [BoundedContext:QualifiedName])*)*
+        ('contains' boundedContexts += [BoundedContext:QualifiedName] ((",")? boundedContexts += [BoundedContext:QualifiedName])*)*
     '}'
 ;
 
 BoundedContext:
-    'BoundedContext' name=ID ('in' (domain=[Domain:QualifiedName]))?
+    'BoundedContext' name=ID ('implements' (domain=[Domain:QualifiedName]))?
     '{'
-        ('description' ('is')? description=STRING)?
+        ('description'Assignment description=STRING)?
+        ('relationships' '{' 
+            relationships += Relationship ((",")? relationships += Relationship)*
+        '}')?
         ('classifiers' '{'
-            ('role' ('is')? roleClassifier=[Role])?
-            ('domain' ('is')? domainClassifier=[Classification])?
-            ('businessModel' ('is')? businessModel=[Classification])?
-            ('evolution' ('is')? evolution=[Classification])?
+            ('role' Assignment roleClassifier=[Role])?
+            ('domain' Assignment domainClassifier=[Classification])?
+            ('businessModel' Assignment businessModel=[Classification])?
+            ('evolution' Assignment evolution=[Classification])?
         '}')?
         ('terminology' '{' 
-            domainTerminology += DomainTerm ("," domainTerminology += DomainTerm)* 
+            (domainTerminology += DomainTerm (",")?)* 
         '}')?
         ('decisions' '{' 
-            decisions += AbstractDecision
+            (decisions += AbstractDecision (',')?)*
         '}')?
     '}'
 ;
@@ -52,10 +55,12 @@ BoundedContext:
 Domain:
     'Domain' name=ID ('partof' parentDomain=[Domain:QualifiedName])?
     '{'
-        ('description' ('is')? description=STRING)?
-        ('classifier' ('is')? classifier=[Classification])?
+        ('description' Assignment description=STRING)?
+        ('classifier' Assignment classifier=[Classification])?
     '}'
 ;
+
+fragment Assignment returns string: (':' | 'is');
 
 /*
 Classifications
@@ -68,6 +73,15 @@ Role:
     'Role' name=ID
 ;
 
+Relationship:
+    Acl | Conformist | UpstreamDownstream;
+
+UpstreamDownstream:
+    'upstream' 'for' downstream=[BoundedContext:QualifiedName] | 'downstream' 'for' upstream=[BoundedContext:QualifiedName];
+
+Acl: 'ACL' name='ACL';
+Conformist: 'CF' name='CF';
+
 /* 
 Ubiquitous language definitions
 */
@@ -77,17 +91,17 @@ AbstractDecision:
     BusinessRule;
 
 Decision:
-    'decision' name=ID 'where' value=STRING
+    'decision' name=ID Assignment value=STRING
 ;
 Policy:
-    'policy' name=ID 'where' value=STRING
+    'policy' name=ID Assignment value=STRING
 ;
 BusinessRule:
-    'rule' name=ID 'where' value=STRING
+    'rule' name=ID Assignment value=STRING
 ;
 
 DomainTerm:
-    'term' name=ID ('means' meaning=STRING)
+    'term' name=ID (Assignment meaning=STRING)
 ;
 
 QualifiedName returns string:
@@ -95,7 +109,7 @@ QualifiedName returns string:
 ;
 
 hidden terminal WS: /\s+/;
-terminal ID: /[_a-zA-Z][\w_]*/;
+terminal ID: /[_a-zA-Z][\w_-]*/;
 terminal INT returns number: /[0-9]+/;
 terminal STRING: /"(\\.|[^"\\])*"|'(\\.|[^'\\])*'/;
 
