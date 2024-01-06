@@ -1,7 +1,8 @@
-
 <img src="images/icon.png" width="100" />
 
 # The DomainLang idea
+
+[![Visual Studio Marketplace](https://vsmarketplacebadges.dev/version/thinkability.domain-lang.svg)](https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang)
 
 Inspired by the [ContextMapper DSL](https://github.com/ContextMapper/context-mapper-dsl), I wanted to try crafting a more complete DDD specification language, one that can be used for diagrams-as-code for DDD and at the same time serve as a semantic and *compilable*, model of a domain-driven architecture.
 
