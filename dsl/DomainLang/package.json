@@ -6,7 +6,7 @@
     "description": "A DSL for Domain-Driven Design",
     "publisher": "thinkability",
     "author": "larsbaunwall",
-    "license": "MIT",
+    "license": "Apache License 2.0",
     "icon": "images/icon.png",
     "keywords": [
         "ddd",
