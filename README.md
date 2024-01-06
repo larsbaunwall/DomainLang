@@ -1,3 +1,5 @@
+![DomainLang](images/icon.png)
+
 # The DomainLang idea
 
 Inspired by the [ContextMapper DSL](https://github.com/ContextMapper/context-mapper-dsl), I wanted to try crafting a more complete DDD specification language, one that can be used for diagrams-as-code for DDD and at the same time serve as a semantic and *compilable*, model of a domain-driven architecture.

@@ -1,10 +1,13 @@
 {
+    "private": true,
     "name": "domain-lang",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "displayName": "DomainLang",
     "description": "A DSL for Domain-Driven Design",
-    "publisher": "larslb",
+    "publisher": "thinkability",
+    "author": "larsbaunwall",
     "license": "MIT",
+    "icon": "images/icon.png",
     "keywords": [
         "ddd",
         "domain-driven design",
@@ -13,10 +16,10 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/larslb/DomainLang"
+        "url": "https://github.com/larsbaunwall/DomainLang"
     },
     "bugs": {
-        "url": "https://github.com/larslb/DomainLang/issues"
+        "url": "https://github.com/larsbaunwall/DomainLang/issues"
     },
     "files": [
         "bin"
