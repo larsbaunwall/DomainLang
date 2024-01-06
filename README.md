@@ -1,4 +1,5 @@
-![DomainLang](images/icon.png)
+
+<img src="images/icon.png" width="100" />
 
 # The DomainLang idea
 
