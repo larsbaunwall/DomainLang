@@ -4,8 +4,8 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import type { PackageDeclaration } from './generated/ast.js';
-import { isPackageDeclaration } from './generated/ast.js';
+import type { Container, PackageDeclaration } from './generated/ast.js';
+import { isModel, isPackageDeclaration } from './generated/ast.js';
 
 export function toQualifiedName(pack: PackageDeclaration, childName: string): string {
     return (isPackageDeclaration(pack.$container) ? toQualifiedName(pack.$container, pack.name) : pack.name) + '.' + childName;
@@ -19,8 +19,8 @@ export class QualifiedNameProvider {
      * @param name simple name
      * @returns qualified name separated by `.`
      */
-    getQualifiedName(qualifier: PackageDeclaration | string, name: string): string {
-        let prefix = qualifier;
+    getQualifiedName(qualifier: Container | string, name: string): string {
+        let prefix = isModel(qualifier) ? '' : qualifier;
         if (isPackageDeclaration(prefix)) {
             prefix = (isPackageDeclaration(prefix.$container)
                 ? this.getQualifiedName(prefix.$container, prefix.name) : prefix.name);

@@ -1,8 +1,10 @@
 grammar DomainLang
 
 entry Model: 
-        (elements+=StructureElement)*
+        (children+=StructureElement)*
 ;
+
+type Container = PackageDeclaration | Model;
 
 StructureElement: 
     Type |
@@ -19,7 +21,7 @@ Type:
 
 PackageDeclaration:
     'package' name=QualifiedName '{'
-        (elements+=StructureElement)*
+        (children+=StructureElement)*
     '}'
 ;
 
@@ -55,7 +57,7 @@ BoundedContext:
 Domain:
     'Domain' name=ID ('partof' parentDomain=[Domain:QualifiedName])?
     '{'
-        ('description' Assignment description=STRING)?
+        ('vision' Assignment vision=STRING)?
         ('classifier' Assignment classifier=[Classification])?
     '}'
 ;

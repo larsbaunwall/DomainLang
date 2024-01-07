@@ -5,6 +5,7 @@ import { DomainLangValidator, registerValidationChecks } from './domain-lang-val
 import { QualifiedNameProvider } from './domain-lang-naming.js';
 import { DomainLangScopeComputation } from './domain-lang-scope.js';
 import { DomainLangFormatter } from './domain-lang-formatter.js';
+import { DomainLangHoverProvider } from './lsp/domain-lang-hover.js';
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -17,7 +18,8 @@ export type DomainLangAddedServices = {
         DomainLangValidator: DomainLangValidator
     },
     lsp: {
-        Formatter: DomainLangFormatter
+        Formatter: DomainLangFormatter,
+        HoverProvider: DomainLangHoverProvider
     }
 }
 
@@ -41,7 +43,8 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
         QualifiedNameProvider: () => new QualifiedNameProvider()
     },
     lsp: {
-        Formatter: () => new DomainLangFormatter()
+        Formatter: () => new DomainLangFormatter(),
+        HoverProvider: (services) => new DomainLangHoverProvider(services),
     }
 };
 
