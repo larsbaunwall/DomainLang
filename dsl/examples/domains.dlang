@@ -1,15 +1,14 @@
 Domain Ecommerce {
-    description: "The digital marketplace"
+    vision: "The digital marketplace"
 }
 
 Domain Marketplace partof Ecommerce {
-    description: "A place where people can buy and sell things"
+    vision: "A place where people can buy and sell things"
 }
 
 Domain Inventory partof Marketplace {
-    description: "The inventory of the marketplace"
+    vision: "The inventory of the marketplace"
 }
 
 Domain Users partof Marketplace {
-    description: "Users of the marketplace"
 }

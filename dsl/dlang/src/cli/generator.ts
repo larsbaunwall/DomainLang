@@ -1,6 +1,6 @@
 import type { Model } from '../language/generated/ast.js';
 import * as fs from 'node:fs';
-import { CompositeGeneratorNode, NL, toString, JsonSerializer, DefaultJsonSerializer } from 'langium';
+import { CompositeGeneratorNode, NL, toString } from 'langium';
 import * as path from 'node:path';
 import { extractDestinationAndName } from './cli-util.js';
 

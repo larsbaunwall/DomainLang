@@ -1,16 +1,24 @@
 package CustomerFacing {
 
+    ContextMap map {
+        contains CustomerFacing.Listings
+    }
+
+    /*
+    * The CustomerFacing bounded context is responsible for all interactions with the customer.
+    */
     BoundedContext ApplicationFramework {
-        description: "The framework that allows micro-frontends to co-exist in our e-commerce channel"
         terminology {
             term micro-frontend : "a small, self-contained frontend application"
         }
     }
 
+    BoundedContext Listings {}
+
     BoundedContext Listings implements Inventory {
         description: "The product listings"
         classifiers {
-            role: Executing
+            role: Nothing
         }
         terminology {
             term product    : "a product that is for sale"
@@ -31,3 +39,5 @@ package CustomerFacing {
      */
     Role Executing
 }
+
+Role Nothing
