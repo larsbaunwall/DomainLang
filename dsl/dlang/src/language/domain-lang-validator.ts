@@ -57,5 +57,5 @@ function* extractNames(element: Container): Generator<{fqn: string, node: AstNod
             if (isContainer(child)) {
                 yield* extractNames(child);
             }
-    }
+        }
 }

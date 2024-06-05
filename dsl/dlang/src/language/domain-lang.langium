@@ -32,6 +32,9 @@ ContextMap:
     '}'
 ;
 
+/*
+A Bounded Context is the logical encapsulation of a Domain Model
+*/
 BoundedContext:
     'BoundedContext' name=ID ('implements' (domain=[Domain:QualifiedName]))?
     '{'

@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "domain-lang",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "displayName": "DomainLang",
     "description": "A DSL for Domain-Driven Design",
     "publisher": "thinkability",
@@ -22,40 +22,58 @@
         "url": "https://github.com/larsbaunwall/DomainLang/issues"
     },
     "files": [
-        "bin"
+        "bin",
+        "out",
+        "src"
     ],
     "type": "module",
     "scripts": {
-        "build": "tsc -b tsconfig.json && node esbuild.mjs",
-        "watch": "concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.json --watch\" \"node esbuild.mjs --watch\"",
+        "build": "tsc -b tsconfig.src.json && node esbuild.mjs",
+        "watch": "concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.src.json --watch\" \"node esbuild.mjs --watch\"",
         "lint": "eslint src --ext ts",
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
-        "vscode:prepublish-old": "npm run build && npm run lint",
-        "vscode:prepublish": "npm run esbuild-base -- --minify && npm run lint",
-        "esbuild-base": "esbuild ./src/extension/main.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node"
+        "vscode:prepublish": "npm run build && npm run lint",
+        "prepare:static": "node ./scripts/prepare.js",
+        "build:web": "npm run build && npm run prepare:static && npm run build:monarch && npm run build:worker && npm run build:bundle",
+        "build:monarch": "tsc -b tsconfig.monarch.json",
+        "build:bundle": "vite --config ./vite.bundle.config.ts build",
+        "build:worker": "esbuild --minify ./out/language/main-browser.js --bundle --format=iife --outfile=./static/worker/domain-lang-server-worker.js",
+        "dev": "vite",
+        "dev:debug": "vite --debug --force",
+        "serve": "npm run dev",
+        "test": "vitest run"
     },
     "dependencies": {
+        "langium": "~3.0.0",
+        "vscode-languageclient": "~9.0.1",
+        "vscode-languageserver": "~9.0.1",
         "chalk": "~5.3.0",
         "commander": "~11.0.0",
-        "langium": "~2.1.0",
-        "vscode-languageclient": "~9.0.1",
-        "vscode-languageserver": "~9.0.1"
+        "@codingame/monaco-vscode-editor-service-override": "1.83.16",
+        "@codingame/monaco-vscode-keybindings-service-override": "1.83.16",
+        "monaco-editor": "npm:@codingame/monaco-editor-treemended@1.83.16",
+        "monaco-editor-workers": "~0.44.0",
+        "monaco-editor-wrapper": "~3.5.0",
+        "monaco-languageclient": "~7.2.0",
+        "vscode": "npm:@codingame/monaco-vscode-api@1.83.16"
     },
     "devDependencies": {
-        "@types/node": "~16.18.41",
-        "@types/vscode": "~1.67.0",
-        "@typescript-eslint/eslint-plugin": "~6.4.1",
+        "@types/node": "^18.0.0",
         "@typescript-eslint/parser": "~6.4.1",
-        "concurrently": "~8.2.1",
-        "esbuild": "^0.19.11",
+        "@typescript-eslint/eslint-plugin": "~6.4.1",
         "eslint": "~8.47.0",
-        "langium-cli": "~2.1.0",
-        "typescript": "~5.1.6"
+        "langium-cli": "~3.0.0",
+        "typescript": "~5.1.6",
+        "@types/vscode": "~1.67.0",
+        "concurrently": "~8.2.1",
+        "esbuild": "~0.19.2",
+        "vite": "~4.4.11",
+        "vitest": "~1.0.0"
     },
     "engines": {
         "vscode": "^1.67.0",
-        "node": ">=16.0.0"
+        "node": ">=18.0.0"
     },
     "categories": [
         "Programming Languages"
@@ -68,9 +86,7 @@
                     "DomainLang",
                     "domain-lang"
                 ],
-                "extensions": [
-                    ".dlang"
-                ],
+                "extensions": [".dlang"],
                 "configuration": "./language-configuration.json"
             }
         ],
@@ -88,5 +104,13 @@
     "main": "./out/extension/main.cjs",
     "bin": {
         "domain-lang-cli": "./bin/cli.js"
+    },
+    "overrides": {
+        "monaco-editor": "$monaco-editor",
+        "vscode": "$vscode"
+    },
+    "resolutions": {
+        "monaco-editor": "npm:@codingame/monaco-editor-treemended@1.83.16",
+        "vscode": "npm:@codingame/monaco-vscode-api@1.83.16"
     }
 }

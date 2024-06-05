@@ -6,6 +6,9 @@
         "fileExtensions": [".dlang"],
         "textMate": {
             "out": "syntaxes/domain-lang.tmLanguage.json"
+        },
+        "monarch": {
+            "out": "syntaxes/domain-lang.monarch.ts"
         }
     }],
     "out": "src/language/generated"

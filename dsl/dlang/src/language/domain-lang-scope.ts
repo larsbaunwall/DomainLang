@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 import type { AstNode, AstNodeDescription, LangiumDocument, PrecomputedScopes } from 'langium';
-import { DefaultScopeComputation, interruptAndCheck, MultiMap, streamAllContents } from 'langium';
+import { DefaultScopeComputation, interruptAndCheck, MultiMap, AstUtils } from 'langium';
 import { CancellationToken } from 'vscode-jsonrpc';
 import { isType, isPackageDeclaration, PackageDeclaration, Model, Container } from './generated/ast.js';
 import { QualifiedNameProvider } from './domain-lang-naming.js';
@@ -25,7 +25,7 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
      */
     override async computeExports(document: LangiumDocument, cancelToken = CancellationToken.None): Promise<AstNodeDescription[]> {
         const descr: AstNodeDescription[] = [];
-        for (const modelNode of streamAllContents(document.parseResult.value)) {
+        for (const modelNode of AstUtils.streamAllContents(document.parseResult.value)) {
             await interruptAndCheck(cancelToken);
             if (isType(modelNode)) {
                 let name = this.nameProvider.getName(modelNode);
