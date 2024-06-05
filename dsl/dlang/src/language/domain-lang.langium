@@ -8,11 +8,16 @@ type Container = PackageDeclaration | Model;
 
 StructureElement: 
     Type |
+    ObjectMap |
     PackageDeclaration
 ;
 
-Type:
+ObjectMap: 
     ContextMap | 
+    DomainMap
+;
+
+Type:
     BoundedContext | 
     Domain | 
     Role |
@@ -29,6 +34,14 @@ ContextMap:
     'ContextMap' name=ID
     '{'
         ('contains' boundedContexts += [BoundedContext:QualifiedName] ((",")? boundedContexts += [BoundedContext:QualifiedName])*)*
+        (relationships += Relationship ((",")? relationships += Relationship)*)*
+    '}'
+;
+
+DomainMap:
+    'DomainMap' name=ID
+    '{'
+        ('contains' domains += [Domain:QualifiedName] ((",")? domains += [Domain:QualifiedName])*)*
     '}'
 ;
 
@@ -38,7 +51,8 @@ A Bounded Context is the logical encapsulation of a Domain Model
 BoundedContext:
     'BoundedContext' name=ID ('implements' (domain=[Domain:QualifiedName]))?
     '{'
-        ('description'Assignment description=STRING)?
+        ('description' Assignment description=STRING)?
+        ('team' Assignment description=STRING)?
         ('relationships' '{' 
             relationships += Relationship ((",")? relationships += Relationship)*
         '}')?
@@ -58,12 +72,15 @@ BoundedContext:
 ;
 
 Domain:
-    'Domain' name=ID ('partof' parentDomain=[Domain:QualifiedName])?
+    'Domain' name=ID ('in' parentDomain=[Domain:QualifiedName])?
     '{'
         ('vision' Assignment vision=STRING)?
         ('classifier' Assignment classifier=[Classification])?
     '}'
 ;
+
+Team: 
+    'Team' name=ID;
 
 fragment Assignment returns string: (':' | 'is');
 
@@ -79,13 +96,70 @@ Role:
 ;
 
 Relationship:
-    Acl | Conformist | UpstreamDownstream;
+	SymmetricRelationship | UpstreamDownstreamRelationship
+;
 
-UpstreamDownstream:
-    'upstream' 'for' downstream=[BoundedContext:QualifiedName] | 'downstream' 'for' upstream=[BoundedContext:QualifiedName];
+SymmetricRelationship:
+	Partnership | SharedKernel
+;
+
+Partnership:
+	(
+		(participant1 = [BoundedContext:QualifiedName] '[''P'']' '<->' '[''P'']' participant2 = [BoundedContext:QualifiedName]) |
+		('[''P'']' participant1 = [BoundedContext:QualifiedName] '<->' '[''P'']' participant2 = [BoundedContext:QualifiedName]) |
+		(participant1 = [BoundedContext:QualifiedName] '[''P'']' '<->' participant2 = [BoundedContext:QualifiedName] '[''P'']') |
+		('[''P'']' participant1 = [BoundedContext:QualifiedName] '<->' participant2 = [BoundedContext:QualifiedName] '[''P'']') |
+		(participant1 = [BoundedContext:QualifiedName] 'Partnership' participant2 = [BoundedContext:QualifiedName])
+	)
+;
+
+SharedKernel:
+	(
+		(participant1 = [BoundedContext:QualifiedName] '[''SK'']' '<->' '[''SK'']' participant2 = [BoundedContext:QualifiedName]) |
+		('[''SK'']' participant1 = [BoundedContext:QualifiedName] '<->' '[''SK'']' participant2 = [BoundedContext:QualifiedName]) |
+		(participant1 = [BoundedContext:QualifiedName] '[''SK'']' '<->' participant2 = [BoundedContext:QualifiedName] '[''SK'']') |
+		('[''SK'']' participant1 = [BoundedContext:QualifiedName] '<->' participant2 = [BoundedContext:QualifiedName] '[''SK'']') |
+		(participant1 = [BoundedContext:QualifiedName] 'Shared-Kernel' participant2 = [BoundedContext:QualifiedName]) |
+		(participant1 = [BoundedContext:QualifiedName] '<->' participant2 = [BoundedContext:QualifiedName])
+	)
+;
+
+
+UpstreamDownstreamRelationship:
+	CustomerSupplierRelationship |
+	(
+		(
+			(upstream = [BoundedContext:QualifiedName] (('[''U'']') | ('['('U'',')?(upstreamRoles+=UpstreamRole) (',' upstreamRoles+=UpstreamRole)*)']')? '->' (('[''D'']') | ('['('D'',')?(downstreamRoles+=DownstreamRole) (',' downstreamRoles+=DownstreamRole)*)']')? downstream = [BoundedContext:QualifiedName]) |
+			(downstream = [BoundedContext:QualifiedName] (('[''D'']') | ('['('D'',')?(downstreamRoles+=DownstreamRole) (',' downstreamRoles+=DownstreamRole)*)']')? '<-' (('[''U'']') | ('['('U'',')?(upstreamRoles+=UpstreamRole) (',' upstreamRoles+=UpstreamRole)*)']')? upstream = [BoundedContext:QualifiedName]) |
+			(upstream = [BoundedContext:QualifiedName] ('['((upstreamRoles+=UpstreamRole) (',' upstreamRoles+=UpstreamRole)*)?']')?'Upstream-Downstream'('['((downstreamRoles+=DownstreamRole) (',' downstreamRoles+=DownstreamRole)*)?']')? downstream = [BoundedContext:QualifiedName]) |
+			(downstream = [BoundedContext:QualifiedName] ('['((downstreamRoles+=DownstreamRole) (',' downstreamRoles+=DownstreamRole)*)?']')?'Downstream-Upstream'('['((upstreamRoles+=UpstreamRole) (',' upstreamRoles+=UpstreamRole)*)?']')? upstream = [BoundedContext:QualifiedName])
+		)
+	)
+;
+
+CustomerSupplierRelationship:
+	(
+		(
+			(upstream = [BoundedContext:QualifiedName] '['('U'',')?'S'(','(upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']' '->' '['('D'',')?'C'(','(downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']' downstream = [BoundedContext:QualifiedName]) |
+			(downstream = [BoundedContext:QualifiedName] '['('D'',')?'C'(','(downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']' '<-' '['('U'',')?'S'(','(upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']' upstream = [BoundedContext:QualifiedName]) |
+			(downstream = [BoundedContext:QualifiedName] ('['((downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']')?'Customer-Supplier'('['((upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']')? upstream = [BoundedContext:QualifiedName]) |
+			(upstream = [BoundedContext:QualifiedName] ('['((upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']')?'Supplier-Customer'('['((downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']')? downstream = [BoundedContext:QualifiedName])
+		)
+	)
+;
+
 
 Acl: 'ACL' name='ACL';
 Conformist: 'CF' name='CF';
+PublishedLanguage: 'PL' name='PL';
+OpenHostService: 'OHS' name='OHS';
+
+UpstreamRole: PublishedLanguage | OpenHostService
+;
+
+DownstreamRole: Acl | Conformist
+;
+
 
 /* 
 Ubiquitous language definitions

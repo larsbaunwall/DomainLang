@@ -1,7 +1,9 @@
 package CustomerFacing {
 
     ContextMap map {
-        contains CustomerFacing.Listings
+        ApplicationFramework [U,CF] -> [D,OHS] ApplicationFramework
+        Listings <-> ApplicationFramework
+        ApplicationFramework [SK] <-> Listings [SK]
     }
 
     /*
@@ -12,8 +14,6 @@ package CustomerFacing {
             term micro-frontend : "a small, self-contained frontend application"
         }
     }
-
-    BoundedContext Listings {}
 
     BoundedContext Listings implements Inventory {
         description: "The product listings"
