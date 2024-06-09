@@ -6,6 +6,10 @@ domain SupplyChain {
     vision: "Timely sourcing of relevant products"
 }
 
+domain Orders in Ordering {
+    vision is "Orders vision"
+}
+
 DomainMap FulfilmentMap {
     contains 
         Ordering,

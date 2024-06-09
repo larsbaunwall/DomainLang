@@ -30,8 +30,8 @@ describe('Parsing tests', () => {
         let document = await parseTestFile('domain-model.dlang');
         let domains = document.parseResult.value?.children.filter(e => isDomain(e));
 
-        expect(domains.length).toBe(2);
-        expect(domains.map(e => e.name).join(',')).toBe('Ordering,SupplyChain');
+        expect(domains.length).toBe(3);
+        expect(domains.map(e => e.name).join(',')).toBe('Ordering,SupplyChain,Orders');
         expect(domains.map(d => d as Domain).map(d => d.vision).every(v => v !== undefined)).toBe(true);
     });
 
@@ -41,6 +41,14 @@ describe('Parsing tests', () => {
 
         expect(domain.vision).toBeDefined();
         expect(domain.vision).toBe('Impeccable one-click ordering process');
+
+    });
+
+    test('parse a subdomain', async () => {
+        let document = await parseTestFile('domain-model.dlang');
+        let domain = document.parseResult.value?.children.find(e => isDomain(e) && e.name === 'Orders') as Domain;
+
+        expect(domain.parentDomain?.ref?.name).toBe('Ordering');
 
     });
 
