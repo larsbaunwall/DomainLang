@@ -39,7 +39,7 @@ ContextMap:
 ;
 
 DomainMap:
-    'DomainMap' name=ID
+    ('DomainMap' | 'domainmap') name=ID
     '{'
         ('contains' domains += [Domain:QualifiedName] ((",")? domains += [Domain:QualifiedName])*)*
     '}'
@@ -72,7 +72,7 @@ BoundedContext:
 ;
 
 Domain:
-    'Domain' name=ID ('in' parentDomain=[Domain:QualifiedName])?
+    ('Domain' | 'domain') name=ID ('in' parentDomain=[Domain:QualifiedName])?
     '{'
         ('vision' Assignment vision=STRING)?
         ('classifier' Assignment classifier=[Classification])?
@@ -87,6 +87,7 @@ fragment Assignment returns string: (':' | 'is');
 /*
 Classifications
 */
+
 Classification:
     'Classification' name=ID
 ;
@@ -94,6 +95,10 @@ Classification:
 Role:
     'Role' name=ID
 ;
+
+/*
+Relationships
+*/
 
 Relationship:
 	SymmetricRelationship | UpstreamDownstreamRelationship
@@ -128,42 +133,41 @@ SharedKernel:
 UpstreamDownstreamRelationship:
 	CustomerSupplierRelationship |
 	(
-		(
-			(upstream = [BoundedContext:QualifiedName] (('[''U'']') | ('['('U'',')?(upstreamRoles+=UpstreamRole) (',' upstreamRoles+=UpstreamRole)*)']')? '->' (('[''D'']') | ('['('D'',')?(downstreamRoles+=DownstreamRole) (',' downstreamRoles+=DownstreamRole)*)']')? downstream = [BoundedContext:QualifiedName]) |
-			(downstream = [BoundedContext:QualifiedName] (('[''D'']') | ('['('D'',')?(downstreamRoles+=DownstreamRole) (',' downstreamRoles+=DownstreamRole)*)']')? '<-' (('[''U'']') | ('['('U'',')?(upstreamRoles+=UpstreamRole) (',' upstreamRoles+=UpstreamRole)*)']')? upstream = [BoundedContext:QualifiedName]) |
-			(upstream = [BoundedContext:QualifiedName] ('['((upstreamRoles+=UpstreamRole) (',' upstreamRoles+=UpstreamRole)*)?']')?'Upstream-Downstream'('['((downstreamRoles+=DownstreamRole) (',' downstreamRoles+=DownstreamRole)*)?']')? downstream = [BoundedContext:QualifiedName]) |
-			(downstream = [BoundedContext:QualifiedName] ('['((downstreamRoles+=DownstreamRole) (',' downstreamRoles+=DownstreamRole)*)?']')?'Downstream-Upstream'('['((upstreamRoles+=UpstreamRole) (',' upstreamRoles+=UpstreamRole)*)?']')? upstream = [BoundedContext:QualifiedName])
-		)
+        (upstream = [BoundedContext:QualifiedName] ('[' ('U' | (('U,')?(upstreamRoles+=UpstreamRole (',')?)*)) ']') '->' ('[''D'']' | '['('D'',')?(downstreamRoles+=DownstreamRole (',')?)*']') downstream = [BoundedContext:QualifiedName]) |
+        (downstream = [BoundedContext:QualifiedName] ('[''D'']' | '['('D'',')?(downstreamRoles+=DownstreamRole (',')?)*']')? '<-' ('[''U'']' | '['('U'',')?(upstreamRoles+=UpstreamRole (',')?)*']')? upstream = [BoundedContext:QualifiedName]) |
+        (upstream = [BoundedContext:QualifiedName] ('['(upstreamRoles+=UpstreamRole (',')?)*']')?'Upstream-Downstream'('['(downstreamRoles+=DownstreamRole (',')?)*']')? downstream = [BoundedContext:QualifiedName]) |
+        (downstream = [BoundedContext:QualifiedName] ('['(downstreamRoles+=DownstreamRole (',')?)*']')?'Downstream-Upstream'('['(upstreamRoles+=UpstreamRole (',')?)*']')? upstream = [BoundedContext:QualifiedName])
 	)
 ;
 
 CustomerSupplierRelationship:
-	(
-		(
-			(upstream = [BoundedContext:QualifiedName] '['('U'',')?'S'(','(upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']' '->' '['('D'',')?'C'(','(downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']' downstream = [BoundedContext:QualifiedName]) |
-			(downstream = [BoundedContext:QualifiedName] '['('D'',')?'C'(','(downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']' '<-' '['('U'',')?'S'(','(upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']' upstream = [BoundedContext:QualifiedName]) |
-			(downstream = [BoundedContext:QualifiedName] ('['((downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']')?'Customer-Supplier'('['((upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']')? upstream = [BoundedContext:QualifiedName]) |
-			(upstream = [BoundedContext:QualifiedName] ('['((upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']')?'Supplier-Customer'('['((downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']')? downstream = [BoundedContext:QualifiedName])
-		)
+    (
+        (
+            (upstream = [BoundedContext:QualifiedName] '['('U'',')?'S'(','(upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']' '->' '['('D'',')?'C'(','(downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']' downstream = [BoundedContext:QualifiedName]) |
+            (downstream = [BoundedContext:QualifiedName] '['('D'',')?'C'(','(downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']' '<-' '['('U'',')?'S'(','(upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']' upstream = [BoundedContext:QualifiedName]) |
+            (downstream = [BoundedContext:QualifiedName] ('['((downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']')?'Customer-Supplier'('['((upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']')? upstream = [BoundedContext:QualifiedName]) |
+            (upstream = [BoundedContext:QualifiedName] ('['((upstreamRoles+=UpstreamRole) ("," upstreamRoles+=UpstreamRole)*)?']')?'Supplier-Customer'('['((downstreamRoles+=DownstreamRole) ("," downstreamRoles+=DownstreamRole)*)?']')? downstream = [BoundedContext:QualifiedName])
+        )
 	)
 ;
 
 
-Acl: 'ACL' name='ACL';
-Conformist: 'CF' name='CF';
-PublishedLanguage: 'PL' name='PL';
-OpenHostService: 'OHS' name='OHS';
+Acl returns string: 'ACL';
+Conformist returns string: 'CF';
+PublishedLanguage returns string: 'PL';
+OpenHostService returns string: 'OHS';
 
-UpstreamRole: PublishedLanguage | OpenHostService
+UpstreamRole returns string: PublishedLanguage | OpenHostService
 ;
 
-DownstreamRole: Acl | Conformist
+DownstreamRole returns string: Acl | Conformist
 ;
 
 
 /* 
 Ubiquitous language definitions
 */
+
 AbstractDecision: 
     Decision | 
     Policy | 
