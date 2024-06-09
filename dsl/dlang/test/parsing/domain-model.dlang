@@ -1,0 +1,13 @@
+domain Ordering {
+    vision is "Impeccable one-click ordering process"
+}
+
+domain SupplyChain {
+    vision: "Timely sourcing of relevant products"
+}
+
+DomainMap FulfilmentMap {
+    contains 
+        Ordering,
+        SupplyChain
+}

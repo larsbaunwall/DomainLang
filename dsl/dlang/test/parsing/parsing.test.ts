@@ -3,11 +3,13 @@ import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { parseHelper } from "langium/test";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
-import { Model, isModel } from "../../src/language/generated/ast.js";
+import { Domain, DomainMap, Model, isDomain, isDomainMap, isModel } from "../../src/language/generated/ast.js";
+import fs from "fs";
+import exp from "constants";
 
 let services: ReturnType<typeof createDomainLangServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
-let document: LangiumDocument<Model> | undefined;
+//let document: LangiumDocument<Model> | undefined;
 
 beforeAll(async () => {
     services = createDomainLangServices(EmptyFileSystem);
@@ -19,35 +21,47 @@ beforeAll(async () => {
 
 describe('Parsing tests', () => {
 
-    test('parse simple model', async () => {
-        document = await parse(`
-            person Langium
-            Hello Langium!
-        `);
+    test('parse test file succesfully', async () => {
+        let document = await parseTestFile('domain-model.dlang');
+        expect(isDocumentValid(document)).toBe(true);
+    });
 
-        // check for absensce of parser errors the classic way:
-        //  deacivated, find a much more human readable way below!
-        // expect(document.parseResult.parserErrors).toHaveLength(0);
+    test('parse domains', async () => {
+        let document = await parseTestFile('domain-model.dlang');
+        let domains = document.parseResult.value?.children.filter(e => isDomain(e));
 
-        expect(
-            // here we use a (tagged) template expression to create a human readable representation
-            //  of the AST part we are interested in and that is to be compared to our expectation;
-            // prior to the tagged template expression we check for validity of the parsed document object
-            //  by means of the reusable function 'checkDocumentValid()' to sort out (critical) typos first;
-            checkDocumentValid(document) || s`
-                Persons:
-                  ${document.parseResult.value?.persons?.map(p => p.name)?.join('\n  ')}
-                Greetings to:
-                  ${document.parseResult.value?.greetings?.map(g => g.person.$refText)?.join('\n  ')}
-            `
-        ).toBe(s`
-            Persons:
-              Langium
-            Greetings to:
-              Langium
-        `);
+        expect(domains.length).toBe(2);
+        expect(domains.map(e => e.name).join(',')).toBe('Ordering,SupplyChain');
+        expect(domains.map(d => d as Domain).map(d => d.vision).every(v => v !== undefined)).toBe(true);
+    });
+
+    test('parse a domain vision', async () => {
+        let document = await parseTestFile('domain-model.dlang');
+        let domain = document.parseResult.value?.children.find(e => isDomain(e) && e.name === 'Ordering') as Domain;
+
+        expect(domain.vision).toBeDefined();
+        expect(domain.vision).toBe('Impeccable one-click ordering process');
+
+    });
+
+    test('parse the domain map', async () => {
+        let document = await parseTestFile('domain-model.dlang');
+        let domainMaps = document.parseResult.value?.children.filter(e => isDomainMap(e));
+        let fulfilmentMap = domainMaps[0] as DomainMap;
+
+        expect(domainMaps.length).toBe(1);
+        expect(fulfilmentMap.name).toBe('FulfilmentMap');
+        expect(fulfilmentMap.domains.map(d => d.ref?.name).join(',')).toBe('Ordering,SupplyChain');
     });
 });
+
+async function parseTestFile(path: string): Promise<LangiumDocument<Model>> {
+    return await parse(fs.readFileSync(`test/parsing/${path}`, 'utf8'));
+}
+
+function isDocumentValid(document: LangiumDocument): boolean {
+    return checkDocumentValid(document) === undefined;
+}
 
 function checkDocumentValid(document: LangiumDocument): string | undefined {
     return document.parseResult.parserErrors.length && s`
