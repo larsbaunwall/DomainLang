@@ -2,13 +2,13 @@ Domain Ecommerce {
     vision: "The digital marketplace"
 }
 
-Domain Marketplace partof Ecommerce {
+Domain Marketplace in Ecommerce {
     vision: "A place where people can buy and sell things"
 }
 
-Domain Inventory partof Marketplace {
+Domain Inventory in Marketplace {
     vision: "The inventory of the marketplace"
 }
 
-Domain Users partof Marketplace {
+Domain Users in Marketplace {
 }

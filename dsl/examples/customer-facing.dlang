@@ -1,8 +1,8 @@
 package CustomerFacing {
 
     ContextMap map {
-        ApplicationFramework [U,CF] -> [D,OHS] ApplicationFramework
-        Listings <-> ApplicationFramework
+        ApplicationFramework [U,OHS] -> [D, ACL] ApplicationFramework
+        Listings [P] <-> [P] ApplicationFramework
         ApplicationFramework [SK] <-> Listings [SK]
     }
 

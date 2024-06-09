@@ -23,7 +23,9 @@ describe('Validating', () => {
   
     test('check no errors', async () => {
         document = await parse(`
-            person Langium
+            Domain TestDomain {
+                vision: "This is a test domain."
+            }
         `);
 
         expect(
