@@ -5,7 +5,6 @@ import { parseHelper } from "langium/test";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
 import { Domain, DomainMap, Model, isDomain, isDomainMap, isModel } from "../../src/language/generated/ast.js";
 import fs from "fs";
-import exp from "constants";
 
 let services: ReturnType<typeof createDomainLangServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
@@ -19,7 +18,7 @@ beforeAll(async () => {
     // await services.shared.workspace.WorkspaceManager.initializeWorkspace([]);
 });
 
-describe('Parsing tests', () => {
+describe('Parsing domain entities', () => {
 
     test('parse test file succesfully', async () => {
         let document = await parseTestFile('domain-model.dlang');

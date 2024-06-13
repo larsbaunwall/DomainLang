@@ -1,0 +1,10 @@
+domain Ordering {
+    vision is "Impeccable one-click ordering process"
+}
+
+boundedcontext PaymentBC {}
+boundedcontext OrdersBC {}
+
+ContextMap eShopMap {
+    PaymentBC [U,OHS] -> [D,CF] OrdersBC
+}
