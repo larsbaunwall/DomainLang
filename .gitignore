@@ -302,3 +302,4 @@ dist
 
 
 # End of https://www.toptal.com/developers/gitignore/api/eclipse,xtext,visualstudiocode,macos,windows
+**/*.vsix

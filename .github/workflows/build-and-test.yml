@@ -1,6 +1,7 @@
-name: Test and Build DomainLang
+name: Build and test
 
 on:
+    workflow_dispatch:
     push:
         branches:
             - main
@@ -21,11 +22,6 @@ jobs:
                   node-version: 21
                   cache: 'npm'
                   cache-dependency-path: ./dsl/dlang/package-lock.json
-
-            - name: Debug
-              run: |
-                pwd
-                ls -la
                 
             - name: Install dependencies
               run: npm ci
@@ -42,3 +38,51 @@ jobs:
             - name: Run tests
               run: npm test
               working-directory: ./dsl/dlang
+    release:
+        needs: build
+        runs-on: ubuntu-latest
+        if: github.event_name == 'workflow_dispatch'
+        steps:
+            - name: Get version
+              id: pkg
+              run: echo "::set-output name=version::$(node -p "require('./dsl/dlang/package.json').version")"
+              shell: bash
+
+            - name: Construct filename
+              id: filename
+              run: echo "::set-output name=filename::domain-lang-${{ steps.pkg.outputs.version }}.vsix"
+              shell: bash
+
+            - name: Build VSIX ${{steps.filename.outputs.filename}}
+              run: npm run vscode:prepublish && vsce package
+              working-directory: ./dsl/dlang
+
+            - name: Create release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref }}
+                  release_name: Release ${{ github.ref }}
+                  body: |
+                      Changes in this Release
+                  draft: true
+                  prerelease: false
+
+            - name: Upload release asset
+              id: upload-release-asset
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./dsl/dlang/${{ steps.filename.outputs.filename }}
+                  asset_name: ${{ steps.filename.outputs.filename }}
+                  asset_content_type: application/octet-stream
+
+            - name: Notify
+              id: sdf
+              run: |
+                echo "Release created: ${{ steps.create_release.outputs.upload_url }}"
+              shell: bash
