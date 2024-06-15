@@ -38,14 +38,17 @@ jobs:
             - name: Run tests
               run: npm test
               working-directory: ./dsl/dlang
+            
+            - name: Get version
+              id: get_version
+              run: echo "VERSION=$(node -p "require('./dsl/dlang/package.json').version")" >> $GITHUB_ENV
 
             - name: Add build tag to git
               run: |
                 git config --local user.email "action@github.com"
                 git config --local user.name "GitHub Action"
-                git tag "build-${{ github.run_number }}"
+                git tag "${{env.VERSION}}.${{ github.run_number }}"
                 git push --tags
-
 
             - name: Install vsce
               run: npm install -g @vscode/vsce
@@ -55,13 +58,11 @@ jobs:
               working-directory: ./dsl/dlang
               shell: bash
             
-            - name: Get version
-              id: get_version
-              run: echo "VERSION=$(node -p "require('./dsl/dlang/package.json').version")" >> $GITHUB_ENV
+
 
             - name: Upload build artifacts
               uses: actions/upload-artifact@v2
               with:
                 name: build-artifacts
-                path: .dsl/dlang/domain-lang-${{env.VERSION}}.vsix
+                path: ./dsl/dlang/domain-lang-${{env.VERSION}}.vsix
                 
