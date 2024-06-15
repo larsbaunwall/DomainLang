@@ -10,6 +10,9 @@ Inspired by the [ContextMapper DSL](https://github.com/ContextMapper/context-map
 
 Go directly to the language implementation [here](dsl/dlang).
 
+> [!TIP] Try it live
+> You can try DomainLang for yourself in the [online VS Code editor here](https://larsbaunwall.github.io/DomainLang/index.html).
+
 ## Goals
 
 I want to provide a great IDE experience with code-completion and everything else you might be used to from coding. Preferably, this is going to work quite easy with VSCode.
