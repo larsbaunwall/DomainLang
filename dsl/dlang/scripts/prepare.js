@@ -18,3 +18,5 @@ const logError = (err) => {
 cp('./node_modules/monaco-editor-workers/dist/index.js', './static/monaco-editor-workers/index.js', logError);
 cp('./node_modules/monaco-editor-workers/dist/workers/editorWorker-es.js', './static/monaco-editor-workers/workers/editorWorker-es.js', logError);
 cp('./node_modules/monaco-editor-workers/dist/workers/editorWorker-iife.js', './static/monaco-editor-workers/workers/editorWorker-iife.js', logError);
+cp('./syntaxes', './static/syntaxes', { recursive: true }, logError);
+cp('./language-configuration.json', './static/language-configuration.json', logError);
