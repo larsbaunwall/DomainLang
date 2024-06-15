@@ -82,7 +82,7 @@ Domain:
 Team: 
     'Team' name=ID;
 
-fragment Assignment returns string: (':' | 'is');
+fragment Assignment returns string: (':' | 'is' | '=');
 
 /*
 Classifications
