@@ -56,6 +56,10 @@ jobs:
                 git tag "build-${{ github.run_number }}"
                 git push --tags
 
+
+            - name: Install vsce
+              run: npm install @vscode/vsce
+
             - name: Build vsix
               run: npm run vscode:prepublish && vsce package
               working-directory: ./dsl/dlang
