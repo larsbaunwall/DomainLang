@@ -16,16 +16,6 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Get version
-              id: pkg
-              run: echo "::set-output name=version::$(node -p "require('./dsl/dlang/package.json').version")"
-              shell: bash
-
-            - name: Construct filename
-              id: filename
-              run: echo "::set-output name=filename::domain-lang-${{ steps.pkg.outputs.version }}.vsix"
-              shell: bash
-
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
@@ -58,15 +48,16 @@ jobs:
 
 
             - name: Install vsce
-              run: npm install @vscode/vsce
+              run: npm install -g @vscode/vsce
 
             - name: Build vsix
               run: npm run vscode:prepublish && vsce package
               working-directory: ./dsl/dlang
-
+              shell: bash
+              
             - name: Upload build artifacts
               uses: actions/upload-artifact@v2
               with:
                 name: build-artifacts
-                path: .dsl/dlang/${{steps.filename.outputs.filename}}
+                path: .dsl/dlang/$(node -p "require('./dsl/dlang/package.json').version).vsix
                 
