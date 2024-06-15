@@ -35,7 +35,7 @@
         "langium:watch": "langium generate --watch",
         "vscode:prepublish": "npm run build && npm run lint",
         "prepare:static": "node ./scripts/prepare.js",
-        "build:web": "npm run build && npm run prepare:static && npm run build:monarch && npm run build:worker && npm run build:bundle",
+        "build:web": "npm run build && npm run prepare:static && npm run build:monarch && npm run build:worker && npm run build:bundle && cp -r ./syntaxes ./static",
         "build:monarch": "tsc -b tsconfig.monarch.json",
         "build:bundle": "vite --config ./vite.bundle.config.ts build",
         "build:worker": "esbuild --minify ./out/language/main-browser.js --bundle --format=iife --outfile=./static/worker/domain-lang-server-worker.js",
