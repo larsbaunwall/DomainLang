@@ -32,33 +32,13 @@ describe('Parsing relationships tests', () => {
         expect(ctxMap.relationships.length).toBe(1);
 
         let rel = ctxMap.relationships[0] as UpstreamDownstreamRelationship;
-        expect(rel.downstream.ref?.name).toBe('OrdersBC');
-        expect(rel.upstream.ref?.name).toBe('PaymentBC');
+        expect(rel.downstream.$refText).toBe('OrdersBC');
+        expect(rel.upstream.$refText).toBe('PaymentBC');
 
         expect(rel.upstreamRoles).toStrictEqual(['OHS']);
         expect(rel.downstreamRoles).toStrictEqual(['CF']);
     });
 
-    test('fail if references cannot be found', async () => {
-        let document = await parse(`
-            ContextMap FaultyMap {
-                PaymentBC <- OrdersBC
-        }`);
-
-        // Document is valid because the references are not checked in the parser
-        expect(isDocumentValid(document)).toBe(true);
-
-        // But the references are not resolved
-        let ctxMap = document.parseResult.value?.children[0] as ContextMap;
-        expect(ctxMap.relationships.length).toBe(1);
-        
-        let rel = ctxMap.relationships[0] as UpstreamDownstreamRelationship;
-        expect(rel.downstream.ref).toBeUndefined();
-        expect(rel.downstream.error).toBeDefined()
-
-        expect(rel.upstream.ref).toBeUndefined();
-        expect(rel.upstream.error).toBeDefined()
-    });
 
     test('fail roles are used in wrong direction', async () => {
         let document = await parse(`

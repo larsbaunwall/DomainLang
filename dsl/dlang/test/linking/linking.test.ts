@@ -3,7 +3,7 @@ import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { clearDocuments, parseHelper } from "langium/test";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
-import { Model, isModel } from "../../src/language/generated/ast.js";
+import { Container, ContextMap, Model, StructureElement, UpstreamDownstreamRelationship, isModel } from "../../src/language/generated/ast.js";
 
 let services: ReturnType<typeof createDomainLangServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
@@ -23,24 +23,62 @@ afterEach(async () => {
 
 describe('Linking tests', () => {
 
-    test('linking of greetings', async () => {
-        document = await parse(`
-            person Langium
-            Hello Langium!
+
+    test('fail if references cannot be found', async () => {
+        let document = await parse(`
+            ContextMap FaultyMap {
+                PaymentBC <- OrdersBC
+        }`);
+
+        // Document is valid because the references are not checked in the parser
+        expect(checkDocumentValid(document)).toBeUndefined();
+
+        // But the references are not resolved
+        let ctxMap = document.parseResult.value?.children[0] as ContextMap;
+        expect(ctxMap.relationships.length).toBe(1);
+        
+        let rel = ctxMap.relationships[0] as UpstreamDownstreamRelationship;
+        expect(rel.downstream.ref).toBeUndefined();
+        expect(rel.downstream.error).toBeDefined()
+
+        expect(rel.upstream.ref).toBeUndefined();
+        expect(rel.upstream.error).toBeDefined()
+    });
+
+    test('succeed if references can be found', async () => {
+        let document = await parse(`
+            package TestPackage {
+            
+                ContextMap CorrectMap {
+                    OtherPackage.PaymentBC <- OrdersBC
+                }
+                
+                BoundedContext OrdersBC {
+                }
+            }
+            
+            package OtherPackage {
+                BoundedContext PaymentBC {
+                }
+            }
         `);
 
-        expect(
-            // here we first check for validity of the parsed document object by means of the reusable function
-            //  'checkDocumentValid()' to sort out (critical) typos first,
-            // and then evaluate the cross references we're interested in by checking
-            //  the referenced AST element as well as for a potential error message;
-            checkDocumentValid(document)
-                || document.parseResult.value.greetings.map(g => g.person.ref?.name || g.person.error?.message).join('\n')
-        ).toBe(s`
-            Langium
-        `);
+        // Document is valid because the references are not checked in the parser
+        expect(checkDocumentValid(document)).toBeUndefined();
+
+        // Now the references are resolved
+        let ctxMap = document.parseResult.value?.children.flatMap(e => (e as Container)?.children).find(e => e.$type === 'ContextMap') as ContextMap;
+        expect(ctxMap.relationships.length).toBe(1);
+        
+        let rel = ctxMap.relationships[0] as UpstreamDownstreamRelationship;
+        expect(rel.downstream.ref).toBeDefined();
+        expect(rel.downstream.error).toBeUndefined()
+
+        expect(rel.upstream.ref).toBeDefined();
+        expect(rel.upstream.error).toBeUndefined()
     });
 });
+
 
 function checkDocumentValid(document: LangiumDocument): string | undefined {
     return document.parseResult.parserErrors.length && s`

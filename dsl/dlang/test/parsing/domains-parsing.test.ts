@@ -25,7 +25,7 @@ describe('Parsing domain entities', () => {
         expect(isDocumentValid(document)).toBe(true);
     });
 
-    test('parse domains', async () => {
+    test('parse multiple domains', async () => {
         let document = await parseTestFile('domain-model.dlang');
         let domains = document.parseResult.value?.children.filter(e => isDomain(e));
 
@@ -47,7 +47,7 @@ describe('Parsing domain entities', () => {
         let document = await parseTestFile('domain-model.dlang');
         let domain = document.parseResult.value?.children.find(e => isDomain(e) && e.name === 'Orders') as Domain;
 
-        expect(domain.parentDomain?.ref?.name).toBe('Ordering');
+        expect(domain.parentDomain?.$refText).toBe('Ordering');
 
     });
 
