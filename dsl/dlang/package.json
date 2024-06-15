@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "domain-lang",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "displayName": "DomainLang",
     "description": "A DSL for Domain-Driven Design",
     "publisher": "thinkability",

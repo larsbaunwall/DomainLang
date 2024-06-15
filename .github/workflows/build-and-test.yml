@@ -54,10 +54,14 @@ jobs:
               run: npm run vscode:prepublish && vsce package
               working-directory: ./dsl/dlang
               shell: bash
-              
+            
+            - name: Get version
+              id: get_version
+              run: echo "VERSION=$(node -p "require('./dsl/dlang/package.json').version")" >> $GITHUB_ENV
+
             - name: Upload build artifacts
               uses: actions/upload-artifact@v2
               with:
                 name: build-artifacts
-                path: .dsl/dlang/$(node -p "require('./dsl/dlang/package.json').version).vsix
+                path: .dsl/dlang/domain-lang-${{env.VERSION}}.vsix
                 
