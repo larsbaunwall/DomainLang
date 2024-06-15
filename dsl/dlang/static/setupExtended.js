@@ -5,8 +5,8 @@ addMonacoStyles('monaco-editor-styles');
 
 export const setupConfigExtended = () => {
     const extensionFilesOrContents = new Map();
-    const languageConfigUrl = new URL('../language-configuration.json', window.location.href);
-    const textmateConfigUrl = new URL('../syntaxes/domain-lang.tmLanguage.json', window.location.href);
+    const languageConfigUrl = new URL('./language-configuration.json', window.location.href);
+    const textmateConfigUrl = new URL('./syntaxes/domain-lang.tmLanguage.json', window.location.href);
     extensionFilesOrContents.set('/language-configuration.json', languageConfigUrl);
     extensionFilesOrContents.set('/domain-lang-grammar.json', textmateConfigUrl);
 
