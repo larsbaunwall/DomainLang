@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html class="theme-light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DomainLang Playgound</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <nav class="navbar is-black" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="https://larsbaunwall.github.io/DomainLang">
+            <img alt="DomainLang" src="img/icon.png" height="28" width="28"><span id="logo-text">DomainLang</span>
+          </a>
+      
+          <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+        </div>
+      
+        <div id="navbarBasicExample" class="navbar-menu">
+          <div class="navbar-start">
+            <a class="navbar-item is-active" href="index.html">
+              Playground
+            </a>
+            <a class="navbar-item" href="docs/syntax.html">
+              Documentation
+            </a>
+          </div>
+        </div>
+      </nav>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">
+        Try DomainLang in the playground!
+      </h1>
+      <div class="wrapper">
+        <div id="monaco-editor-root"></div>
+    </div>
+    <script type="module">
+        import { executeExtended } from './setupExtended.js';
+
+       // keep a reference to a promise for when the editor is finished starting, we'll use this to setup the canvas on load
+       const startingPromise = executeExtended(document.getElementById('monaco-editor-root'));
+   </script>
+    </div>
+  </section>
+  </body>
+</html>

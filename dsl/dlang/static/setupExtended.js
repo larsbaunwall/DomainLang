@@ -45,7 +45,7 @@ export const setupConfigExtended = () => {
                 }],                
                 userConfiguration: {
                     json: JSON.stringify({
-                        'workbench.colorTheme': 'Default Dark Modern',
+                        'workbench.colorTheme': 'Default Light Modern',
                         'editor.semanticHighlighting.enabled': true
                     })
                 }
