@@ -1,10 +1,10 @@
 import type { Module } from 'langium';
 import { inject } from 'langium';
 import { DomainLangGeneratedModule, DomainLangGeneratedSharedModule } from './generated/module.js';
-import { DomainLangValidator, registerValidationChecks } from './domain-lang-validator.js';
-import { QualifiedNameProvider } from './domain-lang-naming.js';
-import { DomainLangScopeComputation } from './domain-lang-scope.js';
-import { DomainLangFormatter } from './domain-lang-formatter.js';
+import { DomainLangValidator, registerValidationChecks } from './lsp/domain-lang-validator.js';
+import { QualifiedNameProvider } from './lsp/domain-lang-naming.js';
+import { DomainLangScopeComputation } from './lsp/domain-lang-scope.js';
+import { DomainLangFormatter } from './lsp/domain-lang-formatter.js';
 import { DomainLangHoverProvider } from './lsp/domain-lang-hover.js';
 import { DefaultSharedModuleContext, LangiumServices, LangiumSharedServices, PartialLangiumServices, createDefaultModule, createDefaultSharedModule } from 'langium/lsp';
 

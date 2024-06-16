@@ -4,8 +4,8 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import type { Container, PackageDeclaration } from './generated/ast.js';
-import { isModel, isPackageDeclaration } from './generated/ast.js';
+import type { Container, PackageDeclaration } from '../generated/ast.js';
+import { isModel, isPackageDeclaration } from '../generated/ast.js';
 
 export function toQualifiedName(pack: PackageDeclaration, childName: string): string {
     return (isPackageDeclaration(pack.$container) ? toQualifiedName(pack.$container, pack.name) : pack.name) + '.' + childName;

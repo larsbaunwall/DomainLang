@@ -7,9 +7,9 @@
 import type { AstNode, AstNodeDescription, LangiumDocument, PrecomputedScopes } from 'langium';
 import { DefaultScopeComputation, interruptAndCheck, MultiMap, AstUtils } from 'langium';
 import { CancellationToken } from 'vscode-jsonrpc';
-import { isType, isPackageDeclaration, PackageDeclaration, Model, Container } from './generated/ast.js';
+import { isType, isPackageDeclaration, PackageDeclaration, Model, Container } from '../generated/ast.js';
 import { QualifiedNameProvider } from './domain-lang-naming.js';
-import { DomainLangServices } from './domain-lang-module.js';
+import { DomainLangServices } from '../domain-lang-module.js';
 
 export class DomainLangScopeComputation extends DefaultScopeComputation {
 

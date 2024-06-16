@@ -1,6 +1,6 @@
 import type { AstNode, ValidationAcceptor, ValidationChecks } from 'langium';
-import { type DomainLangAstType, type Domain, Model, Container, isContainer, BoundedContext } from './generated/ast.js';
-import type { DomainLangServices } from './domain-lang-module.js';
+import { type DomainLangAstType, type Domain, Model, Container, isContainer, BoundedContext } from '../generated/ast.js';
+import type { DomainLangServices } from '../domain-lang-module.js';
 import { QualifiedNameProvider } from './domain-lang-naming.js';
 
 /**
