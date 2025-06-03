@@ -52,12 +52,12 @@ BoundedContext:
 
 BoundedContextDocumentationBlock:
       ('description' Assignment description=STRING)
-    | (TeamAssignment Assignment team=[Team])
+    | (TeamAssignment Assignment team=[Team:QualifiedName])
     | ('relationships' '{' (relationships += Relationship (("," )? relationships += Relationship)*)* '}')
     | ('classifiers' '{'
-        (RoleAssignment Assignment roleClassifier=[Role])?
-        (BusinessModelAssignment Assignment businessModel=[Classification])?
-        (EvolutionAssignment Assignment evolution=[Classification])?
+        (RoleAssignment Assignment roleClassifier=[Role:QualifiedName])?
+        (BusinessModelAssignment Assignment businessModel=[Classification:QualifiedName])?
+        (EvolutionAssignment Assignment evolution=[Classification:QualifiedName])?
       '}')
     | ('terminology' '{' (domainTerminology += DomainTerm (",")?)* '}')
     | ('decisions' '{' (decisions += AbstractDecision (',')?)* '}')
