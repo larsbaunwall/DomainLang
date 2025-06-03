@@ -12,7 +12,51 @@ export const setupConfigExtended = (): UserConfig => {
             editorAppConfig: {
                 $type: 'extended',
                 languageId: 'domain-lang',
-                code: `// DomainLang is running in the web!`,
+                code: `package CustomerFacing {
+
+    ContextMap map {
+        ApplicationFramework [OHS] -> [ACL] ApplicationFramework
+        Listings [P] <-> [P] ApplicationFramework
+        ApplicationFramework [SK] <-> Listings [SK]
+    }
+
+    Domain Inventory {}
+
+    /*
+    * The CustomerFacing bounded context is responsible for all interactions with the customer.
+    */
+    BoundedContext ApplicationFramework {
+        terminology {
+            term micro-frontend : "a small, self-contained frontend application"
+        }
+    }
+
+    BoundedContext Listings implements Inventory {
+        description: "The product listings"
+        classifiers {
+            role: Nothing
+        }
+        terminology {
+            term product    : "a product that is for sale"
+            term SKU        : "a stock keeping unit"
+        }
+        decisions {
+            // test
+            policy do_not_allow_orders_without_stock : "do not allow orders for products that are out of stock"
+            
+            //other stuff
+            rule   product_has_a_sku : "a product has a SKU"
+        }
+        
+    }
+
+    /**
+     * Directly involved in executing transactions with the customer
+     */
+    Role Executing
+}
+
+Role Nothing`,
                 useDiffEditor: false,
                 extensions: [{
                     config: {

@@ -1,10 +1,12 @@
 package CustomerFacing {
 
     ContextMap map {
-        ApplicationFramework [U,OHS] -> [D, ACL] ApplicationFramework
+        ApplicationFramework [OHS] -> [ACL] ApplicationFramework
         Listings [P] <-> [P] ApplicationFramework
         ApplicationFramework [SK] <-> Listings [SK]
     }
+
+    Domain Inventory {}
 
     /*
     * The CustomerFacing bounded context is responsible for all interactions with the customer.
