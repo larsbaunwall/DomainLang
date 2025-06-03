@@ -1,4 +1,4 @@
-import { type Model, type Relationship, type StructureElement, isBoundedContext, isContextMap, isPackageDeclaration, isThisRef, type BoundedContext, type BoundedContextRef } from '../generated/ast.js';
+import { type Model, type Relationship, type StructureElement, isBoundedContext, isContextMap, isPackageDeclaration, type BoundedContext } from '../generated/ast.js';
 
 
 export function setInferredRelationshipTypes(model: Model) {
