@@ -12,7 +12,7 @@ Go directly to the language implementation [here](dsl/dlang).
 
 > [!TIP] 
 > <b>Try it live!</b>
-> You can try DomainLang for yourself in our [online editor](https://larsbaunwall.github.io/DomainLang/index.html).
+> You can try DomainLang for yourself in the [online editor](https://larsbaunwall.github.io/DomainLang/index.html).
 
 ## Goals
 
