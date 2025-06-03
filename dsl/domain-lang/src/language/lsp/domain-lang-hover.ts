@@ -33,10 +33,8 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
 
     protected getAstNodeHoverContent(node: AstNode): MaybePromise<Hover | undefined> {
         const content = this.documentationProvider.getDocumentation(node);
-        let comment = this.commentProvider.getComment(node);
 
-        const commentBlock = comment && isJSDoc(comment) ? `*${parseJSDoc(comment).toMarkdown()}*` : '';
-
+        const commentBlock = content ? `*${content}*\n\n` : '';
         // --- Domain ---
         if (ast.isDomain(node)) {
             const n = node as ast.Domain;
@@ -53,7 +51,7 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                 contents: {
                     kind: 'markdown',
                     value:
-commentBlock + `<br>`+
+commentBlock + 
 `<sub>📁 <b>Domain</b></sub>
 
 &nbsp;
