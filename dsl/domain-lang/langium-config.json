@@ -8,11 +8,7 @@
             "out": "syntaxes/domain-lang.tmLanguage.json"
         },
         "monarch": {
-            "out": "syntaxes/domain-lang.monarch.ts"
-        },
-        "railroad": {
-            "out": "static/docs/syntax.html",
-            "mode": "html"
+            "out": "src/syntaxes/domain-lang.monarch.ts"
         }
     }],
     "out": "src/language/generated"

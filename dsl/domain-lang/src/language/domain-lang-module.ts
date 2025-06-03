@@ -1,23 +1,23 @@
-import type { Module } from 'langium';
-import { inject } from 'langium';
+import { type Module, inject } from 'langium';
+import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
 import { DomainLangGeneratedModule, DomainLangGeneratedSharedModule } from './generated/module.js';
 import { DomainLangValidator, registerValidationChecks } from './lsp/domain-lang-validator.js';
 import { QualifiedNameProvider } from './lsp/domain-lang-naming.js';
 import { DomainLangScopeComputation } from './lsp/domain-lang-scope.js';
 import { DomainLangFormatter } from './lsp/domain-lang-formatter.js';
 import { DomainLangHoverProvider } from './lsp/domain-lang-hover.js';
-import { DefaultSharedModuleContext, LangiumServices, LangiumSharedServices, PartialLangiumServices, createDefaultModule, createDefaultSharedModule } from 'langium/lsp';
+
 
 /**
  * Declaration of custom services - add your own service classes here.
  */
 export type DomainLangAddedServices = {
-references: {
+    references: {
         QualifiedNameProvider: QualifiedNameProvider
     },
     validation: {
         DomainLangValidator: DomainLangValidator
-},
+    },
     lsp: {
         Formatter: DomainLangFormatter,
         HoverProvider: DomainLangHoverProvider
@@ -38,7 +38,7 @@ export type DomainLangServices = LangiumServices & DomainLangAddedServices
 export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices & DomainLangAddedServices> = {
     validation: {
         DomainLangValidator: () => new DomainLangValidator()
-},
+    },
     references: {
         ScopeComputation: (services) => new DomainLangScopeComputation(services),
         QualifiedNameProvider: () => new QualifiedNameProvider()
@@ -79,5 +79,10 @@ export function createDomainLangServices(context: DefaultSharedModuleContext): {
     );
     shared.ServiceRegistry.register(DomainLang);
     registerValidationChecks(DomainLang);
+    if (!context.connection) {
+        // We don't run inside a language server
+        // Therefore, initialize the configuration provider instantly
+        shared.workspace.ConfigurationProvider.initialized({});
+    }
     return { shared, DomainLang };
 }
