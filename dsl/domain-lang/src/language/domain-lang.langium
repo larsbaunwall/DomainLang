@@ -42,6 +42,7 @@ DomainDocumentationBlock:
     | ('classifier' Assignment classifier=[Classification])
 ;
 
+
 BoundedContext:
     ('BoundedContext' | 'boundedcontext') name=ID ('implements' (domain=[Domain:QualifiedName]))?
     '{'

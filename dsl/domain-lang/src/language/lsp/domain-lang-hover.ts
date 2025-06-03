@@ -1,7 +1,8 @@
-import { AstNode, CommentProvider, DocumentationProvider, MaybePromise } from "langium";
+import { AstNode, CommentProvider, DocumentationProvider, isJSDoc, MaybePromise, parseJSDoc } from "langium";
 import { Hover } from "vscode-languageserver";
 import * as ast from '../generated/ast.js';
 import { AstNodeHoverProvider, LangiumServices } from "langium/lsp";
+import { keywordExplanations } from './domain-lang-keywords.js';
 
 export class DomainLangHoverProvider extends AstNodeHoverProvider {
 
@@ -33,21 +34,8 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
     protected getAstNodeHoverContent(node: AstNode): MaybePromise<Hover | undefined> {
         const content = this.documentationProvider.getDocumentation(node);
         let comment = this.commentProvider.getComment(node);
-        // Remove /* ... */ and // delimiters, and leading * from multiline comments
-        if (comment) {
-            // Remove /* ... */ delimiters (including multiline)
-            comment = comment.replace(/^\/\*+/, '').replace(/\*+\/$/, '');
-            // Remove // from start of lines
-            comment = comment.replace(/^\/\//gm, '');
-            // Remove leading * and whitespace from each line (for multiline block comments)
-            comment = comment.split('\n').map(line => line.replace(/^\s*\*\s?/, '').trimEnd()).join('\n');
-            comment = comment.trim();
-        }
-        const commentBlock = comment ? `*${comment}*
 
-&nbsp;
-
-` : '';
+        const commentBlock = comment && isJSDoc(comment) ? `*${parseJSDoc(comment).toMarkdown()}*` : '';
 
         // --- Domain ---
         if (ast.isDomain(node)) {
@@ -65,7 +53,7 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                 contents: {
                     kind: 'markdown',
                     value:
-commentBlock +
+commentBlock + `<br>`+
 `<sub>📁 <b>Domain</b></sub>
 
 &nbsp;
@@ -517,5 +505,28 @@ Refers to the current Bounded Context.`
 <code>${(node as any).$type ?? typeof node}</code>`
             }
         };
+    }
+
+    protected override getKeywordHoverContent(node: AstNode): MaybePromise<Hover | undefined> {
+        const keyword = (node as any)?.keyword ?? (node as any)?.value ?? node;
+        if (typeof keyword === 'string') {
+            const explanation = keywordExplanations[keyword];
+            if (explanation) {
+                return {
+                    contents: {
+                        kind: 'markdown',
+                        value: `💡 `+ explanation
+                    }
+                };
+            }
+            // fallback for unknown keywords
+            return {
+                contents: {
+                    kind: 'markdown',
+                    value: `**${keyword}**`
+                }
+            };
+        }
+        return undefined;
     }
 }
