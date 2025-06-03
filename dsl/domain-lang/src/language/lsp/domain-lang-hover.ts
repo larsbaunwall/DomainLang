@@ -1,4 +1,4 @@
-import { AstNode, CommentProvider, DocumentationProvider, isJSDoc, MaybePromise, parseJSDoc } from "langium";
+import { AstNode, CommentProvider, DocumentationProvider, MaybePromise } from "langium";
 import { Hover } from "vscode-languageserver";
 import * as ast from '../generated/ast.js';
 import { AstNodeHoverProvider, LangiumServices } from "langium/lsp";

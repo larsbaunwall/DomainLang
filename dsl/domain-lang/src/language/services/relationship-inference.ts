@@ -27,16 +27,16 @@ function walkStructureElements(elements: StructureElement[] = [], containerBc?: 
     }
 }
 
-function resolveBoundedContextRef(ref: BoundedContextRef, container: BoundedContext | undefined): BoundedContext | undefined {
-    if (isThisRef(ref)) {
-        return container;
-    }
-    // ref.ref is a Reference<BoundedContext> | undefined; get the actual node via $ref
-    if (ref && 'ref' in ref && ref.ref && '$ref' in ref.ref && ref.ref.$ref) {
-        return ref.ref.$ref as BoundedContext;
-    }
-    return undefined;
-}
+// function resolveBoundedContextRef(ref: BoundedContextRef, container: BoundedContext | undefined): BoundedContext | undefined {
+//     if (isThisRef(ref)) {
+//         return container;
+//     }
+//     // ref.ref is a Reference<BoundedContext> | undefined; get the actual node via $ref
+//     if (ref && 'ref' in ref && ref.ref && '$ref' in ref.ref && ref.ref.$ref) {
+//         return ref.ref.$ref as BoundedContext;
+//     }
+//     return undefined;
+// }
 
 function enrichRelationship(rel: Relationship, containerBc?: BoundedContext) {
     // Example: resolve left/right for further processing
