@@ -7,7 +7,6 @@ import { DomainLangScopeComputation } from './lsp/domain-lang-scope.js';
 import { DomainLangFormatter } from './lsp/domain-lang-formatter.js';
 import { DomainLangHoverProvider } from './lsp/domain-lang-hover.js';
 
-
 /**
  * Declaration of custom services - add your own service classes here.
  */
@@ -46,7 +45,7 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
     lsp: {
         Formatter: () => new DomainLangFormatter(),
         HoverProvider: (services) => new DomainLangHoverProvider(services),
-    }
+    },
 };
 
 /**

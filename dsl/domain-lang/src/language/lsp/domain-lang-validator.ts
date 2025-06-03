@@ -1,7 +1,8 @@
 import type { AstNode, ValidationAcceptor, ValidationChecks } from 'langium';
-import { type DomainLangAstType, type Domain, Model, Container, isContainer, BoundedContext } from '../generated/ast.js';
+import { type DomainLangAstType, type Domain, Model, Container, isContainer, BoundedContext, Relationship } from '../generated/ast.js';
 import type { DomainLangServices } from '../domain-lang-module.js';
 import { QualifiedNameProvider } from './domain-lang-naming.js';
+import { setInferredRelationshipTypes } from '../services/relationship-inference.js';
 
 /**
  * Register custom validation checks.
@@ -36,16 +37,37 @@ export class DomainLangValidator {
                 accept('error', `This element is already defined elsewhere: '${fqn}'`, { node: node, property: 'name' });
             }
         }
+
+        setInferredRelationshipTypes(model);
     }
 
     checkBC(bc: BoundedContext, accept: ValidationAcceptor): void {
-        if(!bc.description)
-            accept('warning', `Bounded Context '${bc.name}' has no description`, { node: bc, property: 'description' });
+
+        const hasDescription = bc.documentation?.some(
+            block => 'description' in block && block.description
+        );
+        if (!hasDescription)
+            accept('warning', `Bounded Context '${bc.name}' has no description`, { node: bc, property: 'documentation' });
     }
 
     checkDomain(domain: Domain, accept: ValidationAcceptor): void {
-        if(!domain.vision)
-            accept('warning', `Domain '${domain.name}' has no domain vision. Consider adding one.`, { node: domain, property: 'vision' });
+        const hasVision = domain.documentation?.some(
+            block => 'vision' in block && block.vision
+        );
+        if (!hasVision)
+            accept('warning', `Domain '${domain.name}' has no domain vision. Consider adding one.`, { node: domain, property: 'documentation' });
+    }
+
+    validateSeparateWaysArrow(relationship: Relationship, accept: ValidationAcceptor): void {
+        const effectiveType = relationship.type ?? relationship.inferredType;
+        if (relationship.arrow === '><') {
+            if (effectiveType !== 'SeparateWays') {
+                accept('error', "`><` arrow can only be used with type 'SeparateWays'.", { node: relationship, property: 'arrow' });
+            }
+        }
+        if (effectiveType === 'SeparateWays' && relationship.arrow !== '><') {
+            // Optionally, warn or auto-correct if you want to enforce `><` for SeparateWays
+        }
     }
 }
 
