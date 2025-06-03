@@ -14,6 +14,10 @@ Go directly to the language implementation [here](dsl/domain-lang).
 > <b>Try it live!</b>
 > You can try DomainLang for yourself in the [online editor](https://larsbaunwall.github.io/DomainLang/index.html).
 
+### Grammar / syntax
+
+The [language grammar](./dsl/domain-lang/src/language/domain-lang.langium) has this syntax: [Railway diagram](./dsl/domain-lang/docs/syntax-diagram.html)
+
 ## Goals
 
 I want to provide a great IDE experience with code-completion and everything else you might be used to from coding. Preferably, this is going to work quite easy with VSCode.

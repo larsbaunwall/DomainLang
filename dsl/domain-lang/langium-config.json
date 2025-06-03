@@ -9,6 +9,9 @@
         },
         "monarch": {
             "out": "src/syntaxes/domain-lang.monarch.ts"
+        },
+        "railroad": {
+            "out": "docs/syntax-diagram.html"
         }
     }],
     "out": "src/language/generated"

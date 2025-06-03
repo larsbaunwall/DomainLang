@@ -40,8 +40,8 @@ function resolveBoundedContextRef(ref: BoundedContextRef, container: BoundedCont
 
 function enrichRelationship(rel: Relationship, containerBc?: BoundedContext) {
     // Example: resolve left/right for further processing
-    const leftContext = resolveBoundedContextRef(rel.left, containerBc);
-    const rightContext = resolveBoundedContextRef(rel.right, containerBc);
+    //const leftContext = resolveBoundedContextRef(rel.left, containerBc);
+    //const rightContext = resolveBoundedContextRef(rel.right, containerBc);
     // You can use leftContext/rightContext as needed for further inference
     if (!rel.type) {
         rel.inferredType = inferRelationshipType(rel);
