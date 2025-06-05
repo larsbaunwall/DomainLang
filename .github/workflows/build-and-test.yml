@@ -1,66 +1,131 @@
-name: Build and test
+name: build-test-deploy
 
 on:
-    workflow_dispatch:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build-and-test:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
 
-        steps:
-            - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 21
-                  cache: 'npm'
-                  cache-dependency-path: ./dsl/domain-lang/package-lock.json
-                
-            - name: Install dependencies
-              run: npm ci
-              working-directory: ./dsl/domain-lang
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+          cache: 'npm'
+          cache-dependency-path: ./dsl/domain-lang/package-lock.json
+          
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./dsl/domain-lang
 
-            - name: Generate langium AST
-              run: npm run langium:generate
-              working-directory: ./dsl/domain-lang
+      - name: Generate langium AST
+        run: npm run langium:generate
+        working-directory: ./dsl/domain-lang
 
-            - name: Build project
-              run: npm run build
-              working-directory: ./dsl/domain-lang
+      - name: Build project
+        run: npm run build
+        working-directory: ./dsl/domain-lang
 
-            - name: Run tests
-              run: npm test
-              working-directory: ./dsl/domain-lang
-            
-            - name: Get version
-              id: get_version
-              run: echo "VERSION=$(node -p "require('./dsl/domain-lang/package.json').version")" >> $GITHUB_ENV
+      - name: Run tests
+        run: npm test
+        working-directory: ./dsl/domain-lang
+      
+      - name: Get version
+        id: get_version
+        run: echo "version=$(node -p "require('./dsl/domain-lang/package.json').version")" >> $GITHUB_OUTPUT
 
-            - name: Add build tag to git
-              run: |
-                git config --local user.email "action@github.com"
-                git config --local user.name "GitHub Action"
-                git tag "${{env.VERSION}}.${{ github.run_number }}"
-                git push --tags
+      - name: Build web version
+        run: npm run build:web
+        working-directory: ./dsl/domain-lang
 
-            - name: Install vsce
-              run: npm install -g @vscode/vsce
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: ./dsl/domain-lang/static
 
-            - name: Build vsix
-              run: npm run vscode:prepublish && vsce package
-              working-directory: ./dsl/domain-lang
-              shell: bash
-            
-            - name: Upload build artifacts
-              uses: actions/upload-artifact@v2
-              with:
-                name: build-artifacts
-                path: ./dsl/domain-lang/domain-lang-${{env.VERSION}}.vsix
+      - name: Add build tag to git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag "${{steps.get_version.outputs.version}}.${{ github.run_number }}"
+          git push --tags
+
+  deploy-pages:
+    needs: build-and-test
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  build-vsix:
+    needs: build-and-test
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+          cache: 'npm'
+          cache-dependency-path: ./dsl/domain-lang/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./dsl/domain-lang
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Build vsix
+        run: npm run vscode:prepublish && vsce package
+        working-directory: ./dsl/domain-lang
+        shell: bash
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-package
+          path: ./dsl/domain-lang/domain-lang-${{needs.build-and-test.outputs.version}}.vsix
                 
