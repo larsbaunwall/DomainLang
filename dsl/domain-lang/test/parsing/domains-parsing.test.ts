@@ -3,12 +3,17 @@ import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { parseHelper } from "langium/test";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
-import { Domain, DomainMap, Model, isDomain, isDomainMap, isModel } from "../../src/language/generated/ast.js";
+import { Model, isDomain, isDomainMap, isModel, isPackageDeclaration } from "../../src/language/generated/ast.js";
 import fs from "fs";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 let services: ReturnType<typeof createDomainLangServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
 //let document: LangiumDocument<Model> | undefined;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 beforeAll(async () => {
     services = createDomainLangServices(EmptyFileSystem);
@@ -21,49 +26,59 @@ beforeAll(async () => {
 describe('Parsing domain entities', () => {
 
     test('parse test file succesfully', async () => {
-        let document = await parseTestFile('domain-model.dlang');
+        let document = await parseTestFile('domains-parsing-fixture.dlang');
         expect(isDocumentValid(document)).toBe(true);
     });
 
     test('parse multiple domains', async () => {
-        let document = await parseTestFile('domain-model.dlang');
-        let domains = document.parseResult.value?.children.filter(e => isDomain(e));
+        let document = await parseTestFile('domains-parsing-fixture.dlang');
+        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
+        if (!pkg) throw new Error('Test package not found');
+        let domains = (pkg as any).children.filter((e: any) => isDomain(e));
 
         expect(domains.length).toBe(3);
-        expect(domains.map(e => e.name).join(',')).toBe('Ordering,SupplyChain,Orders');
-        expect(domains.map(d => d as Domain).map(d => d.vision).every(v => v !== undefined)).toBe(true);
+        expect(domains.map((e: any) => e.name).join(',')).toBe('Ordering,SupplyChain,Orders');
+        // Check that each domain has a documentation block with description and vision
+        for (const d of domains) {
+            const docBlock = d.documentation;
+            expect(docBlock.some((b: any) => b.description)).toBe(true);
+            expect(docBlock.some((b: any) => b.vision)).toBe(true);
+        }
     });
 
     test('parse a domain vision', async () => {
-        let document = await parseTestFile('domain-model.dlang');
-        let domain = document.parseResult.value?.children.find(e => isDomain(e) && e.name === 'Ordering') as Domain;
-
-        expect(domain.vision).toBeDefined();
-        expect(domain.vision).toBe('Impeccable one-click ordering process');
-
+        let document = await parseTestFile('domains-parsing-fixture.dlang');
+        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
+        if (!pkg) throw new Error('Test package not found');
+        let domain = (pkg as any).children.find((e: any) => isDomain(e) && e.name === 'Ordering');
+        const visionBlock = domain.documentation.find((b: any) => b.vision);
+        expect(visionBlock).toBeDefined();
+        expect(visionBlock.vision).toBe('Impeccable one-click ordering process');
     });
 
     test('parse a subdomain', async () => {
-        let document = await parseTestFile('domain-model.dlang');
-        let domain = document.parseResult.value?.children.find(e => isDomain(e) && e.name === 'Orders') as Domain;
-
-        expect(domain.parentDomain?.$refText).toBe('Ordering');
-
+        let document = await parseTestFile('domains-parsing-fixture.dlang');
+        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
+        if (!pkg) throw new Error('Test package not found');
+        let domain = (pkg as any).children.find((e: any) => isDomain(e) && e.name === 'Orders');
+        expect(domain.parentDomain?.ref?.name).toBe('Ordering');
     });
 
     test('parse the domain map', async () => {
-        let document = await parseTestFile('domain-model.dlang');
-        let domainMaps = document.parseResult.value?.children.filter(e => isDomainMap(e));
-        let fulfilmentMap = domainMaps[0] as DomainMap;
-
+        let document = await parseTestFile('domains-parsing-fixture.dlang');
+        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
+        if (!pkg) throw new Error('Test package not found');
+        let domainMaps = (pkg as any).children.filter((e: any) => isDomainMap(e));
+        let fulfilmentMap = domainMaps[0];
         expect(domainMaps.length).toBe(1);
         expect(fulfilmentMap.name).toBe('FulfilmentMap');
-        expect(fulfilmentMap.domains.map(d => d.ref?.name).join(',')).toBe('Ordering,SupplyChain');
+        expect(fulfilmentMap.domains.map((d: any) => d.ref?.name).join(',')).toBe('Ordering,SupplyChain');
     });
 });
 
 async function parseTestFile(path: string): Promise<LangiumDocument<Model>> {
-    return await parse(fs.readFileSync(`test/parsing/${path}`, 'utf8'));
+    const fullPath = join(__dirname, path);
+    return await parse(fs.readFileSync(fullPath, 'utf8'));
 }
 
 function isDocumentValid(document: LangiumDocument): boolean {

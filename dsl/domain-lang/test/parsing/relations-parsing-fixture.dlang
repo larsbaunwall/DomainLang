@@ -1,0 +1,13 @@
+package test {
+    boundedcontext PaymentBC {
+        description: "Payment context"
+    }
+
+    boundedcontext OrdersBC {
+        description: "Orders context"
+    }
+
+    contextmap eShopMap {
+        PaymentBC [OHS] -> [CF] OrdersBC : UpstreamDownstream
+    }
+}

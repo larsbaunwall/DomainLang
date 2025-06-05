@@ -5,10 +5,15 @@ import { parseHelper } from "langium/test";
 import type { Diagnostic } from "vscode-languageserver-types";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
 import { Model, isModel } from "../../src/language/generated/ast.js";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 let services: ReturnType<typeof createDomainLangServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
 let document: LangiumDocument<Model> | undefined;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 beforeAll(async () => {
     services = createDomainLangServices(EmptyFileSystem);

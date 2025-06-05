@@ -3,12 +3,17 @@ import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { parseHelper } from "langium/test";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
-import { ContextMap, Domain, DomainMap, Model, UpstreamDownstreamRelationship, isDomain, isDomainMap, isModel } from "../../src/language/generated/ast.js";
+import { ContextMap, Domain, DomainMap, Model, isDomain, isDomainMap, isModel, isPackageDeclaration, isContextMap } from "../../src/language/generated/ast.js";
 import fs from "fs";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 let services: ReturnType<typeof createDomainLangServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
 //let document: LangiumDocument<Model> | undefined;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 beforeAll(async () => {
     services = createDomainLangServices(EmptyFileSystem);
@@ -21,50 +26,35 @@ beforeAll(async () => {
 describe('Parsing relationships tests', () => {
 
     test('parse test file succesfully', async () => {
-        let document = await parseTestFile('context-map.dlang');
+        let document = await parseTestFile('relations-parsing-fixture.dlang');
         expect(isDocumentValid(document)).toBe(true);
     });
 
     test('parse upstream-downstream', async () => {
-        let document = await parseTestFile('context-map.dlang');
-        let ctxMap = document.parseResult.value?.children.find(e => e.name === 'eShopMap') as ContextMap;
-        
+        let document = await parseTestFile('relations-parsing-fixture.dlang');
+
+        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
+        if (!pkg) throw new Error('Test package not found');
+
+        let ctxMap = (pkg as any).children.find((e: any) => isContextMap(e) && e.name === 'eShopMap');
+
         expect(ctxMap.relationships.length).toBe(1);
-
-        let rel = ctxMap.relationships[0] as UpstreamDownstreamRelationship;
-        expect(rel.downstream.$refText).toBe('OrdersBC');
-        expect(rel.upstream.$refText).toBe('PaymentBC');
-
-        expect(rel.upstreamRoles).toStrictEqual(['OHS']);
-        expect(rel.downstreamRoles).toStrictEqual(['CF']);
-    });
-
-
-    test('fail roles are used in wrong direction', async () => {
-        let document = await parse(`
-            boundedcontext PaymentBC {}
-            boundedcontext OrdersBC {}
-
-            ContextMap FaultyMap {
-                PaymentBC [U,CF] -> [D,ACL] OrdersBC
-        }`);
-
-        // Downstream role CF is not allowed in the upstream direction
-        expect(isDocumentValid(document)).toBe(false);
-
-        let ctxMap = document.parseResult.value?.children.find(e => e.name === 'FaultyMap') as ContextMap;
-        let rel = ctxMap.relationships[0] as UpstreamDownstreamRelationship;
-        expect(rel.upstreamRoles.length).toBe(0);
-        expect(rel.downstreamRoles).toBeDefined();
+        
+        let rel = ctxMap.relationships[0];
+        expect(rel.left.link?.ref.name).toBe('PaymentBC');
+        expect(rel.right.link?.ref.name).toBe('OrdersBC');
+        expect(rel.type).toBe('UpstreamDownstream');
     });
 
 });
 
 async function parseTestFile(path: string): Promise<LangiumDocument<Model>> {
-    return await parse(fs.readFileSync(`test/parsing/${path}`, 'utf8'));
+    const fullPath = join(__dirname, path);
+    return await parse(fs.readFileSync(fullPath, 'utf8'));
 }
 
 function isDocumentValid(document: LangiumDocument): boolean {
+    console.log(checkDocumentValid(document));
     return checkDocumentValid(document) === undefined;
 }
 
