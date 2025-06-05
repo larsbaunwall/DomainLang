@@ -148,7 +148,7 @@ QualifiedName returns string:
 ;
 
 BoundedContextRef:
-    {infer ThisRef} 'this' | ref=[BoundedContext:QualifiedName]
+    {infer ThisRef} 'this' | link=[BoundedContext:QualifiedName]
 ;
 
 // === Terminals ===

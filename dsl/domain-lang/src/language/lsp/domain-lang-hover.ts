@@ -141,7 +141,7 @@ ${relationships.length ? `---
 
 <sub>Relationships</sub>
 
-${relationships.map(r => `- ${this.refLink(r.left?.ref)} ${r.arrow} ${this.refLink(r.right?.ref)}${r.type ? ' <i>(' + r.type + ')</i>' : ''}`).join('\n')}
+${relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? ' <i>(' + r.type + ')</i>' : ''}`).join('\n')}
 
 &nbsp;
 
@@ -261,7 +261,7 @@ ${n.relationships.length ? `---
 
 <sub>Relationships</sub>
 
-${n.relationships.map(r => `- ${this.refLink(r.left?.ref)} ${r.arrow} ${this.refLink(r.right?.ref)}${r.type ? ' <i>(' + r.type + ')</i>' : ''}`).join('\n')}
+${n.relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? ' <i>(' + r.type + ')</i>' : ''}`).join('\n')}
 
 &nbsp;
 
@@ -304,7 +304,7 @@ ${n.domains.map(d => `- ${this.refLink(d.ref)}`).join('\n')}
 &nbsp;
 
 ${n.leftRoles && n.leftRoles.length ? `<sub>Left Roles:</sub> ${n.leftRoles.map(r => `[36m${r}[0m`).join(', ')}
-` : ''}${this.refLink(n.left?.ref)} ${n.arrow} ${this.refLink(n.right?.ref)}${n.type ? ' <i>(' + n.type + ')</i>' : ''}${n.rightRoles && n.rightRoles.length ? `
+` : ''}${this.refLink(n.left?.link)} ${n.arrow} ${this.refLink(n.right?.link)}${n.type ? ' <i>(' + n.type + ')</i>' : ''}${n.rightRoles && n.rightRoles.length ? `
 <sub>Right Roles:</sub> ${n.rightRoles.map(r => `[36m${r}[0m`).join(', ')}` : ''}`
                 }
             };
@@ -475,7 +475,7 @@ ${fields.join('<br>')}`
 
 &nbsp;
 
-${n.ref ? `References: ${this.getRefName(n.ref)}` : ''}`
+${n.link ? `References: ${this.getRefName(n.link)}` : ''}`
                 }
             };
         }
