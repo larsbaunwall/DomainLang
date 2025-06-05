@@ -1,0 +1,81 @@
+name: Build and Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      commit_sha: ${{ steps.get_commit.outputs.sha }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get commit SHA
+        id: get_commit
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+          cache: 'npm'
+          cache-dependency-path: ./dsl/domain-lang/package-lock.json
+          
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./dsl/domain-lang
+
+      - name: Generate langium AST
+        run: npm run langium:generate
+        working-directory: ./dsl/domain-lang
+
+      - name: Build project
+        run: npm run build
+        working-directory: ./dsl/domain-lang
+
+      - name: Run tests
+        run: npm test
+        working-directory: ./dsl/domain-lang
+      
+      - name: Get version
+        id: get_version
+        run: echo "version=$(node -p "require('./dsl/domain-lang/package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Build web version
+        run: npm run bundle
+        working-directory: ./dsl/domain-lang
+
+      - name: Build VSIX
+        run: |
+          npm install -g @vscode/vsce
+          npm run vscode:prepublish && vsce package
+        working-directory: ./dsl/domain-lang
+        shell: bash
+
+      - name: Create manifest
+        run: |
+          cat > ./dsl/domain-lang/dist/manifest.yaml << EOF
+          version: ${{ steps.get_version.outputs.version }}
+          commit_sha: ${{ steps.get_commit.outputs.sha }}
+          build_date: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          EOF
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            ./dsl/domain-lang/dist
+            ./dsl/domain-lang/domain-lang-${{steps.get_version.outputs.version}}.vsix 
