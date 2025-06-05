@@ -51,14 +51,14 @@ jobs:
         run: echo "version=$(node -p "require('./dsl/domain-lang/package.json').version")" >> $GITHUB_OUTPUT
 
       - name: Build web version
-        run: npm run build:web
+        run: npm run bundle
         working-directory: ./dsl/domain-lang
 
       - name: Upload web build
         uses: actions/upload-artifact@v4
         with:
           name: web-build
-          path: ./dsl/domain-lang/static
+          path: ./dsl/domain-lang/dist
 
       - name: Add build tag to git
         run: |
