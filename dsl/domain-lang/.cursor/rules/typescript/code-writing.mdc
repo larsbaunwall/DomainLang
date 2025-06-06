@@ -1,0 +1,12 @@
+---
+description: 
+globs: *.ts,**/*.ts
+alwaysApply: false
+---
+# Code writing rules
+
+## Never use unknown types
+
+Never use the any or unknown type. Always try to use strong types if available.
+
+Inspect the AST to find types.
