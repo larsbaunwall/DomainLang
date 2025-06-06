@@ -1,4 +1,4 @@
-package test {
+group test {
     boundedcontext PaymentBC {
         description: "Payment context"
     }

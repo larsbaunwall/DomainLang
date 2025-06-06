@@ -12,7 +12,7 @@ export const setupConfigExtended = (): UserConfig => {
             editorAppConfig: {
                 $type: 'extended',
                 languageId: 'domain-lang',
-                code: `package CustomerFacing {
+                code: `group CustomerFacing {
 
     ContextMap map {
         ApplicationFramework [OHS] -> [ACL] ApplicationFramework

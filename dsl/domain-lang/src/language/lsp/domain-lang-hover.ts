@@ -208,13 +208,13 @@ Contains ${n.children.length} elements.`
                 }
             };
         }
-        // --- PackageDeclaration ---
-        if (ast.isPackageDeclaration && ast.isPackageDeclaration(node)) {
-            const n = node as ast.PackageDeclaration;
+        // --- GroupDeclaration ---
+        if (ast.isGroupDeclaration && ast.isGroupDeclaration(node)) {
+            const n = node as ast.GroupDeclaration;
             return {
                 contents: {
                     kind: 'markdown',
-                    value: commentBlock + `<sub>📦 <b>Package</b></sub>
+                    value: commentBlock + `<sub>📦 <b>Group</b></sub>
 
 &nbsp;
 

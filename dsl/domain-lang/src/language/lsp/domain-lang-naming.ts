@@ -4,25 +4,25 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import type { Container, PackageDeclaration } from '../generated/ast.js';
-import { isModel, isPackageDeclaration } from '../generated/ast.js';
+import type { Container, GroupDeclaration } from '../generated/ast.js';
+import { isModel, isGroupDeclaration } from '../generated/ast.js';
 
-export function toQualifiedName(pack: PackageDeclaration, childName: string): string {
-    return (isPackageDeclaration(pack.$container) ? toQualifiedName(pack.$container, pack.name) : pack.name) + '.' + childName;
+export function toQualifiedName(group: GroupDeclaration, childName: string): string {
+    return (isGroupDeclaration(group.$container) ? toQualifiedName(group.$container, group.name) : group.name) + '.' + childName;
 }
 
 export class QualifiedNameProvider {
 
     /**
      * @param qualifier if the qualifier is a `string`, simple string concatenation is done: `qualifier.name`.
-     *      if the qualifier is a `PackageDeclaration` fully qualified name is created: `package1.package2.name`.
+     *      if the qualifier is a `GroupDeclaration` fully qualified name is created: `group1.group2.name`.
      * @param name simple name
      * @returns qualified name separated by `.`
      */
     getQualifiedName(qualifier: Container | string, name: string): string {
         let prefix = isModel(qualifier) ? '' : qualifier;
-        if (isPackageDeclaration(prefix)) {
-            prefix = (isPackageDeclaration(prefix.$container)
+        if (isGroupDeclaration(prefix)) {
+            prefix = (isGroupDeclaration(prefix.$container)
                 ? this.getQualifiedName(prefix.$container, prefix.name) : prefix.name);
         }
         return prefix ? prefix + '.' + name : name;

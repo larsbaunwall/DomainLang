@@ -43,7 +43,8 @@
         "dev:debug": "vite --debug --force",
         "serve": "npm run dev",
         "test": "vitest run",
-        "test:coverage": "vitest run --coverage",
+        "test:coverage": "vitest --coverage",
+        "test:watch": "vitest --watch",
         "publish:latest": "npm publish --tag latest --access public"
     },
     "dependencies": {

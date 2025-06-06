@@ -3,7 +3,7 @@ import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { parseHelper } from "langium/test";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
-import { Model, isDomain, isDomainMap, isModel, isPackageDeclaration } from "../../src/language/generated/ast.js";
+import { Model, isDomain, isDomainMap, isModel, isGroupDeclaration } from "../../src/language/generated/ast.js";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -32,9 +32,9 @@ describe('Parsing domain entities', () => {
 
     test('parse multiple domains', async () => {
         let document = await parseTestFile('domains-parsing-fixture.dlang');
-        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
-        if (!pkg) throw new Error('Test package not found');
-        let domains = (pkg as any).children.filter((e: any) => isDomain(e));
+        let group = document.parseResult.value?.children.find((e: any) => isGroupDeclaration(e) && e.name === 'test');
+        if (!group) throw new Error('Test group not found');
+        let domains = (group as any).children.filter((e: any) => isDomain(e));
 
         expect(domains.length).toBe(3);
         expect(domains.map((e: any) => e.name).join(',')).toBe('Ordering,SupplyChain,Orders');
@@ -48,9 +48,9 @@ describe('Parsing domain entities', () => {
 
     test('parse a domain vision', async () => {
         let document = await parseTestFile('domains-parsing-fixture.dlang');
-        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
-        if (!pkg) throw new Error('Test package not found');
-        let domain = (pkg as any).children.find((e: any) => isDomain(e) && e.name === 'Ordering');
+        let group = document.parseResult.value?.children.find((e: any) => isGroupDeclaration(e) && e.name === 'test');
+        if (!group) throw new Error('Test group not found');
+        let domain = (group as any).children.find((e: any) => isDomain(e) && e.name === 'Ordering');
         const visionBlock = domain.documentation.find((b: any) => b.vision);
         expect(visionBlock).toBeDefined();
         expect(visionBlock.vision).toBe('Impeccable one-click ordering process');
@@ -58,17 +58,17 @@ describe('Parsing domain entities', () => {
 
     test('parse a subdomain', async () => {
         let document = await parseTestFile('domains-parsing-fixture.dlang');
-        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
-        if (!pkg) throw new Error('Test package not found');
-        let domain = (pkg as any).children.find((e: any) => isDomain(e) && e.name === 'Orders');
+        let group = document.parseResult.value?.children.find((e: any) => isGroupDeclaration(e) && e.name === 'test');
+        if (!group) throw new Error('Test group not found');
+        let domain = (group as any).children.find((e: any) => isDomain(e) && e.name === 'Orders');
         expect(domain.parentDomain?.ref?.name).toBe('Ordering');
     });
 
     test('parse the domain map', async () => {
         let document = await parseTestFile('domains-parsing-fixture.dlang');
-        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
-        if (!pkg) throw new Error('Test package not found');
-        let domainMaps = (pkg as any).children.filter((e: any) => isDomainMap(e));
+        let group = document.parseResult.value?.children.find((e: any) => isGroupDeclaration(e) && e.name === 'test');
+        if (!group) throw new Error('Test group not found');
+        let domainMaps = (group as any).children.filter((e: any) => isDomainMap(e));
         let fulfilmentMap = domainMaps[0];
         expect(domainMaps.length).toBe(1);
         expect(fulfilmentMap.name).toBe('FulfilmentMap');

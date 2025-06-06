@@ -7,7 +7,7 @@
 import type { AstNode, AstNodeDescription, LangiumDocument, PrecomputedScopes } from 'langium';
 import { DefaultScopeComputation, interruptAndCheck, MultiMap, AstUtils } from 'langium';
 import { CancellationToken } from 'vscode-jsonrpc';
-import { isType, isPackageDeclaration, PackageDeclaration, Model, Container } from '../generated/ast.js';
+import { isType, isGroupDeclaration, GroupDeclaration, Model, Container } from '../generated/ast.js';
 import { QualifiedNameProvider } from './domain-lang-naming.js';
 import { DomainLangServices } from '../domain-lang-module.js';
 
@@ -30,8 +30,8 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
             if (isType(modelNode)) {
                 let name = this.nameProvider.getName(modelNode);
                 if (name) {
-                    if (isPackageDeclaration(modelNode.$container)) {
-                        name = this.qualifiedNameProvider.getQualifiedName(modelNode.$container as PackageDeclaration, name);
+                    if (isGroupDeclaration(modelNode.$container)) {
+                        name = this.qualifiedNameProvider.getQualifiedName(modelNode.$container as GroupDeclaration, name);
                     }
                     descr.push(this.descriptions.createDescription(modelNode, name, document));
                 }
@@ -54,7 +54,7 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
             if (isType(element) && element.name) {
                 const description = this.descriptions.createDescription(element, element.name, document);
                 localDescriptions.push(description);
-            } else if (isPackageDeclaration(element)) {
+            } else if (isGroupDeclaration(element)) {
                 const nestedDescriptions = await this.processContainer(element, scopes, document, cancelToken);
                 for (const description of nestedDescriptions) {
                     // Add qualified names to the container
@@ -67,8 +67,8 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
         return localDescriptions;
     }
 
-    protected createQualifiedDescription(pack: PackageDeclaration, description: AstNodeDescription, document: LangiumDocument): AstNodeDescription {
-        const name = this.qualifiedNameProvider.getQualifiedName(pack.name, description.name);
+    protected createQualifiedDescription(group: GroupDeclaration, description: AstNodeDescription, document: LangiumDocument): AstNodeDescription {
+        const name = this.qualifiedNameProvider.getQualifiedName(group.name, description.name);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return this.descriptions.createDescription(description.node!, name, document);
     }

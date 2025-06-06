@@ -1,4 +1,4 @@
-package test {
+group test {
     domain Ordering {
         description: "Ordering domain"
         vision: "Impeccable one-click ordering process"

@@ -5,7 +5,7 @@ import * as ast from '../generated/ast.js';
 export class DomainLangFormatter extends AbstractFormatter {
 
     protected format(node: AstNode): void {
-        if(ast.isPackageDeclaration(node)) {
+        if(ast.isGroupDeclaration(node)) {
             const f = this.getNodeFormatter(node);
             const open = f.keyword('{');
             const close = f.keyword('}');

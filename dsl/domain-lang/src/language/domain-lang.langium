@@ -5,30 +5,29 @@ entry Model:
     (children+=StructureElement)*
 ;
 
-type Container = PackageDeclaration | Model;
+type Container = GroupDeclaration | Model;
 
 // === Core Structure ===
 StructureElement: 
     Type |
     ObjectMap |
-    PackageDeclaration
+    GroupDeclaration
 ;
 
 Type:
     BoundedContext | 
     Domain | 
-    Role |
     Team |
     Classification
 ;
 
-PackageDeclaration:
-    'package' name=QualifiedName '{'
+GroupDeclaration:
+    ('Group' | 'group') name=QualifiedName '{'
         (children+=StructureElement)*
     '}'
 ;
 
-// === Domain Concepts ===
+// === Documentation Blocks ===
 interface DescriptionBlock {
     description: string
 }
@@ -46,7 +45,7 @@ interface RelationshipsBlock {
     relationships: Relationship[]
 }
 interface ClassifiersBlock {
-    roleClassifier?: @Role
+    roleClassifier?: @Classification
     businessModel?: @Classification
     evolution?: @Classification
 }
@@ -57,6 +56,7 @@ interface DecisionsBlock {
     decisions: AbstractDecision[]
 }
 
+// === Domain Concepts ===
 Domain:
     ('Domain' | 'domain') name=ID ('in' parentDomain=[Domain:QualifiedName])?
     '{'
@@ -82,7 +82,7 @@ BoundedContextDocumentationBlock:
     | {TeamBlock} TeamAssignment Assignment team=[Team:QualifiedName]
     | {RelationshipsBlock} 'relationships' '{' (relationships += Relationship ((",")? relationships += Relationship)*)* '}'
     | {ClassifiersBlock} 'classifiers' '{'
-        (RoleAssignment Assignment roleClassifier=[Role:QualifiedName])?
+        (RoleAssignment Assignment roleClassifier=[Classification:QualifiedName])?
         (BusinessModelAssignment Assignment businessModel=[Classification:QualifiedName])?
         (EvolutionAssignment Assignment evolution=[Classification:QualifiedName])?
       '}'
@@ -97,10 +97,6 @@ fragment TeamAssignment returns string: 'team';
 
 Classification:
     ('Classification' | 'classification') name=ID
-;
-
-Role:
-    ('Role' | 'role') name=ID
 ;
 
 Team: 

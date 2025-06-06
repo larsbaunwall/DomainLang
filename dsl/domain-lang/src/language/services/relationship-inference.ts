@@ -1,4 +1,4 @@
-import { type Model, type Relationship, type StructureElement, isBoundedContext, isContextMap, isPackageDeclaration, type BoundedContext } from '../generated/ast.js';
+import { type Model, type Relationship, type StructureElement, isBoundedContext, isContextMap, isGroupDeclaration, type BoundedContext, GroupDeclaration } from '../generated/ast.js';
 
 
 export function setInferredRelationshipTypes(model: Model) {
@@ -7,7 +7,7 @@ export function setInferredRelationshipTypes(model: Model) {
 
 function walkStructureElements(elements: StructureElement[] = [], containerBc?: BoundedContext) {
     for (const element of elements) {
-        if (isPackageDeclaration(element)) {
+        if (isGroupDeclaration(element)) {
             walkStructureElements(element.children, containerBc);
         } else if (isBoundedContext(element)) {
             const relationshipsBlock = element.documentation.find(block => 'relationships' in block);

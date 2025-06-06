@@ -1,7 +1,7 @@
 import { modelChecks } from './model.js';
 import { domainChecks } from './domain.js';
 import { boundedContextChecks } from './bounded-context.js';
-import { packageChecks } from './package.js';
+import { groupChecks } from './group.js';
 import { classificationChecks } from './classification.js';
 import type { ValidationChecks } from 'langium';
 import type { DomainLangAstType } from '../../generated/ast.js';
@@ -12,7 +12,7 @@ const pipeline: ValidationChecks<DomainLangAstType> = {
     Model: modelChecks,
     Domain: domainChecks,
     BoundedContext: boundedContextChecks,
-    PackageDeclaration: packageChecks,
+    GroupDeclaration: groupChecks,
     Classification: classificationChecks,
 };
 

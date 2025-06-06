@@ -55,7 +55,7 @@ describe('Linking tests', () => {
 
     test('succeed if references can be found', async () => {
         let document = await parse(`
-            package TestPackage {
+            group TestPackage {
             
                 ContextMap CorrectMap {
                     OtherPackage.PaymentBC <- OrdersBC
@@ -65,7 +65,7 @@ describe('Linking tests', () => {
                 }
             }
             
-            package OtherPackage {
+            group OtherPackage {
                 BoundedContext PaymentBC {
                 }
             }

@@ -3,7 +3,7 @@ import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { parseHelper } from "langium/test";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
-import { ContextMap, Domain, DomainMap, Model, isDomain, isDomainMap, isModel, isPackageDeclaration, isContextMap } from "../../src/language/generated/ast.js";
+import { ContextMap, Domain, DomainMap, Model, isDomain, isDomainMap, isModel, isGroupDeclaration, isContextMap } from "../../src/language/generated/ast.js";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -33,10 +33,10 @@ describe('Parsing relationships tests', () => {
     test('parse upstream-downstream', async () => {
         let document = await parseTestFile('relations-parsing-fixture.dlang');
 
-        let pkg = document.parseResult.value?.children.find((e: any) => isPackageDeclaration(e) && e.name === 'test');
-        if (!pkg) throw new Error('Test package not found');
+        let group = document.parseResult.value?.children.find((e: any) => isGroupDeclaration(e) && e.name === 'test');
+        if (!group) throw new Error('Test group not found');
 
-        let ctxMap = (pkg as any).children.find((e: any) => isContextMap(e) && e.name === 'eShopMap');
+        let ctxMap = (group as any).children.find((e: any) => isContextMap(e) && e.name === 'eShopMap');
 
         expect(ctxMap.relationships.length).toBe(1);
         
