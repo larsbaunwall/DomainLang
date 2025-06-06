@@ -29,6 +29,34 @@ PackageDeclaration:
 ;
 
 // === Domain Concepts ===
+interface DescriptionBlock {
+    description: string
+}
+interface VisionBlock {
+    vision: string
+}
+interface ClassifierBlock {
+    classifier?: @Classification
+}
+
+interface TeamBlock {
+    team?: @Team
+}
+interface RelationshipsBlock {
+    relationships: Relationship[]
+}
+interface ClassifiersBlock {
+    roleClassifier?: @Role
+    businessModel?: @Classification
+    evolution?: @Classification
+}
+interface TerminologyBlock {
+    domainTerminology: DomainTerm[]
+}
+interface DecisionsBlock {
+    decisions: AbstractDecision[]
+}
+
 Domain:
     ('Domain' | 'domain') name=ID ('in' parentDomain=[Domain:QualifiedName])?
     '{'
@@ -37,11 +65,10 @@ Domain:
 ;
 
 DomainDocumentationBlock:
-      ('description' Assignment description=STRING)
-    | ('vision' Assignment vision=STRING)
-    | ('classifier' Assignment classifier=[Classification])
+      {DescriptionBlock} 'description' Assignment description=STRING
+    | {VisionBlock} 'vision' Assignment vision=STRING
+    | {ClassifierBlock} 'classifier' Assignment classifier=[Classification]
 ;
-
 
 BoundedContext:
     ('BoundedContext' | 'boundedcontext') name=ID ('implements' (domain=[Domain:QualifiedName]))?
@@ -51,16 +78,16 @@ BoundedContext:
 ;
 
 BoundedContextDocumentationBlock:
-      ('description' Assignment description=STRING)
-    | (TeamAssignment Assignment team=[Team:QualifiedName])
-    | ('relationships' '{' (relationships += Relationship (("," )? relationships += Relationship)*)* '}')
-    | ('classifiers' '{'
+      {DescriptionBlock} 'description' Assignment description=STRING
+    | {TeamBlock} TeamAssignment Assignment team=[Team:QualifiedName]
+    | {RelationshipsBlock} 'relationships' '{' (relationships += Relationship ((",")? relationships += Relationship)*)* '}'
+    | {ClassifiersBlock} 'classifiers' '{'
         (RoleAssignment Assignment roleClassifier=[Role:QualifiedName])?
         (BusinessModelAssignment Assignment businessModel=[Classification:QualifiedName])?
         (EvolutionAssignment Assignment evolution=[Classification:QualifiedName])?
-      '}')
-    | ('terminology' '{' (domainTerminology += DomainTerm (",")?)* '}')
-    | ('decisions' '{' (decisions += AbstractDecision (',')?)* '}')
+      '}'
+    | {TerminologyBlock} 'terminology' '{' (domainTerminology += DomainTerm (",")?)* '}'
+    | {DecisionsBlock} 'decisions' '{' (decisions += AbstractDecision (',')?)* '}'
 ;
 
 fragment RoleAssignment returns string: 'role';
