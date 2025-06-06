@@ -2,14 +2,18 @@ import { MonacoEditorLanguageClientWrapper, UserConfig } from 'monaco-editor-wra
 import { configureWorker, defineUserServices } from './setupCommon.js';
 import monarchSyntax from "./syntaxes/domain-lang.monarch.js";
 
-export const setupConfigClassic = (): UserConfig => {
+export const setupConfigClassic = async (): Promise<UserConfig> => {
+    // Fetch code content from the static .dlang file for browser compatibility
+    const response = await fetch('example-customer-facing.dlang');
+    const code = await response.text();
+
     return {
         wrapperConfig: {
             serviceConfig: defineUserServices(),
             editorAppConfig: {
                 $type: 'classic',
                 languageId: 'domain-lang',
-                code: `// DomainLang is running in the web!`,
+                code,
                 useDiffEditor: false,
                 languageExtensionConfig: { id: 'langium' },
                 languageDef: monarchSyntax,
@@ -24,7 +28,7 @@ export const setupConfigClassic = (): UserConfig => {
 };
 
 export const executeClassic = async (htmlElement: HTMLElement) => {
-    const userConfig = setupConfigClassic();
+    const userConfig = await setupConfigClassic();
     const wrapper = new MonacoEditorLanguageClientWrapper();
     await wrapper.initAndStart(userConfig, htmlElement);
 };
