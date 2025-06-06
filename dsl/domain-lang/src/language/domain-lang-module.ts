@@ -1,11 +1,11 @@
 import { type Module, inject } from 'langium';
 import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
 import { DomainLangGeneratedModule, DomainLangGeneratedSharedModule } from './generated/module.js';
-import { registerValidationChecks } from './lsp/validation/domain-lang-validator.js';
+import { registerValidationChecks } from './validation/domain-lang-validator.js';
 import { QualifiedNameProvider } from './lsp/domain-lang-naming.js';
 import { DomainLangScopeComputation } from './lsp/domain-lang-scope.js';
 import { DomainLangFormatter } from './lsp/domain-lang-formatter.js';
-import { DomainLangHoverProvider } from './lsp/domain-lang-hover.js';
+import { DomainLangHoverProvider } from './lsp/hover/domain-lang-hover.js';
 
 /**
  * Declaration of custom services - add your own service classes here.
