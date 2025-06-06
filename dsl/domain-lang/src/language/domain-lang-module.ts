@@ -1,7 +1,7 @@
 import { type Module, inject } from 'langium';
 import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
 import { DomainLangGeneratedModule, DomainLangGeneratedSharedModule } from './generated/module.js';
-import { DomainLangValidator, registerValidationChecks } from './lsp/domain-lang-validator.js';
+import { registerValidationChecks } from './lsp/validation/domain-lang-validator.js';
 import { QualifiedNameProvider } from './lsp/domain-lang-naming.js';
 import { DomainLangScopeComputation } from './lsp/domain-lang-scope.js';
 import { DomainLangFormatter } from './lsp/domain-lang-formatter.js';
@@ -13,9 +13,6 @@ import { DomainLangHoverProvider } from './lsp/domain-lang-hover.js';
 export type DomainLangAddedServices = {
     references: {
         QualifiedNameProvider: QualifiedNameProvider
-    },
-    validation: {
-        DomainLangValidator: DomainLangValidator
     },
     lsp: {
         Formatter: DomainLangFormatter,
@@ -35,9 +32,6 @@ export type DomainLangServices = LangiumServices & DomainLangAddedServices
  * selected services, while the custom services must be fully specified.
  */
 export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices & DomainLangAddedServices> = {
-    validation: {
-        DomainLangValidator: () => new DomainLangValidator()
-    },
     references: {
         ScopeComputation: (services) => new DomainLangScopeComputation(services),
         QualifiedNameProvider: () => new QualifiedNameProvider()
