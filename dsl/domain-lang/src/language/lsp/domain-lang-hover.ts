@@ -428,14 +428,14 @@ ${n.meaning ? `<sub><i>${n.meaning}</i></sub>` : ''}`
         if (ast.isBoundedContextDocumentationBlock && ast.isBoundedContextDocumentationBlock(node)) {
             const n = node as ast.BoundedContextDocumentationBlock;
             let fields = [];
-            if (n.description) fields.push(`Description: _${n.description}_`);
-            if (n.team) fields.push(`Team: ${this.getRefName(n.team.ref)}`);
-            if (n.businessModel) fields.push(`Business Model: ${this.getRefName(n.businessModel.ref)}`);
-            if (n.evolution) fields.push(`Evolution: ${this.getRefName(n.evolution.ref)}`);
-            if (n.roleClassifier) fields.push(`Role: ${this.getRefName(n.roleClassifier.ref)}`);
-            if (n.relationships && n.relationships.length) fields.push(`Relationships: ${n.relationships.length}`);
-            if (n.domainTerminology && n.domainTerminology.length) fields.push(`Terminology: ${n.domainTerminology.length}`);
-            if (n.decisions && n.decisions.length) fields.push(`Decisions: ${n.decisions.length}`);
+            if (n.$type === 'DescriptionBlock' && n.description) fields.push(`Description: _${n.description}_`);
+            if (n.$type === 'TeamBlock' && n.team) fields.push(`Team: ${this.getRefName(n.team.ref)}`);
+            if (n.$type === 'ClassifiersBlock' && n.businessModel) fields.push(`Business Model: ${this.getRefName(n.businessModel.ref)}`);
+            if (n.$type === 'ClassifiersBlock' && n.evolution) fields.push(`Evolution: ${this.getRefName(n.evolution.ref)}`);
+            if (n.$type === 'ClassifiersBlock' && n.roleClassifier) fields.push(`Role: ${this.getRefName(n.roleClassifier.ref)}`);
+            if (n.$type === 'RelationshipsBlock' && n.relationships && n.relationships.length) fields.push(`Relationships: ${n.relationships.length}`);
+            if (n.$type === 'TerminologyBlock' && n.domainTerminology && n.domainTerminology.length) fields.push(`Terminology: ${n.domainTerminology.length}`);
+            if (n.$type === 'DecisionsBlock' && n.decisions && n.decisions.length) fields.push(`Decisions: ${n.decisions.length}`);
             return {
                 contents: {
                     kind: 'markdown',
@@ -451,9 +451,9 @@ ${fields.join('<br>')}`
         if (ast.isDomainDocumentationBlock && ast.isDomainDocumentationBlock(node)) {
             const n = node as ast.DomainDocumentationBlock;
             let fields = [];
-            if (n.description) fields.push(`Description: _${n.description}_`);
-            if (n.vision) fields.push(`Vision: _${n.vision}_`);
-            if (n.classifier) fields.push(`Classifier: ${this.getRefName(n.classifier.ref)}`);
+            if (n.$type === 'DescriptionBlock' && n.description) fields.push(`Description: _${n.description}_`);
+            if (n.$type === 'VisionBlock' && n.vision) fields.push(`Vision: _${n.vision}_`);
+            if (n.$type === 'ClassifierBlock' && n.classifier) fields.push(`Classifier: ${this.getRefName(n.classifier.ref)}`);
             return {
                 contents: {
                     kind: 'markdown',
