@@ -48,6 +48,7 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                 }
             }
         }
+        return undefined;
     }
 
 
@@ -75,9 +76,10 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                     kind: MarkupKind.Markdown,
                     value: this.hoverTemplate(
                         '📁',
-                        ` **\`(domain)\` ${n.name}**${n.parentDomain ? ` _(part of ${this.refLink(n.parentDomain)} domain)_` : ''}`,
+                        ` **\`(domain)\` ${n.name}**`,
                         [
-                            description ? `*${description}*\n\n&nbsp;` : undefined,
+                            `${n.parentDomain ? `*Part of ${this.refLink(n.parentDomain)} domain*` : ''}`,
+                            description ? `---\n\n&nbsp;\n\n*${description}*\n\n&nbsp;` : undefined,
                             classifier ? `🔖 Classifier: ${this.refLink(classifierRef, classifier)}` : undefined,
                             vision ? `💭 Vision: ${vision}` : undefined
                         ],
@@ -228,10 +230,9 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                     kind: 'markdown',
                     value: this.hoverTemplate(
                         '⚖️',
-                        n.name,
+                        ` **\`(decision)\` ${n.name}**`,
                         [
-                            `### ${n.name}`,
-                            n.value ? `*${n.value}` : undefined
+                            n.value ? `---\n\n&nbsp;\n\n*Definition:* ${n.value}` : undefined
                         ],
                         commentBlock
                     )
@@ -246,10 +247,9 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                     kind: 'markdown',
                     value: this.hoverTemplate(
                         '📜',
-                        n.name,
+                        ` **\`(policy)\` ${n.name}**`,
                         [
-                            `### ${n.name}`,
-                            n.value ? `*${n.value}` : undefined
+                            n.value ? `---\n\n&nbsp;\n\n*Definition:* ${n.value}` : undefined
                         ],
                         commentBlock
                     )
@@ -263,11 +263,10 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                 contents: {
                     kind: 'markdown',
                     value: this.hoverTemplate(
-                        '📏',
-                        n.name,
+                        '⚖️',
+                        ` **\`(rule)\` ${n.name}**`,
                         [
-                            `### ${n.name}`,
-                            n.value ? `*${n.value}` : undefined
+                            n.value ? `---\n\n&nbsp;\n\n*Definition:* ${n.value}` : undefined
                         ],
                         commentBlock
                     )
@@ -284,7 +283,7 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                         '🗝️',
                         ` **\`(term)\` ${n.name}**`,
                         [
-                            n.meaning ? `*${n.meaning}*` : undefined
+                            n.meaning ? `---\n\n&nbsp;\n\n*${n.meaning}*` : undefined
                         ],
                         commentBlock
                     )
@@ -292,31 +291,14 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
             };
         }
 
-        // --- StructureElement ---
-        if (ast.isStructureElement && ast.isStructureElement(node)) {
-            return {
-                contents: {
-                    kind: 'markdown',
-                    value: this.hoverTemplate(
-                        '📦',
-                        '',
-                        [
-                            `### ${node.$type}`
-                        ],
-                        commentBlock
-                    )
-                }
-            };
-        }
         // --- Fallback ---
         return {
             contents: {
                 kind: 'markdown',
                 value: this.hoverTemplate(
                     'ℹ️',
-                    '',
+                    ast.isType(node) ? ` **\`(${node.$type.toLowerCase()})\` ${node.name}**` : ` **\`(${node.$type.toLowerCase()})\`**`,
                     [
-                        `**${node.$type}**`
                     ],
                     commentBlock
                 )
