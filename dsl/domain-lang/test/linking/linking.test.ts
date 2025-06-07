@@ -6,6 +6,7 @@ import { createDomainLangServices } from "../../src/language/domain-lang-module.
 import { Container, ContextMap, Model, Relationship, isModel } from "../../src/language/generated/ast.js";
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import * as ast from '../../src/language/generated/ast.js';
 
 let services: ReturnType<typeof createDomainLangServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
@@ -75,7 +76,7 @@ describe('Linking tests', () => {
         expect(checkDocumentValid(document)).toBeUndefined();
 
         // Now the references are resolved
-        let ctxMap = document.parseResult.value?.children.flatMap(e => (e as Container)?.children).find(e => e.$type === 'ContextMap') as ContextMap;
+        let ctxMap = document.parseResult.value?.children.flatMap(e => (e as Container)?.children).find(e => ast.isContextMap(e)) as ContextMap;
         expect(ctxMap.relationships.length).toBe(1);
         
         let rel = ctxMap.relationships[0];
