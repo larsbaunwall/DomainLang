@@ -3,6 +3,8 @@ import chalk from 'chalk';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { URI } from 'langium';
+import { ensureAllImportsLoaded } from '../language/utils/import-utils.js';
+import { isModel } from '../language/generated/ast.js';
 
 export async function extractDocument(fileName: string, services: LangiumCoreServices): Promise<LangiumDocument> {
     const extensions = services.LanguageMetaData.fileExtensions;
@@ -17,6 +19,11 @@ export async function extractDocument(fileName: string, services: LangiumCoreSer
     }
 
     const document = await services.shared.workspace.LangiumDocuments.getOrCreateDocument(URI.file(path.resolve(fileName)));
+    // Ensure all imports (remote and local) are loaded before building/validation
+    const model = document.parseResult.value;
+    if (isModel(model)) {
+        await ensureAllImportsLoaded(model, services.shared.workspace.LangiumDocuments);
+    }
     await services.shared.workspace.DocumentBuilder.build([document], { validation: true });
 
     const validationErrors = (document.diagnostics ?? []).filter(e => e.severity === 1);

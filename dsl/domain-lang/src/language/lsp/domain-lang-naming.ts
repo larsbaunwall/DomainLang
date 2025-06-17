@@ -7,8 +7,8 @@
 // domain-lang-naming.ts
 // Provides utilities for generating fully qualified names (FQN) for domain language elements, supporting nested groups and disambiguation.
 
-import type { Container, GroupDeclaration } from '../generated/ast.js';
-import { isModel, isGroupDeclaration } from '../generated/ast.js';
+import type { Model } from '../generated/ast.js';
+import { isModel } from '../generated/ast.js';
 
 /**
  * Joins parent and child names into a fully qualified name, using '.' as a separator.
@@ -22,18 +22,6 @@ export function joinQualifiedName(parent: string, child: string): string {
 }
 
 /**
- * Recursively computes the fully qualified name for a child element within nested groups.
- * @param group - The current group declaration
- * @param childName - The name of the child element
- * @returns The fully qualified name as a string
- */
-export function toQualifiedName(group: GroupDeclaration, childName: string): string {
-    return isGroupDeclaration(group.$container)
-        ? joinQualifiedName(toQualifiedName(group.$container, group.name), childName)
-        : joinQualifiedName(group.name, childName);
-}
-
-/**
  * Provides qualified name computation for domain language elements, supporting nested groups and models.
  * Used for FQN disambiguation and reference resolution.
  */
@@ -44,13 +32,8 @@ export class QualifiedNameProvider {
      * @param name - The simple name of the element
      * @returns The fully qualified name as a string
      */
-    getQualifiedName(qualifier: Container | string, name: string): string {
+    getQualifiedName(qualifier: Model | string, name: string): string {
         let prefix = isModel(qualifier) ? '' : qualifier;
-        if (isGroupDeclaration(prefix)) {
-            prefix = isGroupDeclaration(prefix.$container)
-                ? this.getQualifiedName(prefix.$container, prefix.name)
-                : prefix.name;
-        }
         return prefix ? `${prefix}.${name}` : name;
     }
 }

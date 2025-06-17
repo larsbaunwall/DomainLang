@@ -10,13 +10,14 @@
 import type { AstNode, AstNodeDescription, LangiumDocument, PrecomputedScopes } from 'langium';
 import { DefaultScopeComputation, interruptAndCheck, MultiMap, AstUtils } from 'langium';
 import { CancellationToken } from 'vscode-jsonrpc';
-import { isType, isGroupDeclaration, GroupDeclaration, Model, Container } from '../generated/ast.js';
+import { isType, Model } from '../generated/ast.js';
 import { QualifiedNameProvider } from './domain-lang-naming.js';
 import { DomainLangServices } from '../domain-lang-module.js';
 
 /**
- * Computes the scope for DomainLang elements, supporting nested groups, FQN disambiguation, and cross-file references.
- * Extends Langium's DefaultScopeComputation to provide custom export and local scope logic.
+ * Computes the scope for DomainLang elements, supporting FQN disambiguation and cross-file references.
+ * Cross-file references are only resolved if the imported document is already loaded (preloaded and built).
+ * This matches the synchronous requirements of Langium's scope computation.
  */
 export class DomainLangScopeComputation extends DefaultScopeComputation {
     qualifiedNameProvider: QualifiedNameProvider;
@@ -42,13 +43,7 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
             await interruptAndCheck(cancelToken);
             if (isType(modelNode)) {
                 let name = this.nameProvider.getName(modelNode);
-                if (!name) {
-                    // Defensive: skip unnamed types
-                    continue;
-                }
-                if (isGroupDeclaration(modelNode.$container)) {
-                    name = this.qualifiedNameProvider.getQualifiedName(modelNode.$container as GroupDeclaration, name);
-                }
+                if (!name) continue;
                 descr.push(this.descriptions.createDescription(modelNode, name, document));
             }
         }
@@ -77,7 +72,7 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
      * @returns A promise resolving to an array of AstNodeDescription
      */
     protected async processContainer(
-        container: Container,
+        container: Model,
         scopes: PrecomputedScopes,
         document: LangiumDocument,
         cancelToken: CancellationToken
@@ -88,33 +83,9 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
             if (isType(element) && element.name) {
                 const description = this.descriptions.createDescription(element, element.name, document);
                 localDescriptions.push(description);
-            } else if (isGroupDeclaration(element)) {
-                const nestedDescriptions = await this.processContainer(element, scopes, document, cancelToken);
-                for (const description of nestedDescriptions) {
-                    // Add qualified names to the container
-                    const qualified = this.createQualifiedDescription(element, description, document);
-                    localDescriptions.push(qualified);
-                }
             }
         }
         scopes.addAll(container, localDescriptions);
         return localDescriptions;
-    }
-
-    /**
-     * Creates a qualified AstNodeDescription for a node within a group.
-     * @param group - The GroupDeclaration containing the node
-     * @param description - The AstNodeDescription to qualify
-     * @param document - The LangiumDocument being processed
-     * @returns A new AstNodeDescription with a fully qualified name
-     */
-    protected createQualifiedDescription(
-        group: GroupDeclaration,
-        description: AstNodeDescription,
-        document: LangiumDocument
-    ): AstNodeDescription {
-        const name = this.qualifiedNameProvider.getQualifiedName(group.name, description.name);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return this.descriptions.createDescription(description.node!, name, document);
     }
 }

@@ -26,26 +26,14 @@ grammar DomainLang
  *   BoundedContext SalesContext { ... }
  *   Group Shared { ... }
  */
-entry Model: 
+entry Model:
+    imports+=ImportStatement*
     (children+=StructureElement)*
 ;
 
-type Container = GroupDeclaration | Model;
-
-/**
- * Represents any top-level structure in the model.
- *
- * Semantics:
- *   - Unifies all major DDD elements (types, maps, groups) for flexible ordering.
- *   - Enables nesting and grouping.
- *
- * AST Impact:
- *   - Used as a union type for children in Model and GroupDeclaration.
- */
 StructureElement: 
     Type |
-    ObjectMap |
-    GroupDeclaration
+    ObjectMap
 ;
 
 /**
@@ -60,29 +48,6 @@ Type:
     Domain | 
     Team |
     Classification
-;
-
-/**
- * Hierarchical grouping for namespacing and modularity.
- *
- * Semantics:
- *   - Allows nesting of elements under a qualified name.
- *   - Supports FQN disambiguation and avoids naming collisions.
- *   - Groups can be nested arbitrarily.
- *
- * Example:
- *   Group Shared {
- *     Domain Common { ... }
- *     BoundedContext CommonContext { ... }
- *   }
- *
- * AST Impact:
- *   - Creates a `GroupDeclaration` node with its own children.
- */
-GroupDeclaration:
-    ('Group' | 'group') name=QualifiedName '{'
-        (children+=StructureElement)*
-    '}'
 ;
 
 /**
@@ -471,6 +436,20 @@ BoundedContextRef:
     {infer ThisRef} 'this' | link=[BoundedContext:QualifiedName]
 ;
 
+/**
+ * Import statement for external models.
+ *
+ * Semantics:
+ *   - Allows importing models from external sources.
+ *   - Supports aliasing for clarity.
+ * 
+ * Example:
+ *   import "github.com/acme/ddd/types.dlang"
+ *   import "./local-types.dlang" as local
+ */
+ImportStatement:
+    'import' uri=STRING ('as' alias=ID)?
+;
 
 hidden terminal WS: /\s+/;
 terminal ID: /[_a-zA-Z][\w_-]*/;

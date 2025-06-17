@@ -6,6 +6,7 @@ import { QualifiedNameProvider } from './lsp/domain-lang-naming.js';
 import { DomainLangScopeComputation } from './lsp/domain-lang-scope.js';
 import { DomainLangFormatter } from './lsp/domain-lang-formatter.js';
 import { DomainLangHoverProvider } from './lsp/hover/domain-lang-hover.js';
+import { DomainLangScopeProvider } from './lsp/domain-lang-scope-provider.js';
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -34,7 +35,8 @@ export type DomainLangServices = LangiumServices & DomainLangAddedServices
 export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices & DomainLangAddedServices> = {
     references: {
         ScopeComputation: (services) => new DomainLangScopeComputation(services),
-        QualifiedNameProvider: () => new QualifiedNameProvider()
+        QualifiedNameProvider: () => new QualifiedNameProvider(),
+        ScopeProvider: (services) => new DomainLangScopeProvider(services)
     },
     lsp: {
         Formatter: () => new DomainLangFormatter(),

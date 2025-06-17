@@ -3,7 +3,7 @@ import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { clearDocuments, parseHelper } from "langium/test";
 import { createDomainLangServices } from "../../src/language/domain-lang-module.js";
-import { Container, ContextMap, Model, Relationship, isModel } from "../../src/language/generated/ast.js";
+import { ContextMap, Model, Relationship, isModel } from "../../src/language/generated/ast.js";
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import * as ast from '../../src/language/generated/ast.js';
@@ -56,27 +56,20 @@ describe('Linking tests', () => {
 
     test('succeed if references can be found', async () => {
         let document = await parse(`
-            group TestPackage {
-            
-                ContextMap CorrectMap {
-                    OtherPackage.PaymentBC <- OrdersBC
-                }
-                
-                BoundedContext OrdersBC {
-                }
+            ContextMap CorrectMap {
+                PaymentBC <- OrdersBC
             }
             
-            group OtherPackage {
-                BoundedContext PaymentBC {
-                }
-            }
+            BoundedContext OrdersBC {}
+        
+            BoundedContext PaymentBC {}
         `, {validation: true});
 
         // Document is valid because the references are not checked in the parser
         expect(checkDocumentValid(document)).toBeUndefined();
 
         // Now the references are resolved
-        let ctxMap = document.parseResult.value?.children.flatMap(e => (e as Container)?.children).find(e => ast.isContextMap(e)) as ContextMap;
+        let ctxMap = document.parseResult.value?.children.find(e => ast.isContextMap(e)) as ContextMap;
         expect(ctxMap.relationships.length).toBe(1);
         
         let rel = ctxMap.relationships[0];

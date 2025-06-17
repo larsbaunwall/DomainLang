@@ -22,6 +22,7 @@ The application we are working on uses the following tech stack:
 - Langium
 - Vite
 - VSCode extentions API
+- Vitest
 
 ## Shortcuts
 

@@ -4,8 +4,8 @@ import * as ast from '../../generated/ast.js';
 import { AstNodeHoverProvider, LangiumServices } from "langium/lsp";
 import { LangiumDocument } from "langium";
 import { keywordExplanations } from './domain-lang-keywords.js';
-import { QualifiedNameProvider } from '../domain-lang-naming.js';
 import type { Reference } from 'langium';
+import { QualifiedNameProvider } from "../domain-lang-naming.js";
 
 /**
  * Provides hover information for DomainLang elements in the editor.
@@ -127,7 +127,6 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                     if (
                         ast.isDomain(parent) ||
                         ast.isBoundedContext(parent) ||
-                        ast.isGroupDeclaration(parent) ||
                         ast.isContextMap(parent) ||
                         ast.isDomainMap(parent) ||
                         ast.isModel(parent)
@@ -191,24 +190,6 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                                 relationships.length ? `---\n\n&nbsp;\n\n#### 🔗 Relationships\n${relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? '(' + r.type + ')' : ''}`).join('\n')}` : undefined,
                                 terminology.length ? `---\n\n&nbsp;\n\n#### 🗝️ Terminology\n${terminology.map(t => `- **${t.name}**: _${t.meaning}_`).join('\n')}` : undefined,
                                 decisions.length ? `---\n\n&nbsp;\n\n#### ⚖️ Decisions\n${decisions.map(d => `- **${d.name}**: _${d.value}_`).join('\n')}` : undefined
-                            ],
-                            commentBlock
-                        )
-                    }
-                };
-            }
-
-            // --- GroupDeclaration ---
-            if (ast.isGroupDeclaration && ast.isGroupDeclaration(node)) {
-                const n = node as ast.GroupDeclaration;
-                return {
-                    contents: {
-                        kind: 'markdown',
-                        value: this.hoverTemplate(
-                            '📦',
-                            ` **\`(group)\` ${n.name}**`,
-                            [
-                                `Contains ${n.children.length} elements.`
                             ],
                             commentBlock
                         )
