@@ -1,11 +1,20 @@
-import {CstUtils, AstNode, CommentProvider, DocumentationProvider, isReference, MaybePromise } from "langium";
-import { Hover, HoverParams, MarkupKind } from "vscode-languageserver";
+import type { 
+    AstNode, 
+    CommentProvider, 
+    DocumentationProvider, 
+    MaybePromise,
+    Reference,
+    LangiumDocument
+} from "langium";
+import { CstUtils, isReference } from "langium";
+import type { Hover, HoverParams } from "vscode-languageserver";
+import { MarkupKind } from "vscode-languageserver";
 import * as ast from '../../generated/ast.js';
-import { AstNodeHoverProvider, LangiumServices } from "langium/lsp";
-import { LangiumDocument } from "langium";
+import type { LangiumServices } from "langium/lsp";
+import { AstNodeHoverProvider } from "langium/lsp";
 import { keywordExplanations } from './domain-lang-keywords.js';
 import { QualifiedNameProvider } from '../domain-lang-naming.js';
-import type { Reference } from 'langium';
+import type { DomainLangServices } from '../../domain-lang-module.js';
 
 /**
  * Provides hover information for DomainLang elements in the editor.
@@ -33,8 +42,9 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
         super(services);
         this.documentationProvider = services.documentation.DocumentationProvider;
         this.commentProvider = services.documentation.CommentProvider;
-        // Defensive: fallback to undefined if not present
-        this.qualifiedNameProvider = (services as any).references?.QualifiedNameProvider ?? new QualifiedNameProvider();
+        // Type-safe access with proper DomainLangServices
+        const domainServices = services as DomainLangServices;
+        this.qualifiedNameProvider = domainServices.references.QualifiedNameProvider;
     }
 
     /**
@@ -348,6 +358,9 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
 
     /**
      * Returns the name of a referenced type, or an empty string if not resolvable.
+     * 
+     * @param ref - Reference to a type or the type itself
+     * @returns The name of the type or empty string
      */
     private getRefName(ref: ast.Type | Reference<ast.Type> | undefined): string {
         const node = isReference(ref) ? ref.ref : ref;
@@ -358,7 +371,11 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
     }
 
     /**
-     * Returns a markdown link to a referenced entity, or an empty string if not resolvable.
+     * Creates a markdown link to a referenced entity.
+     * 
+     * @param ref - Reference to a type or the type itself
+     * @param label - Optional custom label (defaults to qualified name)
+     * @returns Markdown link string or empty string if unresolvable
      */
     private refLink(
         ref: Reference<ast.Type> | ast.Type | undefined,
@@ -386,12 +403,13 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
     }
     
     /**
-     * Formats the hover content as markdown.
+     * Formats hover content as markdown with consistent structure.
      *
-     * @param icon Emoji or icon for the node type
-     * @param title Title for the hover block
-     * @param fields List of markdown fields to include
-     * @param commentBlock Optional comment/documentation block
+     * @param icon - Emoji or icon for the node type
+     * @param title - Title for the hover block
+     * @param fields - List of markdown fields to include (undefined values filtered)
+     * @param commentBlock - Optional comment/documentation block
+     * @returns Formatted markdown string
      */
     private hoverTemplate(
         icon: string,

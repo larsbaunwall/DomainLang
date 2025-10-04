@@ -1,5 +1,11 @@
 import { type Module, inject } from 'langium';
-import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
+import type { 
+    DefaultSharedModuleContext, 
+    LangiumServices, 
+    LangiumSharedServices, 
+    PartialLangiumServices 
+} from 'langium/lsp';
+import { createDefaultModule, createDefaultSharedModule } from 'langium/lsp';
 import { DomainLangGeneratedModule, DomainLangGeneratedSharedModule } from './generated/module.js';
 import { registerValidationChecks } from './validation/domain-lang-validator.js';
 import { QualifiedNameProvider } from './lsp/domain-lang-naming.js';

@@ -1,8 +1,5 @@
-import type { ValidationAcceptor } from 'langium';
+import type { ValidationCheck } from 'langium';
 import type { Classification } from '../generated/ast.js';
 
-function noopValidation(classification: Classification, accept: ValidationAcceptor): void {
-    // TODO: Implement classification validation logic
-}
-
-export const classificationChecks = [noopValidation]; 
+// No validation checks needed for classifications currently
+export const classificationChecks: ValidationCheck<Classification>[] = []; 

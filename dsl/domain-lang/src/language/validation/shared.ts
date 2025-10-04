@@ -1,5 +1,6 @@
 import type { AstNode } from 'langium';
-import { Container, isContainer } from '../generated/ast.js';
+import type { Container } from '../generated/ast.js';
+import { isContainer } from '../generated/ast.js';
 import { QualifiedNameProvider } from '../lsp/domain-lang-naming.js';
 
 export function* extractNames(element: Container): Generator<{fqn: string, node: AstNode}> {

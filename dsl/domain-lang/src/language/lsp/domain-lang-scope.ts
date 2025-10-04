@@ -7,12 +7,23 @@
  * terms of the MIT License, which is available in the project root.
  ***************************************************************************/
 
-import type { AstNode, AstNodeDescription, LangiumDocument, PrecomputedScopes } from 'langium';
-import { DefaultScopeComputation, interruptAndCheck, MultiMap, AstUtils } from 'langium';
+import type { 
+    AstNode, 
+    AstNodeDescription, 
+    LangiumDocument, 
+    PrecomputedScopes 
+} from 'langium';
+import { 
+    DefaultScopeComputation, 
+    interruptAndCheck, 
+    MultiMap, 
+    AstUtils 
+} from 'langium';
 import { CancellationToken } from 'vscode-jsonrpc';
-import { isType, isGroupDeclaration, GroupDeclaration, Model, Container } from '../generated/ast.js';
+import type { GroupDeclaration, Model, Container } from '../generated/ast.js';
+import { isType, isGroupDeclaration } from '../generated/ast.js';
 import { QualifiedNameProvider } from './domain-lang-naming.js';
-import { DomainLangServices } from '../domain-lang-module.js';
+import type { DomainLangServices } from '../domain-lang-module.js';
 
 /**
  * Computes the scope for DomainLang elements, supporting nested groups, FQN disambiguation, and cross-file references.
@@ -103,10 +114,15 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
 
     /**
      * Creates a qualified AstNodeDescription for a node within a group.
+     * 
      * @param group - The GroupDeclaration containing the node
      * @param description - The AstNodeDescription to qualify
      * @param document - The LangiumDocument being processed
      * @returns A new AstNodeDescription with a fully qualified name
+     * 
+     * @example
+     * // For a Domain "Sales" in Group "Shared"
+     * // Returns description with name "Shared.Sales"
      */
     protected createQualifiedDescription(
         group: GroupDeclaration,

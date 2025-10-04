@@ -27,6 +27,7 @@ grammar DomainLang
  *   Group Shared { ... }
  */
 entry Model: 
+    imports+=ImportStatement*
     (children+=StructureElement)*
 ;
 
@@ -478,3 +479,10 @@ terminal INT returns number: /[0-9]+/;
 terminal STRING: /"(\\.|[^"\\])*"|'(\\.|[^'\\])*'/;
 hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
 hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
+
+/**
+ * Import statement for external models with optional alias.
+ */
+ImportStatement:
+    'import' uri=STRING ('as' alias=ID)?
+;

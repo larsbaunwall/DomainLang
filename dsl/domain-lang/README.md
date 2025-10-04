@@ -7,3 +7,7 @@ The ambition is to evolve this into a visual representation of your strategic DD
 ## Work in progress 🚧
 
 This represents work in progress. Keep an eye out for the first major version, or even better: [Join the effort](https://github.com/larsbaunwall/domainlang)!
+
+—
+
+Developer note: If you use GitHub Copilot or Copilot Chat in this repository, see `.github/copilot-instructions.md` for project-specific guidance.

@@ -15,10 +15,16 @@ const packagePath = path.resolve(__dirname, '..', '..', 'package.json');
 const packageContent = await fs.readFile(packagePath, 'utf-8');
 
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
-    const services = createDomainLangServices(NodeFileSystem).DomainLang;
-    const model = await extractAstNode<Model>(fileName, services);
-    const generatedFilePath = generateJavaScript(model, fileName, opts.destination);
-    console.log(chalk.green(`JavaScript code generated successfully: ${generatedFilePath}`));
+    try {
+        const services = createDomainLangServices(NodeFileSystem).DomainLang;
+        const model = await extractAstNode<Model>(fileName, services);
+        const generatedFilePath = generateJavaScript(model, fileName, opts.destination);
+        console.log(chalk.green('✓ JavaScript code generated successfully:'), chalk.cyan(generatedFilePath));
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.error(chalk.red('✗ Generation failed:'), message);
+        process.exit(1);
+    }
 };
 
 export type GenerateOptions = {
