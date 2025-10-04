@@ -2,7 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { URI, type LangiumDocument, type LangiumDocuments } from 'langium';
 import type { Model } from '../generated/ast.js';
-import { GitUrlParser, type GitUrlResolver } from '../services/git-url-resolver.js';
+import { GitUrlParser } from '../services/git-url-resolver.js';
+import type { GitUrlResolver } from '../services/git-url-resolver.js';
 import { WorkspaceManager } from '../services/workspace-manager.js';
 
 // Singleton workspace manager instance
@@ -133,15 +134,29 @@ export async function resolveImportPath(
   importingDoc: LangiumDocument,
   rawImportPath: string
 ): Promise<URI> {
+  const baseDir = path.dirname(importingDoc.uri.fsPath);
+
+  // Handle manifest dependency aliases (friendly names)
+  const manager = await getWorkspaceManager(baseDir);
+  let gitResolver: GitUrlResolver | undefined;
+
+  try {
+    const manifestImport = await manager.resolveDependencyImport(rawImportPath);
+    if (manifestImport) {
+      gitResolver = await manager.getGitResolver();
+      return await gitResolver.resolve(manifestImport);
+    }
+  } catch {
+    // Ignore manifest resolution issues; fall back to other strategies
+  }
+
   // Handle git URLs (shorthand or full)
   if (GitUrlParser.isGitUrl(rawImportPath)) {
-    const baseDir = path.dirname(importingDoc.uri.fsPath);
-    const resolver = await getGitResolver(baseDir);
-    return await resolver.resolve(rawImportPath);
+    gitResolver = gitResolver ?? await manager.getGitResolver();
+    return await gitResolver.resolve(rawImportPath);
   }
 
   // Handle workspace-relative paths (~/)
-  const baseDir = path.dirname(importingDoc.uri.fsPath);
   let resolvedPath = rawImportPath;
 
   if (rawImportPath.startsWith('~/')) {

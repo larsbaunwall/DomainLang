@@ -8,6 +8,7 @@ import { resetGlobalOptimizer } from "../../src/language/services/performance-op
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const TEST_ROOT = path.resolve(__dirname, "../fixtures/sample-workspace");
+const ALIAS_ROOT = path.resolve(__dirname, "../fixtures/alias-workspace");
 const LOCK_FILE = path.join(TEST_ROOT, "model.lock");
 
 // Helper: create a dummy lock file
@@ -58,5 +59,18 @@ describe("WorkspaceManager", () => {
         await manager.initialize(TEST_ROOT);
         const lock = await manager.getLockFile();
         expect(lock).toBeUndefined();
+    });
+
+    it("resolves dependency aliases from manifest", async () => {
+        const manager = new WorkspaceManager({ autoResolve: false });
+        await manager.initialize(ALIAS_ROOT);
+        const direct = await manager.resolveDependencyImport("ddd-patterns");
+        expect(direct).toBe("ddd-patterns/core@v2.1.0");
+
+        const withSubPath = await manager.resolveDependencyImport("ddd-patterns/patterns.dlang");
+        expect(withSubPath).toBe("ddd-patterns/core@v2.1.0/patterns.dlang");
+
+        const missing = await manager.resolveDependencyImport("unknown");
+        expect(missing).toBeUndefined();
     });
 });

@@ -1,5 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import YAML from 'yaml';
 import { DependencyResolver } from './dependency-resolver.js';
 import { GitUrlResolver } from './git-url-resolver.js';
 import { getGlobalOptimizer } from './performance-optimizer.js';
@@ -21,6 +22,27 @@ export interface WorkspaceManagerOptions {
     readonly lockFiles?: readonly string[];
 }
 
+interface ManifestDependency {
+    readonly source?: string;
+    readonly version?: string;
+    readonly description?: string;
+}
+
+interface ModelManifest {
+    readonly model?: {
+        readonly name?: string;
+        readonly version?: string;
+        readonly entry?: string;
+    };
+    readonly dependencies?: Record<string, ManifestDependency>;
+}
+
+interface ManifestCache {
+    readonly manifest: ModelManifest;
+    readonly path: string;
+    readonly mtimeMs: number;
+}
+
 interface LoadedLockFile {
     readonly lockFile: LockFile;
     readonly filePath: string;
@@ -38,6 +60,7 @@ export class WorkspaceManager {
     private gitResolver: GitUrlResolver | undefined;
     private dependencyResolver: DependencyResolver | undefined;
     private initializePromise: Promise<void> | undefined;
+    private manifestCache: ManifestCache | undefined;
 
     constructor(private readonly options: WorkspaceManagerOptions = {}) {
         this.manifestFiles = options.manifestFiles ?? [...DEFAULT_MANIFEST_FILES];
@@ -152,6 +175,39 @@ export class WorkspaceManager {
         return this.lockFile;
     }
 
+    /**
+     * Resolves a manifest dependency alias to its git import string.
+     *
+     * @param aliasPath - Alias from import statement (may include subpaths)
+     * @returns Resolved git import string or undefined when alias is unknown
+     */
+    async resolveDependencyImport(aliasPath: string): Promise<string | undefined> {
+        await this.ensureInitialized();
+        const manifest = await this.loadManifest();
+        const dependencies = manifest?.dependencies;
+
+        if (!dependencies) {
+            return undefined;
+        }
+
+        for (const [alias, dep] of Object.entries(dependencies)) {
+            if (!dep?.source) {
+                continue;
+            }
+
+            if (aliasPath === alias || aliasPath.startsWith(`${alias}/`)) {
+                const suffix = aliasPath.slice(alias.length);
+                const version = dep.version ?? '';
+                const versionSegment = version
+                    ? (version.startsWith('@') ? version : `@${version}`)
+                    : '';
+                return `${dep.source}${versionSegment}${suffix}`;
+            }
+        }
+
+        return undefined;
+    }
+
     private async performInitialization(startPath: string): Promise<void> {
         this.workspaceRoot = await this.findWorkspaceRoot(startPath);
         if (!this.workspaceRoot) {
@@ -259,6 +315,38 @@ export class WorkspaceManager {
             return this.parseJsonLockFile(content);
         } catch (error) {
             if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') {
+                return undefined;
+            }
+            throw error;
+        }
+    }
+
+    private async loadManifest(): Promise<ModelManifest | undefined> {
+        const manifestPath = await this.getManifestPath();
+        if (!manifestPath) {
+            this.manifestCache = undefined;
+            return undefined;
+        }
+
+        try {
+            const stat = await fs.stat(manifestPath);
+            if (this.manifestCache &&
+                this.manifestCache.path === manifestPath &&
+                this.manifestCache.mtimeMs === stat.mtimeMs) {
+                return this.manifestCache.manifest;
+            }
+
+            const content = await fs.readFile(manifestPath, 'utf-8');
+            const manifest = (YAML.parse(content) ?? {}) as ModelManifest;
+            this.manifestCache = {
+                manifest,
+                path: manifestPath,
+                mtimeMs: stat.mtimeMs,
+            };
+            return manifest;
+        } catch (error) {
+            if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') {
+                this.manifestCache = undefined;
                 return undefined;
             }
             throw error;

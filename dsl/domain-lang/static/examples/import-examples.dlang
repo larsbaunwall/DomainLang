@@ -26,59 +26,59 @@ import "~/shared/patterns.dlang" as CommonPatterns
 import "~/domains/core-domains.dlang"
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. GITHUB IMPORTS (Shorthand Syntax - Recommended)
+// 3. GITHUB REPOSITORY IMPORTS (Shorthand Syntax)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// With version tag
-import "gh:ddd-patterns/core@v2.1.0/patterns.dlang" as DDDPatterns
+// Owner/repo shorthand with version tag (GitHub host assumed)
+import "ddd-patterns/core@v2.1.0" as DDDPatterns
 
-// With commit hash (for exact reproducibility)
-import "gh:ddd-patterns/core@abc123def456/patterns.dlang"
+// Repository imports load the default entry defined in the package's model.yaml
+
+// Pin to a specific commit for reproducibility
+import "ddd-patterns/core@abc123def456"
 
 // Default to main branch (useful for development)
-import "gh:ddd-patterns/core/patterns.dlang"
+import "ddd-patterns/core"
 
-// Nested file paths within repository
-import "gh:ddd-patterns/core@v2.1.0/strategies/aggregates.dlang" as AggregateStrategies
-import "gh:ddd-patterns/core@v2.1.0/strategies/bounded-contexts.dlang"
+// Bring in another GitHub package with an alias
+import "event-sourcing/patterns@v1.5.0" as EventPatterns
 
-// Multiple imports from same repository
-import "gh:event-sourcing/patterns@v1.5.0/events.dlang"
-import "gh:event-sourcing/patterns@v1.5.0/commands.dlang"
-import "gh:event-sourcing/patterns@v1.5.0/projections.dlang"
+// Use the friendly name from model.yaml (maps to source + version)
+import "ddd-patterns" as PatternLibrary
+import "ddd-patterns/patterns.dlang"
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. GITLAB IMPORTS (Shorthand Syntax)
+// 4. GITLAB IMPORTS (Full HTTPS URLs)
 // ═══════════════════════════════════════════════════════════════════════════
 
-import "gl:company/shared-domains@v1.0.0/core.dlang"
-import "gl:company/shared-domains@main/experimental.dlang"
+import "https://gitlab.com/company/shared-domains@v1.0.0" as SharedDomains
+import "https://gitlab.com/company/shared-domains@main"
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. BITBUCKET IMPORTS (Shorthand Syntax)
+// 5. BITBUCKET IMPORTS (Full HTTPS URLs)
 // ═══════════════════════════════════════════════════════════════════════════
 
-import "bb:team/domain-models@release-2.0/entities.dlang"
+import "https://bitbucket.org/team/domain-models@release-2.0" as DomainModels
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 6. FULL GIT URLs (Alternative Syntax)
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Full GitHub URL
-import "https://github.com/ddd-patterns/core/blob/v2.1.0/patterns.dlang"
+import "https://github.com/ddd-patterns/core@v2.1.0"
 
 // Full GitLab URL
-import "https://gitlab.com/company/domains/-/blob/v1.0.0/core.dlang"
+import "https://gitlab.com/company/domains@v1.0.0"
 
 // Full Bitbucket URL
-import "https://bitbucket.org/team/models/src/main/entities.dlang"
+import "https://bitbucket.org/team/models@main"
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 7. NAMED IMPORTS (Future Enhancement)
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Import specific symbols
-// import { AggregatePattern, EntityPattern, ValueObjectPattern } from "gh:ddd-patterns/core@v2.1.0/patterns.dlang"
+// import { AggregatePattern, EntityPattern, ValueObjectPattern } from "ddd-patterns/core@v2.1.0"
 
 // Import specific symbols from local file
 // import { CustomerDomain, OrderDomain } from "./domains/core.dlang"
@@ -99,7 +99,7 @@ BC OrderContext for EcommerceDomain {
   // Reference classifications from imported file
   classifiers {
     role: DDDPatterns.AggregateRoot
-    strategy: AggregateStrategies.EventSourcedAggregate
+    strategy: EventPatterns.EventSourcedAggregate
   }
   
   terminology {

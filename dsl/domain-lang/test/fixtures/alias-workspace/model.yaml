@@ -1,0 +1,13 @@
+model:
+  name: alias-workspace
+  version: 1.0.0
+  entry: index.dlang
+
+dependencies:
+  ddd-patterns:
+    source: ddd-patterns/core
+    version: v2.1.0
+    description: "Reusable DDD architectural patterns"
+  reporting-toolkit:
+    source: acme/reporting-toolkit
+    version: main
