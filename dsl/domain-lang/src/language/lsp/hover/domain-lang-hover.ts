@@ -15,6 +15,7 @@ import { AstNodeHoverProvider } from "langium/lsp";
 import { keywordExplanations } from './domain-lang-keywords.js';
 import { QualifiedNameProvider } from '../domain-lang-naming.js';
 import type { DomainLangServices } from '../../domain-lang-module.js';
+import { generateRelationshipExplanation, explainClassification, explainDecisionCategory } from './ddd-pattern-explanations.js';
 
 /**
  * Provides hover information for DomainLang elements in the editor.

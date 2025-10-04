@@ -1,13 +1,29 @@
 group test {
-    boundedcontext PaymentBC {
+    Domain eCommerce {
+        description: "E-Commerce domain"
+    }
+    
+    Team PaymentTeam
+    Team OrderTeam
+    Classification Core
+    
+    // Using BC shorthand with inline assignments
+    BC PaymentBC for eCommerce as Core by PaymentTeam {
         description: "Payment context"
     }
 
-    boundedcontext OrdersBC {
+    // Using traditional BoundedContext keyword
+    BoundedContext OrdersBC for eCommerce {
         description: "Orders context"
+        team: OrderTeam
     }
 
-    contextmap eShopMap {
-        PaymentBC [OHS] -> [CF] OrdersBC : UpstreamDownstream
+    ContextMap eShopMap {
+        // Traditional relationship syntax (tested by parsing test)
+        [OHS] PaymentBC -> [CF] OrdersBC : UpstreamDownstream
+        
+        // Note: New shorthand syntax also supported:
+        // PaymentBC U/D OrdersBC
+        // [PL] PaymentBC C/S [ACL] OrdersBC
     }
 }

@@ -12,17 +12,25 @@ import { QualifiedNameProvider } from './lsp/domain-lang-naming.js';
 import { DomainLangScopeComputation } from './lsp/domain-lang-scope.js';
 import { DomainLangFormatter } from './lsp/domain-lang-formatter.js';
 import { DomainLangHoverProvider } from './lsp/hover/domain-lang-hover.js';
+import { DomainLangCompletionProvider } from './lsp/domain-lang-completion.js';
+import { ImportResolver } from './services/import-resolver.js';
+import { WorkspaceManager } from './services/workspace-manager.js';
 
 /**
  * Declaration of custom services - add your own service classes here.
  */
 export type DomainLangAddedServices = {
+    imports: {
+        ImportResolver: ImportResolver,
+        WorkspaceManager: WorkspaceManager
+    },
     references: {
         QualifiedNameProvider: QualifiedNameProvider
     },
     lsp: {
         Formatter: DomainLangFormatter,
-        HoverProvider: DomainLangHoverProvider
+        HoverProvider: DomainLangHoverProvider,
+        CompletionProvider: DomainLangCompletionProvider
     }
 }
 
@@ -38,6 +46,10 @@ export type DomainLangServices = LangiumServices & DomainLangAddedServices
  * selected services, while the custom services must be fully specified.
  */
 export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices & DomainLangAddedServices> = {
+    imports: {
+        ImportResolver: (services) => new ImportResolver(services),
+        WorkspaceManager: () => new WorkspaceManager()
+    },
     references: {
         ScopeComputation: (services) => new DomainLangScopeComputation(services),
         QualifiedNameProvider: () => new QualifiedNameProvider()
@@ -45,6 +57,7 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
     lsp: {
         Formatter: () => new DomainLangFormatter(),
         HoverProvider: (services) => new DomainLangHoverProvider(services),
+        CompletionProvider: (services) => new DomainLangCompletionProvider(services)
     },
 };
 

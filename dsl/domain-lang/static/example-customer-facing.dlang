@@ -1,51 +1,80 @@
+// DomainLang Example: Customer-Facing E-Commerce System
+// Demonstrates new simplified syntax features
+
 group CustomerFacing {
 
-    ContextMap map {
-        ApplicationFramework [OHS] -> [ACL] ApplicationFramework
-        Listings [P] <-> [P] ApplicationFramework
-        ApplicationFramework [SK] <-> Listings [SK]
-    }
-
-    Domain Company {
-        vision: "Make lots of money for shareholders"
-    }
-
-    Domain Inventory in Company {}
-
-    /**
-    * The CustomerFacing bounded context is responsible for all interactions with the customer.
-    */
-    BoundedContext ApplicationFramework {
-        terminology {
-            term micro-frontend : "a small, self-contained frontend application"
-        }
-    }
-
-    BoundedContext Listings implements Inventory {
-        description: "The product listings"
-        classifiers {
-            role: Roles.Nothing
-        }
-        terminology {
-            term product    : "a product that is for sale"
-            term SKU        : "a stock keeping unit"
-        }
-        decisions {
-            // test
-            policy do_not_allow_orders_without_stock : "do not allow orders for products that are out of stock"
+    // Simple bounded context declarations
+    BC ApplicationFramework for Company as Supporting by PlatformTeam
+    
+    BC Listings for Inventory as Core by ProductTeam {
+        description: "Product listings and catalog"
+        
+        // Flat classifier syntax (no nesting)
+        businessModel: SaaS
+        evolution: Custom
+        
+        // Rich terminology with synonyms
+        language {
+            term Product: "Item for sale"
+                aka: SKU, Item
+                examples: "Laptop #12345", "Mouse #67890"
             
-            //other stuff
-            rule   product_has_a_sku : "a product has a SKU"
+            term Inventory: "Stock keeping system"
         }
         
+        // Categorized decisions
+        constraints {
+            decision [architectural] EventSourcing: "Use event sourcing for audit trail"
+            policy [business] NoBackorders: "Do not allow orders without stock"
+            rule [technical] UniqueProductId: "Products must have globally unique IDs"
+        }
     }
 
-    /**
-     * Directly involved in executing transactions with the customer
-     */
-    Role Executing
+    // Context map with simplified relationships
+    ContextMap map {
+        contains ApplicationFramework, Listings
+        
+        // Clear relationship syntax
+        [OHS] ApplicationFramework -> [ACL] Listings
+        [SK] ApplicationFramework <-> Listings : SharedKernel
+    }
+
+    // Domain with inline description
+    Domain Company {
+        vision: "Make lots of money for shareholders"
+        description: "Corporate umbrella domain"
+    }
+
+    Domain Inventory in Company {
+        description: "Product inventory management"
+        classifier: Supporting
+    }
+    
+    // Team definition
+    Team ProductTeam
+    Team PlatformTeam
 }
 
+// Organize contexts by strategic role
+ContextGroup CoreBusinessCapabilities for Company {
+    role: Core
+    contains Listings
+}
+
+// Classifications for tagging
 group Roles {
-Classification Nothing 
+    Classification Core
+    Classification Supporting  
+    Classification Generic
+}
+
+group BusinessModels {
+    Classification SaaS
+    Classification Revenue
+}
+
+group Evolution {
+    Classification Custom
+    Classification Product
+    Classification Commodity
 }

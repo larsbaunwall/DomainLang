@@ -9,7 +9,31 @@ import { URI } from 'langium';
 const connection = createConnection(ProposedFeatures.all);
 
 // Inject the shared services and language-specific services
-const { shared } = createDomainLangServices({ connection, ...NodeFileSystem });
+const { shared, DomainLang } = createDomainLangServices({ connection, ...NodeFileSystem });
+
+// Initialize workspace on connection
+connection.onInitialize(async (params) => {
+    const workspaceRoot = params.rootUri ? URI.parse(params.rootUri).fsPath : undefined;
+    
+    if (workspaceRoot) {
+        try {
+            // Initialize workspace manager
+            const workspaceManager = DomainLang.imports.WorkspaceManager;
+            await workspaceManager.initialize(workspaceRoot);
+            console.log(`DomainLang workspace initialized: ${workspaceRoot}`);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            console.warn(`Failed to initialize workspace: ${message}`);
+            // Continue without workspace - local imports will still work
+        }
+    }
+    
+    return {
+        capabilities: {
+            // Language server capabilities are configured by Langium
+        }
+    };
+});
 
 // Optionally start from a single entry file and follow imports.
 // Configure via env DOMAINLANG_ENTRY (absolute or workspace-relative path)

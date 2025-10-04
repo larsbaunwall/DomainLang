@@ -31,13 +31,13 @@ entry Model:
     (children+=StructureElement)*
 ;
 
-type Container = GroupDeclaration | Model;
+type Container = GroupDeclaration | Model | PackageDeclaration;
 
 /**
  * Represents any top-level structure in the model.
  *
  * Semantics:
- *   - Unifies all major DDD elements (types, maps, groups) for flexible ordering.
+ *   - Unifies all major DDD elements (types, maps, groups, packages) for flexible ordering.
  *   - Enables nesting and grouping.
  *
  * AST Impact:
@@ -46,7 +46,9 @@ type Container = GroupDeclaration | Model;
 StructureElement: 
     Type |
     ObjectMap |
-    GroupDeclaration
+    GroupDeclaration |
+    PackageDeclaration |
+    ContextGroup
 ;
 
 /**
@@ -83,6 +85,56 @@ Type:
 GroupDeclaration:
     ('Group' | 'group') name=QualifiedName '{'
         (children+=StructureElement)*
+    '}'
+;
+
+/**
+ * Package declarations for organizing large models.
+ *
+ * Semantics:
+ *   - Provides namespace isolation for DDD elements.
+ *   - Supports qualified name resolution across packages.
+ *   - Enables modular architecture organization.
+ *
+ * Example:
+ *   package acme.sales {
+ *     Domain Sales { ... }
+ *     BC Orders { ... }
+ *   }
+ *
+ * AST Impact:
+ *   - Creates a `PackageDeclaration` node with qualified name and children.
+ */
+PackageDeclaration:
+    'package' name=QualifiedName '{'
+        (children+=StructureElement)*
+    '}'
+;
+
+/**
+ * Groups bounded contexts by strategic role or pattern.
+ *
+ * Semantics:
+ *   - Organizes contexts by DDD patterns (Core, Supporting, Generic).
+ *   - Can reference a domain for scoping.
+ *   - Useful for architecture visualization and governance.
+ *
+ * Example:
+ *   ContextGroup CoreDomain for Sales {
+ *     role: Core
+ *     contains Orders, Pricing, Catalog
+ *   }
+ *
+ * AST Impact:
+ *   - Creates a `ContextGroup` node with role and context references.
+ */
+ContextGroup:
+    ('ContextGroup' | 'contextgroup') name=ID 
+    (('for' | 'in') domain=[Domain:QualifiedName])?
+    '{'
+        ('role' Assignment roleClassifier=[Classification:QualifiedName])?
+        (('contexts' | 'contains') contexts+=[BoundedContext:QualifiedName] 
+            (',' contexts+=[BoundedContext:QualifiedName])*)?
     '}'
 ;
 
@@ -127,6 +179,20 @@ interface ClassifierBlock {
 interface TeamBlock {
     team?: @Team // Cross-reference to Team
 }
+
+/**
+ * Individual classifier blocks for flat syntax.
+ */
+interface RoleBlock {
+    roleClassifier?: @Classification
+}
+interface BusinessModelBlock {
+    businessModel?: @Classification
+}
+interface EvolutionBlock {
+    evolution?: @Classification
+}
+
 interface RelationshipsBlock {
     relationships: Relationship[]
 }
@@ -187,43 +253,61 @@ DomainDocumentationBlock:
  *
  * Semantics:
  *   - Bounded Contexts define boundaries for models and teams.
- *   - Can reference a Domain via `implements` (cross-reference).
+ *   - Can reference a Domain via `implements` or `for` (cross-reference).
+ *   - Supports inline team and role assignment for brevity.
+ *   - Inline assignments can be combined with documentation blocks for flexibility.
  *   - Documentation blocks provide metadata, relationships, classifiers, terminology, and decisions.
  *
- * Example:
+ * Examples:
+ *   BC SalesContext for Sales as Core by SalesTeam
+ *   BC SalesContext for Sales as Core by SalesTeam {
+ *     description: "Handles sales workflows."
+ *   }
  *   BoundedContext SalesContext implements Sales {
  *     description: "Handles sales workflows."
  *     team: SalesTeam
- *     relationships { ... }
- *     classifiers { ... }
- *     terminology { ... }
- *     decisions { ... }
+ *     role: Core
  *   }
  *
  * AST Impact:
  *   - Creates a `BoundedContext` node with documentation and domain reference.
  */
 BoundedContext:
-    ('BoundedContext' | 'boundedcontext') name=ID ('implements' (domain=[Domain:QualifiedName]))? // Cross-reference
-    '{'
-        documentation+=BoundedContextDocumentationBlock*
-    '}'
+    ('BoundedContext' | 'boundedcontext' | 'BC' | 'Context') name=ID 
+    (('implements' | 'for') domain=[Domain:QualifiedName])? // Cross-reference
+    (
+        // Inline assignments (can appear in any order)
+        (('as' | 'tagged:') inlineRole=[Classification:QualifiedName])?
+        (('by' | 'owner:') inlineTeam=[Team:QualifiedName])?
+    )?
+    // Optional documentation block (can be combined with inline assignments)
+    ('{' documentation+=BoundedContextDocumentationBlock* '}')?
 ;
 
 /**
  * Documentation blocks for BoundedContext. See validation for semantic checks.
+ * Supports both flat and nested syntax for flexibility.
  */
 BoundedContextDocumentationBlock:
       {DescriptionBlock} 'description' Assignment description=STRING
-    | {TeamBlock} TeamAssignment Assignment team=[Team:QualifiedName] // Cross-reference
-    | {RelationshipsBlock} 'relationships' '{' (relationships += Relationship ((",")? relationships += Relationship)*)* '}'
+    | {TeamBlock} (TeamAssignment | 'owner' | ('managed' 'by')) Assignment team=[Team:QualifiedName] // Cross-reference
+    
+    // Flat classifier assignments (new, DDD-friendly)
+    | {RoleBlock} ('role' | ('domain' 'role')) Assignment roleClassifier=[Classification:QualifiedName]
+    | {BusinessModelBlock} ('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName]
+    | {EvolutionBlock} ('evolution' | 'maturity') Assignment evolution=[Classification:QualifiedName]
+    
+    // Nested classifiers block (kept for organization)
     | {ClassifiersBlock} 'classifiers' '{'
         (RoleAssignment Assignment roleClassifier=[Classification:QualifiedName])?
         (BusinessModelAssignment Assignment businessModel=[Classification:QualifiedName])?
         (EvolutionAssignment Assignment evolution=[Classification:QualifiedName])?
       '}'
-    | {TerminologyBlock} 'terminology' '{' (domainTerminology += DomainTerm (",")?)* '}'
-    | {DecisionsBlock} 'decisions' '{' (decisions += AbstractDecision (',')?)* '}'
+    
+    // Alternative block names for relationships and terminology
+    | {RelationshipsBlock} ('relationships' | 'integrations' | 'connections') '{' (relationships += Relationship ((",")? relationships += Relationship)*)* '}'
+    | {TerminologyBlock} ('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' (domainTerminology += DomainTerm (",")?)* '}'
+    | {DecisionsBlock} ('decisions' | 'constraints' | 'rules' | 'policies') '{' (decisions += AbstractDecision (',')?)* '}'
 ;
 
 /**
@@ -326,20 +410,34 @@ DomainMap:
  *
  * Semantics:
  *   - Supports role annotations (e.g., [PL], [SK]) and relationship types (e.g., Partnership).
+ *   - Roles appear BEFORE each context for clarity.
  *   - left and right are BoundedContextRef, which can be a reference or 'this'.
- *   - Used in ContextMap and relationships blocks.
+ *   - Supports both arrow and named relationship types.
  *
- * Example:
+ * Examples:
  *   [PL] SalesContext <-> SupportContext : Partnership
+ *   [PL, SK] SalesContext -> [ACL] SupportContext
+ *   SalesContext U/D PaymentContext
  *
  * AST Impact:
  *   - Creates a `Relationship` node with roles, references, and type.
  */
 Relationship:
-    ( '[' leftRoles+=RoleEnum (',' leftRoles+=RoleEnum)* ']' )? left=BoundedContextRef ( '[' leftRoles+=RoleEnum (',' leftRoles+=RoleEnum)* ']' )?
-    arrow=('<->' | '->' | '<-' | '><')
-    ( '[' leftRoles+=RoleEnum (',' leftRoles+=RoleEnum)* ']' )? right=BoundedContextRef ( '[' rightRoles+=RoleEnum (',' rightRoles+=RoleEnum)* ']' )?
+    ('[' leftRoles+=RoleEnum (',' leftRoles+=RoleEnum)* ']')? 
+    left=BoundedContextRef
+    arrow=RelationshipArrow
+    ('[' rightRoles+=RoleEnum (',' rightRoles+=RoleEnum)* ']')? 
+    right=BoundedContextRef
     (':' type=RelationshipType)?
+;
+
+/**
+ * Relationship arrows - supports both symbolic and named types.
+ */
+RelationshipArrow returns string:
+    '<->' | '->' | '<-' | '><'
+    | 'U/D' | 'u/d'  // UpstreamDownstream shorthand
+    | 'C/S' | 'c/s'  // CustomerSupplier shorthand
 ;
 
 /**
@@ -375,7 +473,14 @@ RelationshipType returns string:
  *
  * Semantics:
  *   - Enables documentation of decisions, policies, and rules in the model.
- *   - Used in decisions blocks in BoundedContext.
+ *   - Supports optional categorization for better organization.
+ *   - All types are interchangeable - use what reads best for your domain.
+ *
+ * Examples:
+ *   decision UseMicroservices: "Adopt microservices for scalability"
+ *   decision [architectural] UseMicroservices: "..."
+ *   policy [business] RefundPolicy: "Refunds within 30 days"
+ *   rule [compliance] DataRetention: "Keep data for 7 years"
  */
 AbstractDecision: 
     Decision | 
@@ -384,48 +489,62 @@ AbstractDecision:
 ;
 
 /**
- * Documents a decision in the model.
- *
- * Semantics:
- *   - Used for traceability and documentation.
- *
- * Example:
- *   decision UseMicroservices: "Adopt microservices for scalability."
+ * Documents a decision in the model with optional category.
  */
 Decision:
-    ('decision' | 'Decision') name=ID Assignment value=STRING
-;
-/**
- * Documents a business policy.
- *
- * Example:
- *   policy RefundPolicy: "Refunds allowed within 30 days."
- */
-Policy:
-    ('policy' | 'Policy') name=ID Assignment value=STRING
-;
-/**
- * Documents a business rule.
- *
- * Example:
- *   rule UniqueOrderID: "Order IDs must be unique."
- */
-BusinessRule:
-    ('rule' | 'Rule') name=ID Assignment value=STRING
+    ('decision' | 'Decision') 
+    ('[' category=DecisionCategory ']')?
+    name=ID Assignment value=STRING
 ;
 
 /**
- * Defines a term in the ubiquitous language.
+ * Documents a business policy with optional category.
+ */
+Policy:
+    ('policy' | 'Policy') 
+    ('[' category=DecisionCategory ']')?
+    name=ID Assignment value=STRING
+;
+
+/**
+ * Documents a business rule with optional category.
+ */
+BusinessRule:
+    ('rule' | 'Rule') 
+    ('[' category=DecisionCategory ']')?
+    name=ID Assignment value=STRING
+;
+
+/**
+ * Categories for decisions, policies, and rules.
+ */
+DecisionCategory returns string:
+    'architectural' | 'arch'
+    | 'business' | 'biz'
+    | 'technical' | 'tech'
+    | 'compliance'
+    | 'security'
+    | 'operational' | 'ops'
+;
+
+/**
+ * Defines a term in the ubiquitous language with optional rich metadata.
  *
  * Semantics:
  *   - Used for terminology blocks in BoundedContext.
  *   - Associates a name with a meaning.
+ *   - Supports synonyms and examples for richer glossaries.
  *
- * Example:
- *   term Invoice: "A bill sent to a customer."
+ * Examples:
+ *   term Invoice: "A bill sent to a customer"
+ *   term Order: "Customer purchase request"
+ *       aka: PurchaseOrder, CustomerOrder
+ *       examples: "Web order #12345", "Phone order"
  */
 DomainTerm:
-    ('term' | 'Term') name=ID (Assignment meaning=STRING)
+    ('term' | 'Term' | 'define') name=ID (Assignment meaning=STRING)?
+    (('aka' | 'aka:' | 'synonyms' | 'synonyms:') synonyms+=ID (',' synonyms+=ID)*)?
+    (('examples' | 'examples:' | 'e.g.' | 'e.g.:') examples+=STRING (',' examples+=STRING)*)?
 ;
 
 /**
@@ -481,8 +600,37 @@ hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
 hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
 
 /**
- * Import statement for external models with optional alias.
+ * Import statement supporting local files and git repositories.
+ *
+ * Modern git-native import system inspired by Go modules and Deno.
+ *
+ * Supported syntax:
+ *   - Local files: import "./shared/types.dlang"
+ *   - Workspace-relative: import "~/contexts/sales.dlang"
+ *   - GitHub packages: import "owner/repo@v1.0.0"
+ *   - Full git URLs: import "https://gitlab.com/owner/repo@v1.0.0"
+ *   - With aliases: import "ddd-patterns/core@v2.1.0" as DDD
+ *   - Named imports: import { OrderContext } from "./contexts.dlang"
+ *
+ * Repository imports:
+ *   - Imports entire package (not individual files)
+ *   - Version specified with @tag, @branch, or @commit
+ *   - Package's main entry point (from dlang.toml) is loaded
+ *   - Entry point exports public API symbols
+ *
+ * Examples:
+ *   import "./shared/classifications.dlang"           // Local file
+ *   import "~/domains/customer.dlang" as Customer    // Workspace file
+ *   import "ddd-patterns/core@v2.1.0" as DDD         // GitHub package
+ *   import "https://gitlab.com/company/models@v1.0" // GitLab package
  */
 ImportStatement:
-    'import' uri=STRING ('as' alias=ID)?
+    'import' (
+        // Named imports: import { Symbol1, Symbol2 } from "source"
+        '{' symbols+=ID (',' symbols+=ID)* '}' 'from' uri=STRING
+        // Simple import with optional alias: import "source" as Alias
+        | uri=STRING ('as' alias=ID)?
+        // Optional integrity hash for security (future)
+        ('integrity' integrity=STRING)?
+    )
 ;

@@ -1,0 +1,125 @@
+/**
+ * DomainLang Import Examples
+ * 
+ * Demonstrates all supported import syntaxes in the modern git-native system.
+ */
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 1. LOCAL FILE IMPORTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Relative to current file
+import "./shared/classifications.dlang"
+import "../domains/customer.dlang"
+
+// With alias for disambiguation
+import "./shared/types.dlang" as SharedTypes
+import "../other-context/types.dlang" as OtherTypes
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 2. WORKSPACE-RELATIVE IMPORTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ~ refers to workspace root (where dlang.toml or .git is located)
+import "~/contexts/sales.dlang"
+import "~/shared/patterns.dlang" as CommonPatterns
+import "~/domains/core-domains.dlang"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3. GITHUB IMPORTS (Shorthand Syntax - Recommended)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// With version tag
+import "gh:ddd-patterns/core@v2.1.0/patterns.dlang" as DDDPatterns
+
+// With commit hash (for exact reproducibility)
+import "gh:ddd-patterns/core@abc123def456/patterns.dlang"
+
+// Default to main branch (useful for development)
+import "gh:ddd-patterns/core/patterns.dlang"
+
+// Nested file paths within repository
+import "gh:ddd-patterns/core@v2.1.0/strategies/aggregates.dlang" as AggregateStrategies
+import "gh:ddd-patterns/core@v2.1.0/strategies/bounded-contexts.dlang"
+
+// Multiple imports from same repository
+import "gh:event-sourcing/patterns@v1.5.0/events.dlang"
+import "gh:event-sourcing/patterns@v1.5.0/commands.dlang"
+import "gh:event-sourcing/patterns@v1.5.0/projections.dlang"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. GITLAB IMPORTS (Shorthand Syntax)
+// ═══════════════════════════════════════════════════════════════════════════
+
+import "gl:company/shared-domains@v1.0.0/core.dlang"
+import "gl:company/shared-domains@main/experimental.dlang"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. BITBUCKET IMPORTS (Shorthand Syntax)
+// ═══════════════════════════════════════════════════════════════════════════
+
+import "bb:team/domain-models@release-2.0/entities.dlang"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 6. FULL GIT URLs (Alternative Syntax)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Full GitHub URL
+import "https://github.com/ddd-patterns/core/blob/v2.1.0/patterns.dlang"
+
+// Full GitLab URL
+import "https://gitlab.com/company/domains/-/blob/v1.0.0/core.dlang"
+
+// Full Bitbucket URL
+import "https://bitbucket.org/team/models/src/main/entities.dlang"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 7. NAMED IMPORTS (Future Enhancement)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Import specific symbols
+// import { AggregatePattern, EntityPattern, ValueObjectPattern } from "gh:ddd-patterns/core@v2.1.0/patterns.dlang"
+
+// Import specific symbols from local file
+// import { CustomerDomain, OrderDomain } from "./domains/core.dlang"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// USING IMPORTED PATTERNS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Define a domain using standard DDD patterns from external library
+Domain EcommerceDomain {
+  description: "E-commerce domain model"
+}
+
+// Use imported patterns in bounded context
+BC OrderContext for EcommerceDomain {
+  description: "Order management context"
+  
+  // Reference classifications from imported file
+  classifiers {
+    role: DDDPatterns.AggregateRoot
+    strategy: AggregateStrategies.EventSourcedAggregate
+  }
+  
+  terminology {
+    term Order: "A customer's purchase request"
+    term OrderLine: "Individual item in an order"
+  }
+}
+
+// Another context using shared types
+BC PaymentContext for EcommerceDomain {
+  description: "Payment processing context"
+  
+  classifiers {
+    role: SharedTypes.CoreContext
+  }
+}
+
+// Context map showing relationships
+ContextMap EcommerceMap {
+  OrderContext U/D PaymentContext
+  
+  contains EcommerceDomain
+}
