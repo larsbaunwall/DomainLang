@@ -20,6 +20,7 @@ import { createDomainLangServices } from '../language/domain-lang-module.js';
 import { extractAstNode } from './cli-util.js';
 import { generateJavaScript } from './generator.js';
 import { NodeFileSystem } from 'langium/node';
+import { performance } from 'node:perf_hooks';
 import * as url from 'node:url';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
@@ -31,9 +32,37 @@ const packageContent = await fs.readFile(packagePath, 'utf-8');
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
     try {
         const services = createDomainLangServices(NodeFileSystem).DomainLang;
-        const model = await extractAstNode<Model>(fileName, services);
-        const generatedFilePath = generateJavaScript(model, fileName, opts.destination);
-        console.log(chalk.green('✓ JavaScript code generated successfully:'), chalk.cyan(generatedFilePath));
+        
+        // Simple performance tracking if requested
+        const startTime = opts.profile ? performance.now() : 0;
+        let parseTime = 0, linkTime = 0;
+        
+        if (opts.profile) {
+            console.log(chalk.blue('🔍 Performance profiling enabled'));
+            const parseStart = performance.now();
+            const model = await extractAstNode<Model>(fileName, services);
+            parseTime = performance.now() - parseStart;
+            
+            const linkStart = performance.now();
+            // Linking happens during extractAstNode, so this is just for measurement
+            linkTime = performance.now() - linkStart;
+            
+            const generatedFilePath = generateJavaScript(model, fileName, opts.destination);
+            const totalTime = performance.now() - startTime;
+            
+            // Display profiling results
+            console.log(chalk.blue('\n📊 Performance Profile:'));
+            console.log(chalk.gray('─'.repeat(60)));
+            console.log(chalk.cyan(`  Total Time: ${totalTime.toFixed(2)}ms`));
+            console.log(chalk.gray(`  - Parsing & Linking: ${parseTime.toFixed(2)}ms`));
+            console.log(chalk.gray('─'.repeat(60)));
+            
+            console.log(chalk.green('✓ JavaScript code generated successfully:'), chalk.cyan(generatedFilePath));
+        } else {
+            const model = await extractAstNode<Model>(fileName, services);
+            const generatedFilePath = generateJavaScript(model, fileName, opts.destination);
+            console.log(chalk.green('✓ JavaScript code generated successfully:'), chalk.cyan(generatedFilePath));
+        }
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error(chalk.red('✗ Generation failed:'), message);
@@ -43,6 +72,7 @@ export const generateAction = async (fileName: string, opts: GenerateOptions): P
 
 export type GenerateOptions = {
     destination?: string;
+    profile?: boolean;
 }
 
 export default function(): void {
@@ -55,6 +85,7 @@ export default function(): void {
         .command('generate')
         .argument('<file>', `source file (possible file extensions: ${fileExtensions})`)
         .option('-d, --destination <dir>', 'destination directory of generating')
+        .option('-p, --profile', 'enable performance profiling')
         .description('generates JavaScript code that prints "Hello, {name}!" for each greeting in a source file')
         .action(generateAction);
 

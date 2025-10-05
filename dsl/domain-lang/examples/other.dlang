@@ -1,0 +1,24 @@
+import "./domains.dlang"
+import "./customer-facing.dlang"
+
+Team SupportTeam
+
+BoundedContext SupportPortal for Marketplace as StrategicLandscape.SupportingDomain by SupportTeam {
+    description: "Handles customer support cases and escalations"
+    terminology {
+        term SupportTicket: "Recorded request for assistance"
+            aka: Case
+        term SLA: "Service level agreement applied to a ticket"
+    }
+    decisions {
+        policy [operational] FollowTheSun: "Route tickets to available regional teams"
+    }
+    relationships {
+        [CF] this -> CustomerFacing.ApplicationFramework : SupportIntegration
+    }
+}
+
+ContextGroup SupportLandscape for Marketplace {
+    role: StrategicLandscape.SupportingDomain
+    contains SupportPortal, CustomerFacing.Listings
+}

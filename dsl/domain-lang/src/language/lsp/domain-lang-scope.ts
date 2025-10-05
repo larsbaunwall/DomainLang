@@ -11,7 +11,7 @@ import type {
     AstNode, 
     AstNodeDescription, 
     LangiumDocument, 
-    PrecomputedScopes 
+    LocalSymbols 
 } from 'langium';
 import { 
     DefaultScopeComputation, 
@@ -47,7 +47,7 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
      * @param cancelToken - Optional cancellation token
      * @returns A promise resolving to an array of AstNodeDescription
      */
-    override async computeExports(document: LangiumDocument, cancelToken = CancellationToken.None): Promise<AstNodeDescription[]> {
+    override async collectExportedSymbols(document: LangiumDocument, cancelToken = CancellationToken.None): Promise<AstNodeDescription[]> {
         const descr: AstNodeDescription[] = [];
         for (const modelNode of AstUtils.streamAllContents(document.parseResult.value)) {
             await interruptAndCheck(cancelToken);
@@ -70,9 +70,9 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
      * Computes local scopes for all containers, recursively processing nested groups.
      * @param document - The LangiumDocument to process
      * @param cancelToken - Optional cancellation token
-     * @returns A promise resolving to a PrecomputedScopes map
+     * @returns A promise resolving to a LocalSymbols map
      */
-    override async computeLocalScopes(document: LangiumDocument, cancelToken = CancellationToken.None): Promise<PrecomputedScopes> {
+    override async collectLocalSymbols(document: LangiumDocument, cancelToken = CancellationToken.None): Promise<LocalSymbols> {
         const model = document.parseResult.value as Model;
         const scopes = new MultiMap<AstNode, AstNodeDescription>();
         await this.processContainer(model, scopes, document, cancelToken);
@@ -82,14 +82,14 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
     /**
      * Recursively processes a container and its children, adding local descriptions and qualified names.
      * @param container - The container node (Model or GroupDeclaration)
-     * @param scopes - The PrecomputedScopes map to populate
+     * @param scopes - The LocalSymbols map to populate
      * @param document - The LangiumDocument being processed
      * @param cancelToken - Optional cancellation token
      * @returns A promise resolving to an array of AstNodeDescription
      */
     protected async processContainer(
         container: Container,
-        scopes: PrecomputedScopes,
+        scopes: LocalSymbols,
         document: LangiumDocument,
         cancelToken: CancellationToken
     ): Promise<AstNodeDescription[]> {
@@ -108,7 +108,8 @@ export class DomainLangScopeComputation extends DefaultScopeComputation {
                 }
             }
         }
-        scopes.addAll(container, localDescriptions);
+        // MultiMap implements LocalSymbols interface with add/addAll methods
+        (scopes as MultiMap<AstNode, AstNodeDescription>).addAll(container, localDescriptions);
         return localDescriptions;
     }
 

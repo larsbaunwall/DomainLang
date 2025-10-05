@@ -1,0 +1,54 @@
+Domain Enterprise {
+    description: "Enterprise portfolio serving all customer touchpoints"
+    vision: "Create a cohesive experience from discovery to fulfillment"
+}
+
+Group CustomerFacing {
+    Classification CoreDomain
+    Classification SupportingDomain
+    Team PlatformGuild
+    Team ProductTeam
+
+    Domain Inventory in Enterprise {
+        description: "Catalog definitions, availability, and channel policies"
+        classifier: SupportingDomain
+    }
+
+    BoundedContext ApplicationFramework for Enterprise tagged: SupportingDomain by PlatformGuild {
+        description: "Shared UI primitives and orchestration for edge experiences"
+        terminology {
+            term MicroFrontend: "Self-contained UI vertical integrated at runtime"
+                aka: MicroApp
+        }
+        decisions {
+            decision [technical] AdoptModuleFederation: "Use module federation for runtime composition"
+        }
+    }
+
+    BoundedContext Listings implements Inventory {
+        description: "Customer-facing product discovery and merchandising"
+        classifiers {
+            role: CoreDomain
+        }
+        terminology {
+            term Product: "An item that can be purchased"
+                examples: "Laptop #12345", "Mouse #67890"
+            term SKU: "Stock keeping unit identifier"
+        }
+        decisions {
+            policy [business] NoBackorders: "Do not allow orders without available stock"
+            rule [compliance] ProductMustHaveSku: "Every product requires a SKU for audit trails"
+        }
+    }
+
+    ContextMap WebExperience {
+        contains ApplicationFramework, Listings
+        [SK] ApplicationFramework <-> Listings : SharedKernel
+        [OHS] Listings -> [ACL] ApplicationFramework : CatalogLookup
+    }
+
+    ContextGroup CoreJourney for Enterprise {
+        role: CoreDomain
+        contains Listings, ApplicationFramework
+    }
+}

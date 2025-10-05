@@ -9,6 +9,7 @@
 
 import { CompletionAcceptor, CompletionContext, DefaultCompletionProvider, NextFeature } from 'langium/lsp';
 import { CompletionItemKind, InsertTextFormat } from 'vscode-languageserver';
+import * as ast from '../generated/ast.js';
 
 export class DomainLangCompletionProvider extends DefaultCompletionProvider {
     
@@ -30,7 +31,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
     private isAtTopLevel(context: CompletionContext): boolean {
         // Check if we're at the model/group level
         const node = context.node;
-        return node?.$type === 'Model' || node?.$type === 'GroupDeclaration' || node?.$type === 'PackageDeclaration';
+        return ast.isModel(node) || ast.isGroupDeclaration(node) || ast.isPackageDeclaration(node);
     }
     
     private addTopLevelSnippets(acceptor: CompletionAcceptor, context: CompletionContext): void {

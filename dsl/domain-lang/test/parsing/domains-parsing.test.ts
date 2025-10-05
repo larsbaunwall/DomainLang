@@ -72,7 +72,7 @@ describe('Parsing domain entities', () => {
         let fulfilmentMap = domainMaps[0];
         expect(domainMaps.length).toBe(1);
         expect(fulfilmentMap.name).toBe('FulfilmentMap');
-        expect(fulfilmentMap.domains.map((d: any) => d.ref?.name).join(',')).toBe('Ordering,SupplyChain');
+        expect(fulfilmentMap.domains.flatMap((d: any) => d.items.map((item: any) => item.ref?.name)).join(',')).toBe('Ordering,SupplyChain');
     });
 });
 

@@ -57,7 +57,7 @@ describe('New Syntax Features', () => {
         
         expect(bc).toBeDefined();
         expect(bc!.name).toBe('OrderContext');
-        expect(bc!.domain?.ref?.name).toBe('Sales');
+        expect(bc!.domain?.ref?.name).toBe('Sales');  // Single reference now
         expect(bc!.inlineRole?.ref?.name).toBe('Core');
         expect(bc!.inlineTeam?.ref?.name).toBe('ProductTeam');
     });

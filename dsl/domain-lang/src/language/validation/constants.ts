@@ -38,5 +38,14 @@ export const ValidationMessages = {
      * @param name - The name of the context group
      */
     CONTEXT_GROUP_INVALID_ROLE: (name: string) =>
-        `ContextGroup '${name}' has an invalid role classifier reference.`
+        `ContextGroup '${name}' has an invalid role classifier reference.`,
+    
+    /**
+     * Warning message when a context group contains bounded contexts from multiple domains.
+     * This may indicate unclear context boundaries or poor domain modeling.
+     * @param name - The name of the context group
+     * @param domains - Comma-separated list of domain names
+     */
+    CONTEXT_GROUP_CROSS_DOMAIN: (name: string, domains: string) =>
+        `ContextGroup '${name}' contains bounded contexts from multiple domains (${domains}). This may indicate unclear context boundaries. Consider whether these contexts truly form a cohesive group.`
 } as const;

@@ -1,0 +1,159 @@
+// ============================================================================
+// Multi-Target Reference Examples in DomainLang
+// ============================================================================
+
+// Example 1: Same BC name in different domains (partial definitions)
+// -------------------------------------------------------------------
+// This is useful when different teams model the same concept from their
+// perspective, and you want to aggregate all views
+
+Domain Sales {
+    description: "Sales operations and customer acquisition"
+}
+
+Domain Support {
+    description: "Customer support and service"
+}
+
+// Same BC name "CustomerManagement" but for different domains
+BC CustomerManagement for Sales {
+    description: "Sales team's view: leads, opportunities, deals"
+}
+
+BC CustomerManagement for Support {
+    description: "Support team's view: tickets, SLAs, escalations"
+}
+
+// ContextGroup uses MultiReference - references BOTH CustomerManagement BCs!
+ContextGroup CustomerServices {
+    contains CustomerManagement  // <- Resolves to BOTH instances above!
+}
+
+
+// Example 2: Aggregating contexts from different architectural layers
+// --------------------------------------------------------------------
+
+Classification Core
+Classification Supporting
+Classification Generic
+
+Domain Ordering {
+    description: "Order management domain"
+}
+
+// Different bounded contexts with strategic classifications
+BC OrderProcessing for Ordering as Core {
+    description: "Core order workflow"
+}
+
+BC OrderValidation for Ordering as Supporting {
+    description: "Order validation rules"
+}
+
+BC OrderNotifications for Ordering as Generic {
+    description: "Generic notification service"
+}
+
+// ContextMap aggregates all order-related contexts
+ContextMap OrderingPlatform {
+    contains OrderProcessing, OrderValidation, OrderNotifications
+}
+// Each reference is a MultiReference that can resolve to multiple targets
+// if you have duplicate names from imports or packages
+
+
+// Example 3: DomainMap aggregating domains across business units
+// ---------------------------------------------------------------
+
+Domain Sales {
+    description: "Sales domain"
+}
+
+Domain Marketing {
+    description: "Marketing domain"  
+}
+
+Domain CustomerSupport {
+    description: "Support domain"
+}
+
+// DomainMap uses MultiReference for each domain
+DomainMap CustomerFacing {
+    contains Sales, Marketing, CustomerSupport
+}
+// If you import another file with a "Sales" domain, this reference
+// would resolve to BOTH Sales domains!
+
+
+// Example 4: Real-world scenario with packages (modular architecture)
+// -------------------------------------------------------------------
+
+package acme.ecommerce {
+    Domain Catalog {
+        description: "Product catalog"
+    }
+    
+    BC ProductSearch for Catalog {
+        description: "Search and browse products"
+    }
+}
+
+package acme.payments {
+    Domain Billing {
+        description: "Payment processing"
+    }
+    
+    BC PaymentGateway for Billing {
+        description: "Process payments"
+    }
+}
+
+// This ContextMap references BCs from different packages
+ContextMap ShoppingExperience {
+    contains acme.ecommerce.ProductSearch, acme.payments.PaymentGateway
+}
+
+
+// ============================================================================
+// Why is MultiReference useful?
+// ============================================================================
+
+// 1. MODULAR ARCHITECTURE
+//    Different teams can define their own version of a BC in separate files,
+//    and you can reference all of them in aggregate views.
+
+// 2. IMPORT SCENARIOS  
+//    When you import multiple files that might have overlapping BC names,
+//    references can resolve to all matching instances instead of causing errors.
+
+// 3. DISTRIBUTED MODELING
+//    Large organizations can model the same concept from different perspectives
+//    (e.g., "Customer" from Sales, Support, Marketing viewpoints) and then
+//    create unified views.
+
+// 4. PARTIAL DEFINITIONS
+//    You can split a BC definition across multiple files and reference them
+//    as a cohesive unit in context maps or groups.
+
+// ============================================================================
+// How to access MultiReference in code:
+// ============================================================================
+
+// In TypeScript/JavaScript generated from the AST:
+// 
+// interface ContextGroup {
+//     contexts: Array<MultiReference<BoundedContext>>;  // Array of multi-refs
+// }
+//
+// interface MultiReference<T> {
+//     items: Array<MultiReferenceItem<T>>;  // All resolved targets
+// }
+//
+// interface MultiReferenceItem<T> {
+//     ref: T;  // The actual AST node
+// }
+//
+// Usage:
+// contextGroup.contexts[0].items.forEach(item => {
+//     console.log(item.ref.name);  // Access each matched BC
+// });
