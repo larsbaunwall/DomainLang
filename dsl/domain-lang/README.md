@@ -83,6 +83,8 @@ Key concepts from the grammar and test suite include:
 - Context maps with relationship types like OHS/ACL and Shared Kernel links.
 - Team declarations, governance constraints, and cross-context usage statements for accountability and integration.
 
+➡️ For a construct-by-construct breakdown of the DSL, including imports, documentation blocks, maps, and decision records, read the [DomainLang syntax reference](docs/language.md).
+
 ## CLI Essentials
 
 The `domainlang` CLI wraps validation, generation, and dependency management. Commands map directly to the services covered by the unit and integration tests under `test/cli` and `test/services`.
@@ -186,6 +188,7 @@ The language server resolves these imports through the manifest, rewrites them t
 - **CLI Generators** – Produce JavaScript today; TypeScript, JSON, and diagram emitters are planned (see `src/cli/generator.ts`).
 - **Import System** – Designed for repository-scoped packages with lock files, caching, and transitive dependency management. Decision records in the repository capture the roadmap for versioning and caching behavior.
 - **Testing** – Extensive suites under `test/` cover parsing, linking, validation, and dependency analysis using Langium’s testing utilities.
+- **Documentation** – The [syntax reference](docs/language.md) and `docs/` diagrams explain every language construct and how services consume them.
 
 ## Contributing & Roadmap
 
