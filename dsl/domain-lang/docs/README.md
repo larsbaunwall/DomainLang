@@ -132,7 +132,7 @@ See [Getting Started – Step 2](./getting-started.md#step-2-add-a-bounded-conte
 ```dlang
 ContextMap System {
    contains Orders, Catalog
-   Catalog -> Orders : ProductLookup
+   Catalog -> Orders
 }
 ```
 

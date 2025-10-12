@@ -149,9 +149,10 @@ decisions {
 ### ContextMap
 
 ```dlang
-ContextMap CustomerJourney {
-    contains Checkout, Listings
-    [OHS] Checkout -> [ACL] Listings : CatalogLookup
+ContextMap WebExperience {
+    contains ApplicationFramework, Listings
+    [SK] ApplicationFramework <-> Listings : SharedKernel
+    [OHS] Checkout -> [ACL] Listings
 }
 ```
 

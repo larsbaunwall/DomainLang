@@ -54,7 +54,7 @@ Domain Compliance in Banking {
 // Core Banking Contexts
 // ============================================================================
 
-BC AccountManagement implements CustomerAccounts
+BC AccountManagement for CustomerAccounts
     as CoreDomain
     by CoreBankingTeam {
 
@@ -112,7 +112,7 @@ BC AccountManagement implements CustomerAccounts
     }
 }
 
-BC PaymentProcessing implements Payments
+BC PaymentProcessing for Payments
     as CoreDomain
     by PaymentsTeam {
 
@@ -165,7 +165,7 @@ BC PaymentProcessing implements Payments
     }
 }
 
-BC FraudDetection implements Compliance
+BC FraudDetection for Compliance
     as CoreDomain
     by FraudDetectionTeam {
 
@@ -199,7 +199,7 @@ BC FraudDetection implements Compliance
     }
 }
 
-BC ComplianceReporting implements Compliance
+BC ComplianceReporting for Compliance
     as SupportingDomain
     by ComplianceTeam {
 
@@ -230,7 +230,7 @@ BC ComplianceReporting implements Compliance
     }
 }
 
-BC CustomerService implements CustomerAccounts
+BC CustomerService for CustomerAccounts
     as SupportingDomain
     by CustomerServiceTeam {
 
@@ -254,7 +254,7 @@ BC CustomerService implements CustomerAccounts
     }
 }
 
-BC CardManagement implements Payments
+BC CardManagement for Payments
     as CoreDomain
     by PaymentsTeam {
 
@@ -293,48 +293,48 @@ ContextMap CoreBankingOperations {
     contains AccountManagement, PaymentProcessing, FraudDetection
 
     // Account management provides account data to payments
-    [OHS, PL] AccountManagement -> [ACL] PaymentProcessing : AccountVerification
+    [OHS, PL] AccountManagement -> [ACL] PaymentProcessing
 
     // Fraud detection monitors all transactions
-    PaymentProcessing -> FraudDetection : TransactionEvents
-    AccountManagement -> FraudDetection : AccountActivityEvents
+    PaymentProcessing -> FraudDetection
+    AccountManagement -> FraudDetection
 
     // Fraud detection can block accounts/payments
-    [U/D] FraudDetection -> AccountManagement : BlockAccount
-    [U/D] FraudDetection -> PaymentProcessing : BlockPayment
+    FraudDetection -> AccountManagement
+    FraudDetection -> PaymentProcessing
 }
 
 ContextMap ComplianceAndReporting {
     contains AccountManagement, PaymentProcessing, FraudDetection, ComplianceReporting
 
     // Compliance reporting consumes data from operational contexts
-    AccountManagement -> ComplianceReporting : AccountData
-    PaymentProcessing -> ComplianceReporting : PaymentData
-    FraudDetection -> ComplianceReporting : FraudAlerts
+    AccountManagement -> ComplianceReporting
+    PaymentProcessing -> ComplianceReporting
+    FraudDetection -> ComplianceReporting
 }
 
 ContextMap CustomerInteractions {
     contains AccountManagement, CustomerService, CardManagement
 
     // Customer service needs account information
-    [OHS] AccountManagement -> [ACL] CustomerService : AccountLookup
+    [OHS] AccountManagement -> [ACL] CustomerService
 
     // Card management linked to accounts
-    [SK] CardManagement <-> AccountManagement : SharedAccountModel
+    [SK] CardManagement <-> AccountManagement : SharedKernel
 
     // Customer service helps with card issues
-    CustomerService -> CardManagement : CardSupport
+    CustomerService -> CardManagement
 }
 
 ContextMap PaymentEcosystem {
     contains PaymentProcessing, CardManagement, AccountManagement
 
     // Card transactions affect accounts
-    CardManagement -> PaymentProcessing : CardTransaction
-    PaymentProcessing -> AccountManagement : UpdateBalance
+    CardManagement -> PaymentProcessing
+    PaymentProcessing -> AccountManagement
 
     // Shared payment models
-    [SK] PaymentProcessing <-> CardManagement : SharedPaymentModel
+    [SK] PaymentProcessing <-> CardManagement : SharedKernel
 }
 
 // ============================================================================

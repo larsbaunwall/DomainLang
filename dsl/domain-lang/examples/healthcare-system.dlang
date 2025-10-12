@@ -55,7 +55,7 @@ Domain Pharmacy in Healthcare {
 // Clinical Bounded Contexts
 // ============================================================================
 
-BC ElectronicHealthRecords implements PatientCare
+BC ElectronicHealthRecords for PatientCare
     as CoreDomain
     by ClinicalTeam {
 
@@ -119,7 +119,7 @@ BC ElectronicHealthRecords implements PatientCare
     }
 }
 
-BC AppointmentScheduling implements Administration
+BC AppointmentScheduling for Administration
     as SupportingDomain
     by AdministrativeTeam {
 
@@ -157,7 +157,7 @@ BC AppointmentScheduling implements Administration
     }
 }
 
-BC MedicationManagement implements Pharmacy
+BC MedicationManagement for Pharmacy
     as CoreDomain
     by PharmacyTeam {
 
@@ -208,7 +208,7 @@ BC MedicationManagement implements Pharmacy
     }
 }
 
-BC LaboratoryInformationSystem implements PatientCare
+BC LaboratoryInformationSystem for PatientCare
     as CoreDomain
     by ClinicalTeam {
 
@@ -243,7 +243,7 @@ BC LaboratoryInformationSystem implements PatientCare
     }
 }
 
-BC RadiologyInformationSystem implements PatientCare
+BC RadiologyInformationSystem for PatientCare
     as CoreDomain
     by ClinicalTeam {
 
@@ -274,7 +274,7 @@ BC RadiologyInformationSystem implements PatientCare
     }
 }
 
-BC PatientBilling implements Administration
+BC PatientBilling for Administration
     as SupportingDomain
     by BillingTeam {
 
@@ -308,7 +308,7 @@ BC PatientBilling implements Administration
     }
 }
 
-BC PatientPortal implements PatientCare
+BC PatientPortal for PatientCare
     as SupportingDomain
     by AdministrativeTeam {
 
@@ -344,43 +344,43 @@ ContextMap ClinicalWorkflow {
     contains ElectronicHealthRecords, MedicationManagement, LaboratoryInformationSystem, RadiologyInformationSystem
 
     // EHR is central to clinical workflow
-    [OHS, PL] ElectronicHealthRecords -> [ACL] MedicationManagement : PatientData
-    [OHS, PL] ElectronicHealthRecords -> [ACL] LaboratoryInformationSystem : PatientData
-    [OHS, PL] ElectronicHealthRecords -> [ACL] RadiologyInformationSystem : PatientData
+    [OHS, PL] ElectronicHealthRecords -> [ACL] MedicationManagement
+    [OHS, PL] ElectronicHealthRecords -> [ACL] LaboratoryInformationSystem
+    [OHS, PL] ElectronicHealthRecords -> [ACL] RadiologyInformationSystem
 
     // Results flow back to EHR
-    LaboratoryInformationSystem -> ElectronicHealthRecords : LabResults
-    RadiologyInformationSystem -> ElectronicHealthRecords : ImagingReports
-    MedicationManagement -> ElectronicHealthRecords : MedicationHistory
+    LaboratoryInformationSystem -> ElectronicHealthRecords
+    RadiologyInformationSystem -> ElectronicHealthRecords
+    MedicationManagement -> ElectronicHealthRecords
 }
 
 ContextMap PatientExperience {
     contains AppointmentScheduling, PatientPortal, ElectronicHealthRecords
 
     // Patient portal integrates with scheduling and records
-    [OHS] AppointmentScheduling -> [ACL] PatientPortal : AppointmentData
-    [OHS] ElectronicHealthRecords -> [ACL] PatientPortal : LimitedMedicalRecords
+    [OHS] AppointmentScheduling -> [ACL] PatientPortal
+    [OHS] ElectronicHealthRecords -> [ACL] PatientPortal
 
     // Patients book appointments
-    PatientPortal -> AppointmentScheduling : BookingRequests
+    PatientPortal -> AppointmentScheduling
 }
 
 ContextMap RevenueCycle {
     contains PatientBilling, ElectronicHealthRecords, AppointmentScheduling
 
     // Billing needs clinical and appointment data
-    [OHS] ElectronicHealthRecords -> [ACL] PatientBilling : EncounterData
-    AppointmentScheduling -> PatientBilling : AppointmentCharges
+    [OHS] ElectronicHealthRecords -> [ACL] PatientBilling
+    AppointmentScheduling -> PatientBilling
 }
 
 ContextMap MedicationSafety {
     contains MedicationManagement, ElectronicHealthRecords, LaboratoryInformationSystem
 
     // Medication management checks allergies and interactions
-    [SK] MedicationManagement <-> ElectronicHealthRecords : SharedPatientData
+    [SK] MedicationManagement <-> ElectronicHealthRecords : SharedKernel
 
     // Lab results influence medication decisions
-    LaboratoryInformationSystem -> MedicationManagement : LabBasedDosing
+    LaboratoryInformationSystem -> MedicationManagement
 }
 
 // ============================================================================

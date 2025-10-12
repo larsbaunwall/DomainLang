@@ -910,8 +910,8 @@ BC Checkout for CustomerExperience
     }
 
     relationships {
-        [CF] this -> PaymentGateway : ProcessPayment
-        [OHS] this -> ShoppingCart : RetrieveCart
+        [CF] this -> PaymentGateway
+        [OHS] this -> ShoppingCart
     }
 }
 
@@ -970,32 +970,32 @@ ContextMap CustomerJourney {
     contains ProductCatalog, ShoppingCart, Checkout, PaymentGateway
 
     // Product catalog provides data to shopping cart
-    [OHS, PL] ProductCatalog -> [ACL] ShoppingCart : ProductLookup
+    [OHS, PL] ProductCatalog -> [ACL] ShoppingCart
 
     // Shopping cart feeds checkout process
-    ShoppingCart -> Checkout : CartData
+    ShoppingCart -> Checkout
 
     // Checkout orchestrates payment
-    [CF] Checkout -> PaymentGateway : ProcessPayment
+    [CF] Checkout -> PaymentGateway
 }
 
 ContextMap OrderFulfillment {
     contains Checkout, OrderManagement, PaymentGateway
 
     // Successful checkout creates order
-    Checkout -> OrderManagement : CreateOrder
+    Checkout -> OrderManagement
 
     // Order management can refund via payment gateway
-    OrderManagement -> PaymentGateway : RefundRequest
+    OrderManagement -> PaymentGateway
 }
 
 ContextMap BusinessIntelligence {
     contains ProductCatalog, Checkout, OrderManagement, Analytics
 
     // Analytics consumes data from operational contexts
-    ProductCatalog -> Analytics : ProductData
-    Checkout -> Analytics : CheckoutEvents
-    OrderManagement -> Analytics : OrderData
+    ProductCatalog -> Analytics
+    Checkout -> Analytics
+    OrderManagement -> Analytics
 }
 
 // ============================================================================

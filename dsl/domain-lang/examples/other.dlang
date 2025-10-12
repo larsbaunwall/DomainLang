@@ -14,7 +14,7 @@ BoundedContext SupportPortal for Marketplace as StrategicLandscape.SupportingDom
         policy [operational] FollowTheSun: "Route tickets to available regional teams"
     }
     relationships {
-        [CF] this -> CustomerFacing.ApplicationFramework : SupportIntegration
+        [CF] this -> CustomerFacing.ApplicationFramework
     }
 }
 

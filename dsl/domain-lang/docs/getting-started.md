@@ -319,8 +319,8 @@ namespace Bookstore.Supporting {
 ContextMap BookstoreSystem {
     contains Bookstore.Core.Catalog, Bookstore.Core.OrderManagement, Bookstore.Supporting.Shipping
 
-    Bookstore.Core.Catalog -> Bookstore.Core.OrderManagement : BookLookup
-    Bookstore.Core.OrderManagement -> Bookstore.Supporting.Shipping : FulfillmentRequest
+    Bookstore.Core.Catalog -> Bookstore.Core.OrderManagement
+    Bookstore.Core.OrderManagement -> Bookstore.Supporting.Shipping
 }
 ```
 

@@ -3,7 +3,7 @@ Domain Enterprise {
     vision: "Create a cohesive experience from discovery to fulfillment"
 }
 
-Group CustomerFacing {
+namespace CustomerFacing {
     Classification CoreDomain
     Classification SupportingDomain
     Team PlatformGuild
@@ -25,7 +25,7 @@ Group CustomerFacing {
         }
     }
 
-    BoundedContext Listings implements Inventory {
+    BoundedContext Listings for Inventory {
         description: "Customer-facing product discovery and merchandising"
         classifiers {
             role: CoreDomain
@@ -44,7 +44,7 @@ Group CustomerFacing {
     ContextMap WebExperience {
         contains ApplicationFramework, Listings
         [SK] ApplicationFramework <-> Listings : SharedKernel
-        [OHS] Listings -> [ACL] ApplicationFramework : CatalogLookup
+        [OHS] Listings -> [ACL] ApplicationFramework
     }
 
     ContextGroup CoreJourney for Enterprise {

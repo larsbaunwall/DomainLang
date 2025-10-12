@@ -1,4 +1,4 @@
-Group StrategicLandscape {
+namespace StrategicLandscape {
     Classification CoreDomain
     Classification SupportingDomain
 }

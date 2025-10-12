@@ -130,10 +130,10 @@ ContextMap System {
     A <-> B                             // bidirectional
 
     // Named relationships
-    A -> B : ProductLookup
+    A -> B
 
     // With DDD patterns
-    [OHS] A -> [ACL] B : PublicAPI
+    [OHS] A -> [ACL] B
     [SK] A <-> B : SharedKernel
 }
 ```
@@ -282,7 +282,7 @@ BC Orders for ECommerce as CoreDomain by ProductTeam {
 
 ContextMap Platform {
     contains Catalog, Orders
-    Catalog -> Orders : ProductLookup
+    Catalog -> Orders
 }
 ```
 
@@ -331,7 +331,7 @@ BC OrderManagement for Sales as CoreDomain by SalesTeam {
     }
 
     relationships {
-        [OHS] this -> Catalog : ProductLookup
+        [OHS] this -> Catalog
     }
 }
 ```
@@ -342,9 +342,9 @@ BC OrderManagement for Sales as CoreDomain by SalesTeam {
 ContextMap Integration {
     contains Publisher, Subscriber, Legacy
 
-    [OHS, PL] Publisher -> [ACL] Subscriber : PublicAPI
-    [SK] Publisher <-> Subscriber : SharedModel
-    [CF] Legacy -> Publisher : ConformistIntegration
+    [OHS, PL] Publisher -> [ACL] Subscriber
+    [SK] Publisher <-> Subscriber : SharedKernel
+    [CF] Legacy -> Publisher
 }
 ```
 
