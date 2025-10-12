@@ -1,5 +1,6 @@
 {
-    "private": false,
+    {
+    "private": true,
     "name": "domain-lang",
     "version": "0.0.5",
     "displayName": "DomainLang",
@@ -21,100 +22,28 @@
     "bugs": {
         "url": "https://github.com/larsbaunwall/DomainLang/issues"
     },
-    "files": [
-        "bin",
-        "out",
-        "src",
-        "syntaxes"
-    ],
-    "type": "module",
     "scripts": {
-        "build": "tsc -b tsconfig.src.json && node esbuild.mjs",
-        "watch": "concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.src.json --watch\" \"node esbuild.mjs --watch\"",
-        "lint": "eslint src --ext ts",
-        "langium:generate": "langium generate",
-        "langium:generate:production": "langium generate --mode=production",
-        "langium:watch": "langium generate --watch",
-        "vscode:prepublish": "npm run build && npm run lint",
-        "build:web": "npm run build",
-        "bundle": "vite build",
-        "bundle:serve": "http-server ./dist --port 5175",
-        "dev": "vite",
-        "dev:debug": "vite --debug --force",
-        "serve": "npm run dev",
-        "test": "vitest run",
-        "test:coverage": "vitest --coverage",
-        "test:watch": "vitest --watch",
-        "publish:latest": "npm publish --tag latest --access public"
-    },
-    "dependencies": {
-        "@codingame/monaco-vscode-editor-service-override": "~3.2.3",
-        "@codingame/monaco-vscode-keybindings-service-override": "~3.2.3",
-        "chalk": "~5.3.0",
-        "commander": "~11.0.0",
-        "langium": "~4.1.0",
-        "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@~3.2.3",
-        "monaco-editor-wrapper": "~4.0.2",
-        "monaco-languageclient": "~8.1.1",
-        "vscode": "npm:@codingame/monaco-vscode-api@~3.2.3",
-        "vscode-languageclient": "~9.0.1",
-        "vscode-languageserver": "~9.0.1",
-        "yaml": "^2.8.1"
+        "clean": "npm run clean --workspaces",
+        "watch": "tsc -b tsconfig.build.json --watch",
+        "build": "tsc -b tsconfig.build.json && npm run build --workspaces",
+        "build:clean": "npm run clean && npm run build",
+        "langium:generate": "npm run --workspace packages/language langium:generate",
+        "langium:watch": "npm run --workspace packages/language langium:watch",
+        "test": "npm run --workspace packages/language test"
     },
     "devDependencies": {
-        "@codingame/esbuild-import-meta-url-plugin": "~1.0.2",
-        "@types/node": "^18.0.0",
-        "@types/vscode": "~1.67.0",
-        "@typescript-eslint/eslint-plugin": "~7.3.1",
-        "@typescript-eslint/parser": "~7.3.1",
-        "@vitest/coverage-v8": "^3.2.2",
-        "concurrently": "~8.2.1",
-        "esbuild": "~0.20.2",
-        "eslint": "~8.57.0",
-        "http-server": "~14.1.1",
-        "langium-cli": "~4.1.0",
-        "typescript": "~5.8.0",
-        "vite": "^6.0.0",
-        "vitest": "^3.2.2"
+        "@types/node": "~20.17.48",
+        "shx": "~0.4.0",
+        "typescript": "~5.8.3"
     },
     "volta": {
-        "node": "18.19.1",
-        "npm": "10.2.4"
+        "node": "20.19.2",
+        "npm": "10.8.2"
     },
-    "engines": {
-        "vscode": "^1.67.0",
-        "node": ">=18.0.0"
-    },
-    "categories": [
-        "Programming Languages"
-    ],
-    "contributes": {
-        "languages": [
-            {
-                "id": "domain-lang",
-                "aliases": [
-                    "DomainLang",
-                    "domain-lang"
-                ],
-                "extensions": [
-                    ".dlang"
-                ],
-                "configuration": "./language-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "domain-lang",
-                "scopeName": "source.domain-lang",
-                "path": "syntaxes/domain-lang.tmLanguage.json"
-            }
-        ]
-    },
-    "activationEvents": [
-        "onLanguage:domain-lang"
-    ],
-    "main": "./out/extension/main.cjs",
-    "bin": {
-        "domain-lang-cli": "./bin/cli.js"
-    }
+    "workspaces": [
+        "packages/language",
+        "packages/cli",
+        "packages/extension",
+        "packages/demo"
+    ]
 }

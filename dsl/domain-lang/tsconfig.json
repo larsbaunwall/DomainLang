@@ -1,31 +1,28 @@
 {
-    "compilerOptions": {
-        "target": "ES2017",
-        "module": "Node16",
-        "lib": [
-            "ESNext",
-            "DOM",
-            "WebWorker"
-        ],
-        "sourceMap": true,
-        "outDir": "out",
-        "strict": true,
-        "noUnusedLocals": false,
-        "noImplicitReturns": true,
-        "noImplicitOverride": true,
-        "moduleResolution": "Node16",
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "rootDir": ".",
-        "noEmit": true,
-        "noUnusedParameters": false
-    },
-    "include": [
-        "src/**/*.ts",
-        "test/**/*.ts"
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "lib": [
+        "ES2020", "DOM", "WebWorker"
     ],
-    "exclude": [
-        "node_modules"
-    ]
+    "sourceMap": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "composite": true
+  },
+  "include": [
+     "**/src/**/*",
+     "**/test/**/*"
+  ],
+  "exclude": [
+     "**/lib/**/*",
+     "**/out/**/*",
+     "**/node_modules/**/*"
+  ]
 }

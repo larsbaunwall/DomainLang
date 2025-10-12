@@ -1,0 +1,18 @@
+{
+    "projectName": "DomainLang",
+    "languages": [{
+        "id": "domain-lang",
+        "grammar": "src/domain-lang.langium",
+        "fileExtensions": [".dlang"],
+        "textMate": {
+            "out": "syntaxes/domain-lang.tmLanguage.json"
+        },
+        "monarch": {
+            "out": "src/syntaxes/domain-lang.monarch.ts"
+        },
+        "railroad": {
+            "out": "docs/syntax-diagram.html"
+        }
+    }],
+    "out": "src/generated"
+}
