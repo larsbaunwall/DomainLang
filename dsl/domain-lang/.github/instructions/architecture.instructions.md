@@ -8,6 +8,17 @@ DomainLang is a Domain-Driven Design (DDD) modeling language inspired by [Contex
 - **Semantic model** for domain-driven architectures
 - **Compilable specification** with rich IDE support
 
+## Repository Structure
+
+The repository is an npm workspace with multiple packages:
+
+- `package.json` – root workspace definition with shared scripts and tooling config
+- `packages/language` – Langium grammar (`src/domain-lang.langium`), language services, tests, and generated artifacts (in `src/generated`)
+- `packages/cli` – Node-based CLI that consumes the language services
+- `packages/extension` – VS Code extension implementing the DomainLang LSP client
+- `packages/demo` – Vite-powered browser demo bundling the language
+- `docs/`, `examples/`, `images/` – Documentation set, sample models, and shared assets consumed by the packages
+
 ### Key Objectives
 
 - Provide excellent IDE experience with code completion and LSP features
@@ -46,25 +57,32 @@ DomainLang is a Domain-Driven Design (DDD) modeling language inspired by [Contex
 Define block-based readable syntax for:
 - `Domain` - Domain definitions
 - `BoundedContext` - Context boundaries
-- `Classification` - Domain classifiers
-- `Role` - Context roles
+- `Classification` - Strategic tags and reusable labels
+- `Team` - Ownership declarations
 - `ContextMap` - Context relationships
-- `PackageDeclaration` - Package namespaces
+- `DomainMap` - Domain portfolios
+- `ContextGroup` - Strategic clustering
+- `NamespaceDeclaration` - Hierarchical organization
 
-### Package and Import System
+### Namespace and Import System
 
-Support nested `package` declarations and imports:
+Support nested `namespace` declarations and the import formats implemented in `ImportStatement`:
 ```dlang
-import Strategic from './types.dlang'
-import * from 'acme-ddd'
+namespace Strategic {
+	Classification CoreDomain
+}
+
+import "./shared/types.dlang"
+import "~/contexts/sales.dlang"
+import "owner/repo@v1.0.0" as Patterns
 ```
 
-Use fully qualified names (FQN) for cross-package references: `acme.sales.Sales`
+Use fully qualified names (FQN) based on namespaces, e.g. `Strategic.CoreDomain` or `Company.Engineering.BackendTeam`.
 
 ### Scope Resolution Requirements
 
 Implement `ScopeComputation` and `ScopeProvider` to resolve:
-- References within and across packages
+- References within and across namespaces
 - Symbols from imported files
 - npm-based `.dlang` modules
 
@@ -73,9 +91,9 @@ Ensure FQN disambiguation and avoid naming collisions.
 ### Validation Rules
 
 Enforce validation for:
-- Circular `Domain.partof` references
+- Circular `Domain in` hierarchies that form cycles
 - Invalid classifier assignments
-- Duplicate identifiers in a package
+- Duplicate identifiers within the same namespace scope
 - Unresolved or ambiguous references
 
 ### LSP Feature Requirements

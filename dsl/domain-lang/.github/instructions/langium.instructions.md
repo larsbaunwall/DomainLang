@@ -12,37 +12,50 @@ applyTo: "src/language/**,**/*.langium,**/*.dlang"
 - Official extension: `.dlang`
 - Register in `langium-config.json` and `LanguageMetaData`
 
+### Project Layout
+- Grammar source lives at `packages/language/src/domain-lang.langium`
+- Generated artifacts are emitted into `packages/language/src/generated/`
+- Language-specific services and validators reside under `packages/language/src/lsp/` and `packages/language/src/validation/`
+- Tests for grammar, scoping, and validation are in `packages/language/test/`
+
 ### Grammar Structure
 Define block-based syntax for:
-- `Domain` - Domain definitions
-- `BoundedContext` - Context boundaries
-- `Classification` - Domain classifiers
-- `Role` - Context roles
-- `ContextMap` - Context relationships
-- `PackageDeclaration` - Package namespaces
+- `Domain` - Domain definitions with optional `in` hierarchy
+- `BoundedContext` - Context boundaries with `for` domain association
+- `Classification` - Strategic classifiers
+- `Team` - Ownership declarations
+- `ContextMap` and `DomainMap` - Architecture mapping constructs
+- `ContextGroup` - Strategic clustering of contexts
+- `NamespaceDeclaration` - Namespacing for hierarchical organization
 
-### Package and Import System
-Support nested packages and imports:
+### Namespace and Import System
+Support nested namespaces and the supported import formats:
 ```langium
-import Strategic from './types.dlang'
-import * from 'acme-ddd'
+NamespaceDeclaration:
+    ('namespace' | 'Namespace') name=QualifiedName '{' StructureElement* '}'
+
+ImportStatement:
+    'import' (
+        '{' symbols+=ID (',' symbols+=ID)* '}' 'from' uri=STRING
+        | uri=STRING ('as' alias=ID)? ('integrity' integrity=STRING)?
+    )
 ```
 
-Use fully qualified names for cross-package references: `acme.sales.Sales`
+Use fully qualified names built from namespaces, e.g. `Company.Engineering.BackendTeam`.
 
 ### Scope Resolution
 Implement `ScopeComputation` and `ScopeProvider` to resolve:
-- References within and across packages
-- Symbols from imported files
+- References within and across namespaces
+- Symbols exported by imports (local files, workspace `~`, git URIs)
 - npm-based `.dlang` modules
 
 Ensure FQN disambiguation and avoid naming collisions.
 
 ### Validation Rules
 Implement validations for:
-- Circular `Domain.partof` references
+- Cyclic `Domain in` hierarchies
 - Invalid classifier assignments
-- Duplicate identifiers in a package
+- Duplicate identifiers within a namespace scope
 - Unresolved or ambiguous references
 
 ### LSP Features
@@ -50,7 +63,7 @@ Implement validations for:
 **Hover:** Show `description` fields and import origin for named entities.
 
 **Completions:** Context-aware suggestions for:
-- Domain types in `implements`
+- Domain types in `for`
 - Classifications in `classifiers {}` blocks
 - Known terms in `terminology {}`
 

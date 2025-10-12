@@ -4,6 +4,11 @@ applyTo: "**/*.ts,**/*.tsx,**/*.mts,**/*.cts"
 
 # TypeScript Guidelines for DomainLang
 
+## Workspace Context
+
+- The repository is an npm workspace; TypeScript sources live primarily in `packages/{language,cli,extension,demo}/src/`
+- When running scripts, prefer workspace-scoped commands (e.g. `npm run build --workspace packages/language`)
+
 ## Core Principles
 
 - Use TypeScript strict mode
@@ -33,6 +38,7 @@ applyTo: "**/*.ts,**/*.tsx,**/*.mts,**/*.cts"
   type UserRoleType = typeof UserRole[keyof typeof UserRole];
   ```
 - Avoid type assertions (`as`, `!`) - use proper type guards
+- Use generated Langium AST guards (e.g., `isNamespaceDeclaration`) instead of checking `$type` or casting to `any`
 - Import types separately: `import type { AstNode } from 'langium';`
 
 ## Functions and Documentation
