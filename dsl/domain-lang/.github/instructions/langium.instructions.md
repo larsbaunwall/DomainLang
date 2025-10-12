@@ -25,7 +25,6 @@ Define block-based syntax for:
 - `Classification` - Strategic classifiers
 - `Team` - Ownership declarations
 - `ContextMap` and `DomainMap` - Architecture mapping constructs
-- `ContextGroup` - Strategic clustering of contexts
 - `NamespaceDeclaration` - Namespacing for hierarchical organization
 
 ### Namespace and Import System

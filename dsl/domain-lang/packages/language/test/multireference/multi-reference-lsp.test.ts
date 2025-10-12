@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeAll } from 'vitest';
 import type { TestServices } from '../test-helpers.js';
 import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
-import type { ContextGroup, BoundedContext } from '../../src/generated/ast.js';
-import { isContextGroup } from '../../src/generated/ast.js';
+import type { ContextMap, BoundedContext } from '../../src/generated/ast.js';
+import { isContextMap } from '../../src/generated/ast.js';
 
 /**
  * This test demonstrates the practical use of multi-target references.
@@ -31,9 +31,9 @@ describe('MultiReference Practical Example', () => {
                 description: "Manages support tickets and SLAs"
             }
             
-            // The ContextGroup references "CustomerManagement"
+            // The ContextMap references "CustomerManagement"
             // With MultiReference, this resolves to BOTH BCs above!
-            ContextGroup CustomerServices {
+            ContextMap CustomerServices {
                 contains CustomerManagement
             }
         `;
@@ -44,27 +44,27 @@ describe('MultiReference Practical Example', () => {
         const model = document.parseResult.value;
         
         // Assert
-        // Find the ContextGroup
-        const group = model.children.find((c): c is ContextGroup => 
-            isContextGroup(c) && c.name === 'CustomerServices'
-        ) as ContextGroup;
+        // Find the ContextMap
+        const contextMap = model.children.find((c): c is ContextMap => 
+            isContextMap(c) && c.name === 'CustomerServices'
+        ) as ContextMap;
 
-        // The group has ONE reference to "CustomerManagement"
-        expect(group.contexts.length).toBe(1);
-        console.log(`Number of references: ${group.contexts.length}`);
+        // The map has ONE reference to "CustomerManagement"
+        expect(contextMap.boundedContexts.length).toBe(1);
+        console.log(`Number of references: ${contextMap.boundedContexts.length}`);
         
         // But that ONE reference resolves to TWO targets!
-        const customerMgmtRef = group.contexts[0];
+        const customerMgmtRef = contextMap.boundedContexts[0];
         expect(customerMgmtRef.items.length).toBe(2);
         console.log(`Number of resolved targets: ${customerMgmtRef.items.length}`);
         
         // Both targets have the same name
-        const resolvedNames = customerMgmtRef.items.map(item => item.ref?.name);
+        const resolvedNames = customerMgmtRef.items.map((item: any) => item.ref?.name);
         console.log(`Resolved BC names: ${resolvedNames.join(', ')}`);
         expect(resolvedNames).toEqual(['CustomerManagement', 'CustomerManagement']);
         
         // But they belong to different domains
-        const resolvedContexts = customerMgmtRef.items.map(item => {
+        const resolvedContexts = customerMgmtRef.items.map((item: any) => {
             const bc = item.ref as BoundedContext;
             return bc.domain?.ref?.name;  // Single reference now
         });
@@ -93,7 +93,7 @@ describe('MultiReference Practical Example', () => {
                 description: "Sales campaigns"  
             }
             
-            ContextGroup AllCampaigns {
+            ContextMap AllCampaigns {
                 contains Campaigns
             }
         `;
@@ -104,22 +104,20 @@ describe('MultiReference Practical Example', () => {
         const model = document.parseResult.value;
         
         // Assert
-        const group = model.children.find((c): c is ContextGroup => 
-            isContextGroup(c) && c.name === 'AllCampaigns'
-        ) as ContextGroup;
+        const contextMap = model.children.find((c): c is ContextMap => 
+            isContextMap(c) && c.name === 'AllCampaigns'
+        ) as ContextMap;
 
-        const campaignsRef = group.contexts[0];
+        const campaignsRef = contextMap.boundedContexts[0];
         
-        // When you hover over "Campaigns" in the ContextGroup in VS Code,
-        // the LSP hover provider will show information about BOTH BCs:
-        const hoverInfo = campaignsRef.items.map((item, idx) => {
+        // When you hover over "Campaigns" in the ContextMap in VS Code,
+        // the LSP hover provider will show information about BOTH BCs
+        console.log('\n  Hover tooltip would show information about:');
+        campaignsRef.items.forEach((item: any, idx: number) => {
             const bc = item.ref as BoundedContext;
-            const domain = bc.domain?.ref?.name;  // Single reference now
-            return `${idx + 1}. ${bc.name} (${domain}): ${bc.documentation.find(d => 'description' in d)?.description || 'N/A'}`;
-        }).join('\n   ');
-        
-        console.log('\n  Hover tooltip would show:');
-        console.log(`   ${hoverInfo}`);
+            const domain = bc.domain?.ref?.name;
+            console.log(`   ${idx + 1}. ${bc.name} (${domain})`);
+        });
         
         // This provides rich context about all matching BCs
         expect(campaignsRef.items.length).toBe(2);

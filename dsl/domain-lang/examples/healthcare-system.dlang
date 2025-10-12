@@ -384,25 +384,6 @@ ContextMap MedicationSafety {
 }
 
 // ============================================================================
-// Strategic Groupings
-// ============================================================================
-
-ContextGroup ClinicalCore for PatientCare {
-    role: CoreDomain
-    contains ElectronicHealthRecords, MedicationManagement, LaboratoryInformationSystem, RadiologyInformationSystem
-}
-
-ContextGroup AdministrativeSupport for Administration {
-    role: SupportingDomain
-    contains AppointmentScheduling, PatientBilling, PatientPortal
-}
-
-ContextGroup PharmacyOperations for Pharmacy {
-    role: CoreDomain
-    contains MedicationManagement
-}
-
-// ============================================================================
 // Domain Map
 // ============================================================================
 

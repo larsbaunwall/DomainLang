@@ -17,8 +17,3 @@ BoundedContext SupportPortal for Marketplace as StrategicLandscape.SupportingDom
         [CF] this -> CustomerFacing.ApplicationFramework
     }
 }
-
-ContextGroup SupportLandscape for Marketplace {
-    role: StrategicLandscape.SupportingDomain
-    contains SupportPortal, CustomerFacing.Listings
-}

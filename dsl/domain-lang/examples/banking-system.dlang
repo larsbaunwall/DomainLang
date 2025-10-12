@@ -338,25 +338,6 @@ ContextMap PaymentEcosystem {
 }
 
 // ============================================================================
-// Strategic Groupings
-// ============================================================================
-
-ContextGroup CoreBankingCapabilities for Banking {
-    role: CoreDomain
-    contains AccountManagement, PaymentProcessing, CardManagement
-}
-
-ContextGroup RiskAndCompliance for Compliance {
-    role: SupportingDomain
-    contains FraudDetection, ComplianceReporting
-}
-
-ContextGroup CustomerFacingServices for CustomerAccounts {
-    role: SupportingDomain
-    contains CustomerService
-}
-
-// ============================================================================
 // Domain Map
 // ============================================================================
 

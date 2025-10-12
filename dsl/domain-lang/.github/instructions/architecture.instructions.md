@@ -61,7 +61,6 @@ Define block-based readable syntax for:
 - `Team` - Ownership declarations
 - `ContextMap` - Context relationships
 - `DomainMap` - Domain portfolios
-- `ContextGroup` - Strategic clustering
 - `NamespaceDeclaration` - Hierarchical organization
 
 ### Namespace and Import System

@@ -478,58 +478,6 @@ Context Groups cluster contexts by strategic intent.
 
 ### Basic Context Group
 
-```dlang
-BC Catalog for Sales { description: "Catalog" }
-BC Orders for Sales { description: "Orders" }
-
-ContextGroup CoreCapabilities for Sales {
-    contains Catalog, Orders
-}
-```
-
-### Context Group with Role
-
-```dlang
-Classification CoreDomain
-
-ContextGroup CoreCapabilities {
-    role: CoreDomain
-    contains Catalog, Orders
-}
-```
-
-### Context Group Associated with Domain
-
-```dlang
-Domain Sales { description: "Sales domain" }
-
-ContextGroup SalesCapabilities for Sales {
-    contains Catalog, Orders
-}
-```
-
-### Context Group with Both Domain and Role
-
-```dlang
-Domain Sales { description: "Sales domain" }
-Classification CoreDomain
-
-ContextGroup CoreSalesCapabilities for Sales {
-    role: CoreDomain
-    contains Catalog, Orders
-}
-```
-
-### Alternative Keyword: `in`
-
-```dlang
-ContextGroup SalesCapabilities in Sales {
-    contains Catalog, Orders
-}
-```
-
----
-
 ## Decisions, Policies, and Rules
 
 Document governance, architectural decisions, and business rules.
@@ -996,20 +944,6 @@ ContextMap BusinessIntelligence {
     ProductCatalog -> Analytics
     Checkout -> Analytics
     OrderManagement -> Analytics
-}
-
-// ============================================================================
-// Strategic Groupings
-// ============================================================================
-
-ContextGroup CoreRevenueDriving for CustomerExperience {
-    role: StrategicClassifications.CoreDomain
-    contains ProductCatalog, ShoppingCart, Checkout
-}
-
-ContextGroup Operations for BackOffice {
-    role: StrategicClassifications.SupportingDomain
-    contains OrderManagement, Analytics
 }
 
 // ============================================================================

@@ -118,21 +118,6 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             detail: 'Create a namespaced container'
         });
         
-        // ContextGroup snippet
-        acceptor(context, {
-            label: 'ContextGroup',
-            kind: CompletionItemKind.Snippet,
-            insertText: [
-                'ContextGroup ${1:Name} for ${2:Domain} {',
-                '\trole: ${3:Core}',
-                '\tcontains ${4:Context1}, ${5:Context2}',
-                '}',
-                ''].join('\n'),
-            insertTextFormat: InsertTextFormat.Snippet,
-            documentation: 'Group contexts by strategic role',
-            detail: 'Organize related bounded contexts'
-        });
-        
         // ContextMap snippet
         acceptor(context, {
             label: 'ContextMap',

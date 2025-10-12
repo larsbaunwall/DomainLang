@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeAll } from 'vitest';
 import type { TestServices } from '../test-helpers.js';
 import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
-import type { BoundedContext, ContextMap, DomainMap, ContextGroup } from '../../src/generated/ast.js';
-import { isBoundedContext, isContextMap, isDomainMap, isContextGroup } from '../../src/generated/ast.js';
+import type { BoundedContext, ContextMap, DomainMap } from '../../src/generated/ast.js';
+import { isBoundedContext, isContextMap, isDomainMap } from '../../src/generated/ast.js';
 
 describe('Multi-Target References', () => {
     let testServices: TestServices;
@@ -111,10 +111,9 @@ describe('Multi-Target References', () => {
         expect(domainNames).toEqual(['Marketing', 'Sales', 'Support']);
     });
 
-    test('ContextGroup references each BoundedContext via MultiReference', async () => {
+    test('ContextMap references each BoundedContext via MultiReference', async () => {
         const input = `
             Domain Sales {}
-            Classification Core
             
             BC Orders for Sales {
                 description: "Order management"
@@ -128,8 +127,7 @@ describe('Multi-Target References', () => {
                 description: "Product catalog"
             }
             
-            ContextGroup CoreDomain for Sales {
-                role: Core
+            ContextMap CoreSystems {
                 contains Orders, Pricing, Catalog
             }
         `;
@@ -138,13 +136,13 @@ describe('Multi-Target References', () => {
             expectValidDocument(document);
 
         const model = document.parseResult.value;
-        const contextGroup = model.children.find(c => isContextGroup(c) && c.name === 'CoreDomain') as ContextGroup;
+        const contextMap = model.children.find(c => isContextMap(c) && c.name === 'CoreSystems') as ContextMap;
 
-        expect(contextGroup).toBeDefined();
+        expect(contextMap).toBeDefined();
         // Three separate multi-references
-        expect(contextGroup.contexts.length).toBe(3);
+        expect(contextMap.boundedContexts.length).toBe(3);
         
-        const contextNames = contextGroup.contexts.map((c) => 
+        const contextNames = contextMap.boundedContexts.map((c) => 
             c.items[0]?.ref?.name
         ).filter(Boolean).sort();
         
@@ -230,7 +228,7 @@ describe('Multi-Target References', () => {
                 description: "CRM perspective on customers"
             }
             
-            ContextGroup CustomerServices {
+            ContextMap CustomerServices {
                 contains CustomerManagement
             }
         `;
@@ -239,15 +237,15 @@ describe('Multi-Target References', () => {
             expectValidDocument(document);
 
         const model = document.parseResult.value;
-        const group = model.children.find(c => isContextGroup(c) && c.name === 'CustomerServices') as ContextGroup;
+        const contextMap = model.children.find(c => isContextMap(c) && c.name === 'CustomerServices') as ContextMap;
 
-        expect(group).toBeDefined();
-        expect(group.contexts.length).toBe(1);
+        expect(contextMap).toBeDefined();
+        expect(contextMap.boundedContexts.length).toBe(1);
         
         // Single reference resolves to both BC definitions
-        const customerMgmtRef = group.contexts[0];
+        const customerMgmtRef = contextMap.boundedContexts[0];
         expect(customerMgmtRef.items.length).toBe(2);
-        expect(customerMgmtRef.items.every((item) => item.ref?.name === 'CustomerManagement')).toBe(true);
+        expect(customerMgmtRef.items.every((item: any) => item.ref?.name === 'CustomerManagement')).toBe(true);
     });
 });
 

@@ -5,7 +5,7 @@ This guide summarizes the DomainLang grammar and explains how to structure `.dla
 ## Model structure
 
 - **Entry rule**: Every file parses into a `Model` node. The model accepts an optional series of import statements followed by any number of top-level structure elements.
-- **Structure elements**: You can mix `Domain`, `BoundedContext`, `ContextGroup`, `ObjectMap` (`ContextMap` or `DomainMap`), and `Namespace` declarations in any order.
+- **Structure elements**: You can mix `Domain`, `BoundedContext`, `ObjectMap` (`ContextMap` or `DomainMap`), and `Namespace` declarations in any order.
 - **Container semantics**: `Model` and `Namespace` act as hierarchical scopes. Each child contributes to the global symbol table under its fully qualified name (FQN), formed from ancestor names.
 
 ```dlang
@@ -176,21 +176,6 @@ DomainMap CorporatePortfolio {
 - Type label: optional identifier like `Partnership`, `SharedKernel`, `CustomerSupplier`, `UpstreamDownstream`, or `SeparateWays`.
 - Context references accept `this` via the `BoundedContextRef` special rule.
 
-## Context groups
-
-Use `ContextGroup` to cluster contexts by strategic intent and optionally tie them to a domain:
-
-```dlang
-ContextGroup CoreDomains for Sales {
-    role: Strategic
-    contains Checkout, Listings
-}
-```
-
-- `for` / `in` associates the group with a `Domain`; the association is optional and purely semantic, influencing validations that track coverage.
-- `role` pulls from `Classification` definitions and gives the group a strategic tag; the property is singular and optional.
-- `contains` enumerates `BoundedContext` references, preserving author order for diagramming and code generation.
-
 ## Qualified names and references
 
 - `QualifiedName` composes identifiers with dots (e.g., `acme.sales.Sales`). Identifiers allow underscores and hyphen sequences following the first character.
@@ -298,4 +283,3 @@ namespace acme.platform.customer {
 - Nested namespace declarations produce FQNs such as `acme.platform.customer.SharedKnowledge.CoreDomain`.
 - Git imports introduce reusable classifiers (for example, `Patterns.CoreDomain`) without flattening their namespace.
 - Relationship annotations express both structural (`SharedKernel`) and role-based (`[SK]`) semantics.
-- The context group links strategic classification to the declared contexts, aligning governance with semantic intent.

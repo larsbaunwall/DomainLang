@@ -24,7 +24,6 @@ BC ContextName for DomainName {
 | Classification | `Classification` | - |
 | Context Map | `ContextMap` | - |
 | Domain Map | `DomainMap` | - |
-| Context Group | `ContextGroup` | - |
 | Namespace | `namespace`, `Namespace` | - |
 
 ## Inline Syntax
@@ -200,15 +199,6 @@ BC Orders {
 ```
 
 All three are equivalent. Use `:` for consistency.
-
-## Context Groups
-
-```dlang
-ContextGroup CoreCapabilities for Sales {
-    role: CoreDomain
-    contains Orders, Catalog
-}
-```
 
 ## Domain Maps
 

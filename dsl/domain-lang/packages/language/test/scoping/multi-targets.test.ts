@@ -1,7 +1,7 @@
 import { describe, test, beforeAll, expect } from 'vitest';
 import type { TestServices } from '../test-helpers.js';
 import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
-import { isContextGroup, isContextMap } from '../../src/generated/ast.js';
+import { isContextMap } from '../../src/generated/ast.js';
 
 let testServices: TestServices;
 
@@ -23,20 +23,20 @@ describe('Scoping: Multi-Target References', () => {
                 description: "Support customer management"
             }
             
-            ContextGroup AllCustomerContexts {
+            ContextMap AllCustomerContexts {
                 contains CustomerManagement
             }
         `);
 
         expectValidDocument(document);
         
-        const contextGroup = document.parseResult.value.children.find(child => isContextGroup(child));
-        expect(contextGroup).toBeDefined();
+        const contextMap = document.parseResult.value.children.find(child => isContextMap(child));
+        expect(contextMap).toBeDefined();
         
-        if (contextGroup && isContextGroup(contextGroup)) {
-            // Should resolve to multiple targets
-            expect(contextGroup.contexts).toHaveLength(1);
-            const contextRef = contextGroup.contexts[0];
+        if (contextMap && isContextMap(contextMap)) {
+            // ContextMap uses boundedContexts property
+            expect(contextMap.boundedContexts).toHaveLength(1);
+            const contextRef = contextMap.boundedContexts[0];
             expect(contextRef.items).toBeDefined();
             expect(contextRef.items.length).toBeGreaterThan(0);
         }

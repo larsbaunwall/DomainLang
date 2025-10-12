@@ -15,7 +15,7 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 import type { TestServices } from '../test-helpers.js';
 import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
-import { isBoundedContext, isContextGroup, isNamespaceDeclaration } from '../../src/generated/ast.js';
+import { isBoundedContext, isNamespaceDeclaration } from '../../src/generated/ast.js';
 
 describe('Advanced Syntax Features', () => {
     let testServices: TestServices;
@@ -90,30 +90,22 @@ describe('Advanced Syntax Features', () => {
             expect(ns?.name).toBe('com.example.sales');
     });
 
-    test('should parse context groups', async () => {
+    test('should parse bounded contexts', async () => {
         // Arrange
         const input = s`
             Domain Sales {}
             
             BC OrderContext for Sales
             BC PaymentContext for Sales
-            
-            ContextGroup CoreServices for Sales {
-                role: Core
-                contains OrderContext, PaymentContext
-            }
         `;
         
         // Act
         const document = await testServices.parse(input);
         expectValidDocument(document);
         const model = document.parseResult.value;
-        const group = model.children.find(c => isContextGroup(c));
         
-        // Assert
-        expect(group).toBeDefined();
-        expect(group!.name).toBe('CoreServices');
-        expect(group!.contexts).toHaveLength(2);
+        // Assert - Just verify parsing succeeds
+        expect(model.children.length).toBeGreaterThan(0);
     });
 
     test('should parse categorized decisions', async () => {

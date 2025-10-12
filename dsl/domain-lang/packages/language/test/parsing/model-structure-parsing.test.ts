@@ -66,7 +66,6 @@ describe('Grammar Completeness Tests', () => {
                         }
                     }
                     namespace test.pkg { Domain PkgDomain {} }
-                    ContextGroup TestContextGroup { contains TestBC }
                 `,
                 'StructureElement'
             );
@@ -224,39 +223,6 @@ describe('Grammar Completeness Tests', () => {
                 testServices.parse,
                 `Classification Core`,
                 'Classification'
-            );
-        });
-
-        test('ContextGroup - minimal', async () => {
-            await expectGrammarRuleParsesSuccessfully(
-                testServices.parse,
-                s`
-                    Domain Test {}
-                    BoundedContext TestBC for Test
-                    
-                    ContextGroup TestGroup {
-                        contains TestBC
-                    }
-                `,
-                'ContextGroup minimal'
-            );
-        });
-
-        test('ContextGroup - with role and domain', async () => {
-            await expectGrammarRuleParsesSuccessfully(
-                testServices.parse,
-                s`
-                    Domain Test {}
-                    BoundedContext BC1 for Test
-                    BoundedContext BC2 for Test
-                    Classification Core
-                    
-                    ContextGroup CoreGroup for Test {
-                        role: Core
-                        contains BC1, BC2
-                    }
-                `,
-                'ContextGroup with role'
             );
         });
     });

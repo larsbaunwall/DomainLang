@@ -1,252 +1,502 @@
-// ============================================================================// ============================================================================
+// ============================================================================// ============================================================================// ============================================================================
 
-// Multi-Reference Demonstration - DomainLang Example// Multi-Target Reference Examples in DomainLang
+// Multi-Reference Demonstration - DomainLang Example
 
-// ============================================================================// ============================================================================
+// ============================================================================// Multi-Reference Demonstration - DomainLang Example// Multi-Target Reference Examples in DomainLang
 
 // This example demonstrates how DomainLang handles references when multiple
 
-// elements share the same name across different scopes or namespaces.// Example 1: Same BC name in different domains (partial definitions)
+// elements share the same name across different scopes or namespaces.// ============================================================================// ============================================================================
+
+//
+
+// Multi-references allow you to:// This example demonstrates how DomainLang handles references when multiple
+
+// 1. Model the same concept from different team perspectives
+
+// 2. Aggregate contexts/domains that share names from imports// elements share the same name across different scopes or namespaces.// Example 1: Same BC name in different domains (partial definitions)
+
+// 3. Create flexible, modular domain architectures
 
 //// -------------------------------------------------------------------
 
-// Multi-references allow you to:// This is useful when different teams model the same concept from their
+// ============================================================================
 
-// 1. Model the same concept from different team perspectives// perspective, and you want to aggregate all views
+// Example 1: Same BC name in different domains// Multi-references allow you to:// This is useful when different teams model the same concept from their
 
-// 2. Aggregate contexts/domains that share names from imports
+// ============================================================================
 
-// 3. Create flexible, modular domain architecturesDomain Sales {
+// Different teams can model "CustomerManagement" from their perspective// 1. Model the same concept from different team perspectives// perspective, and you want to aggregate all views
+
+
+
+Domain Sales {// 2. Aggregate contexts/domains that share names from imports
 
     description: "Sales operations and customer acquisition"
 
-// ============================================================================}
+}// 3. Create flexible, modular domain architecturesDomain Sales {
 
-// Example 1: Same BC name in different domains
 
-// ============================================================================Domain Support {
 
-// Different teams can model "CustomerManagement" from their perspective    description: "Customer support and service"
-
-}
-
-Domain Sales {
-
-    description: "Sales operations and customer acquisition"// Same BC name "CustomerManagement" but for different domains
-
-}BC CustomerManagement for Sales {
-
-    description: "Sales team's view: leads, opportunities, deals"
-
-Domain Support {}
+Domain Support {    description: "Sales operations and customer acquisition"
 
     description: "Customer support and service"
 
-}BC CustomerManagement for Support {
+}// ============================================================================}
 
-    description: "Support team's view: tickets, SLAs, escalations"
 
-// Sales team's perspective of customer management}
+
+// Sales team's perspective of customer management// Example 1: Same BC name in different domains
 
 BC CustomerManagement for Sales {
 
-    description: "Sales team's view: leads, opportunities, deals"// ContextGroup uses MultiReference - references BOTH CustomerManagement BCs!
+    description: "Sales team's view: leads, opportunities, deals"// ============================================================================Domain Support {
 
-    ContextGroup CustomerServices {
+    
 
-    terminology {    contains CustomerManagement  // <- Resolves to BOTH instances above!
+    terminology {// Different teams can model "CustomerManagement" from their perspective    description: "Customer support and service"
 
-        term Lead: "Potential customer prospect"}
+        term Lead: "Potential customer prospect"
 
-        term Opportunity: "Qualified sales opportunity"
+        term Opportunity: "Qualified sales opportunity"}
 
         term Deal: "Active sales negotiation"
 
-    }// Example 2: Aggregating contexts from different architectural layers
+    }Domain Sales {
 
-}// --------------------------------------------------------------------
+}
+
+    description: "Sales operations and customer acquisition"// Same BC name "CustomerManagement" but for different domains
+
+// Support team's perspective of customer management
+
+BC CustomerManagement for Support {}BC CustomerManagement for Sales {
+
+    description: "Support team's view: tickets, SLAs, escalations"
+
+        description: "Sales team's view: leads, opportunities, deals"
+
+    terminology {
+
+        term Ticket: "Customer support request"Domain Support {}
+
+        term SLA: "Service level agreement"
+
+        term Escalation: "Elevated priority issue"    description: "Customer support and service"
+
+    }
+
+}}BC CustomerManagement for Support {
 
 
 
-// Support team's perspective of customer managementClassification Core
-
-BC CustomerManagement for Support {Classification Supporting
-
-    description: "Support team's view: tickets, SLAs, escalations"Classification Generic
-
-    
-
-    terminology {Domain Ordering {
-
-        term Ticket: "Customer support request"    description: "Order management domain"
-
-        term SLA: "Service level agreement"}
-
-        term Escalation: "Elevated priority issue"
-
-    }// Different bounded contexts with strategic classifications
-
-}BC OrderProcessing for Ordering as Core {
-
-    description: "Core order workflow"
-
-// ContextGroup can reference BOTH CustomerManagement contexts}
+// ContextMap can reference BOTH CustomerManagement contexts    description: "Support team's view: tickets, SLAs, escalations"
 
 // When you reference "CustomerManagement", it resolves to both instances
 
-ContextGroup CustomerServices {BC OrderValidation for Ordering as Supporting {
+ContextMap CustomerServices {// Sales team's perspective of customer management}
 
-    contains CustomerManagement    description: "Order validation rules"
+    contains CustomerManagement
 
-}}
+}BC CustomerManagement for Sales {
 
 
 
-BC OrderNotifications for Ordering as Generic {
-
-// ============================================================================    description: "Generic notification service"
-
-// Example 2: Namespaced organization with qualified names}
+    description: "Sales team's view: leads, opportunities, deals"// ContextGroup uses MultiReference - references BOTH CustomerManagement BCs!
 
 // ============================================================================
 
-// ContextMap aggregates all order-related contexts
+// Example 2: Namespaced organization with qualified names    ContextGroup CustomerServices {
 
-namespace Ecommerce {ContextMap OrderingPlatform {
+// ============================================================================
 
-    Classification CoreDomain    contains OrderProcessing, OrderValidation, OrderNotifications
+    terminology {    contains CustomerManagement  // <- Resolves to BOTH instances above!
 
-    Classification SupportingDomain}
+namespace Ecommerce {
 
-    // Each reference is a MultiReference that can resolve to multiple targets
+    Classification CoreDomain        term Lead: "Potential customer prospect"}
 
-    Domain Catalog {// if you have duplicate names from imports or packages
+    Classification SupportingDomain
 
-        description: "Product catalog and inventory"
+            term Opportunity: "Qualified sales opportunity"
 
-    }
+    Domain Catalog {
 
-    // Example 3: DomainMap aggregating domains across business units
-
-    Domain Orders {// ---------------------------------------------------------------
-
-        description: "Order processing and fulfillment"
-
-    }Domain Sales {
-
-        description: "Sales domain"
-
-    BC ProductSearch for Catalog as CoreDomain {}
-
-        description: "Search and browse products"
-
-        Domain Marketing {
-
-        terminology {    description: "Marketing domain"  
-
-            term Product: "Item available for purchase"}
-
-            term SearchIndex: "Indexed product data for fast search"
-
-        }Domain CustomerSupport {
-
-    }    description: "Support domain"
+        description: "Product catalog and inventory"        term Deal: "Active sales negotiation"
 
     }
 
-    BC OrderProcessing for Orders as CoreDomain {
+        }// Example 2: Aggregating contexts from different architectural layers
 
-        description: "Process and fulfill customer orders"// DomainMap uses MultiReference for each domain
+    Domain Orders {
 
-        DomainMap CustomerFacing {
-
-        terminology {    contains Sales, Marketing, CustomerSupport
-
-            term Order: "Customer purchase request"}
-
-            term OrderLine: "Individual item in an order"// If you import another file with a "Sales" domain, this reference
-
-        }// would resolve to BOTH Sales domains!
+        description: "Order processing and fulfillment"}// --------------------------------------------------------------------
 
     }
 
     
 
-    // ContextMap within namespace// Example 4: Real-world scenario with packages (modular architecture)
+    BC ProductSearch for Catalog as CoreDomain {
 
-    ContextMap WebStore {// -------------------------------------------------------------------
+        description: "Search and browse products"// Support team's perspective of customer managementClassification Core
 
-        contains ProductSearch, OrderProcessing
+        
 
-        package acme.ecommerce {
+        terminology {BC CustomerManagement for Support {Classification Supporting
 
-        ProductSearch -> OrderProcessing    Domain Catalog {
+            term Product: "Item available for purchase"
 
-    }        description: "Product catalog"
-
-}    }
-
-    
-
-namespace Payments {    BC ProductSearch for Catalog {
-
-    Classification GenericDomain        description: "Search and browse products"
+            term SearchIndex: "Indexed product data for fast search"    description: "Support team's view: tickets, SLAs, escalations"Classification Generic
 
         }
 
-    Domain Billing {}
-
-        description: "Payment processing"
-
-    }package acme.payments {
-
-        Domain Billing {
-
-    BC PaymentGateway for Billing as GenericDomain {        description: "Payment processing"
-
-        description: "Process payments via external providers"    }
-
-            
-
-        terminology {    BC PaymentGateway for Billing {
-
-            term PaymentIntent: "Initiated payment request"        description: "Process payments"
-
-            term PaymentConfirmation: "Successful payment response"    }
-
-        }}
-
-    }
-
-}// This ContextMap references BCs from different packages
-
-ContextMap ShoppingExperience {
-
-// Cross-namespace references using qualified names    contains acme.ecommerce.ProductSearch, acme.payments.PaymentGateway
-
-ContextMap FullEcommerceExperience {}
-
-    contains Ecommerce.ProductSearch, Ecommerce.OrderProcessing, Payments.PaymentGateway
+    }    
 
     
 
-    Ecommerce.OrderProcessing -> Payments.PaymentGateway// ============================================================================
+    BC OrderProcessing for Orders as CoreDomain {    terminology {Domain Ordering {
 
-}// Why is MultiReference useful?
+        description: "Process and fulfill customer orders"
+
+                term Ticket: "Customer support request"    description: "Order management domain"
+
+        terminology {
+
+            term Order: "Customer purchase request"        term SLA: "Service level agreement"}
+
+            term OrderLine: "Individual item in an order"
+
+        }        term Escalation: "Elevated priority issue"
+
+    }
+
+        }// Different bounded contexts with strategic classifications
+
+    // ContextMap within namespace
+
+    ContextMap WebStore {}BC OrderProcessing for Ordering as Core {
+
+        contains ProductSearch, OrderProcessing
+
+            description: "Core order workflow"
+
+        ProductSearch -> OrderProcessing
+
+    }// ContextGroup can reference BOTH CustomerManagement contexts}
+
+}
+
+// When you reference "CustomerManagement", it resolves to both instances
+
+namespace Payments {
+
+    Classification GenericDomainContextGroup CustomerServices {BC OrderValidation for Ordering as Supporting {
+
+    
+
+    Domain Billing {    contains CustomerManagement    description: "Order validation rules"
+
+        description: "Payment processing"
+
+    }}}
+
+    
+
+    BC PaymentGateway for Billing as GenericDomain {
+
+        description: "Process payments via external providers"
+
+        BC OrderNotifications for Ordering as Generic {
+
+        terminology {
+
+            term PaymentIntent: "Initiated payment request"// ============================================================================    description: "Generic notification service"
+
+            term PaymentConfirmation: "Successful payment response"
+
+        }// Example 2: Namespaced organization with qualified names}
+
+    }
+
+}// ============================================================================
+
+
+
+// Cross-namespace references using qualified names// ContextMap aggregates all order-related contexts
+
+ContextMap FullEcommerceExperience {
+
+    contains Ecommerce.ProductSearch, Ecommerce.OrderProcessing, Payments.PaymentGatewaynamespace Ecommerce {ContextMap OrderingPlatform {
+
+    
+
+    Ecommerce.OrderProcessing -> Payments.PaymentGateway    Classification CoreDomain    contains OrderProcessing, OrderValidation, OrderNotifications
+
+}
+
+    Classification SupportingDomain}
+
+
+
+// ============================================================================    // Each reference is a MultiReference that can resolve to multiple targets
+
+// Example 3: Strategic classifications across layers
+
+// ============================================================================    Domain Catalog {// if you have duplicate names from imports or packages
+
+
+
+Classification Core        description: "Product catalog and inventory"
+
+Classification Supporting
+
+Classification Generic    }
+
+
+
+Domain Ordering {    // Example 3: DomainMap aggregating domains across business units
+
+    description: "Order management domain"
+
+}    Domain Orders {// ---------------------------------------------------------------
+
+
+
+Team OrderTeam        description: "Order processing and fulfillment"
+
+Team NotificationTeam
+
+    }Domain Sales {
+
+// Different bounded contexts with strategic classifications
+
+BC OrderProcessing for Ordering as Core by OrderTeam {        description: "Sales domain"
+
+    description: "Core order workflow"
+
+        BC ProductSearch for Catalog as CoreDomain {}
+
+    terminology {
+
+        term Order: "Customer purchase request"        description: "Search and browse products"
+
+        term OrderState: "Current state of order"
+
+            examples: "Pending", "Confirmed", "Shipped", "Delivered"        Domain Marketing {
+
+    }
+
+}        terminology {    description: "Marketing domain"  
+
+
+
+BC OrderValidation for Ordering as Supporting by OrderTeam {            term Product: "Item available for purchase"}
+
+    description: "Order validation rules"
+
+                term SearchIndex: "Indexed product data for fast search"
+
+    terminology {
+
+        term ValidationRule: "Rule for checking order validity"        }Domain CustomerSupport {
+
+        term ValidationError: "Order validation failure"
+
+    }    }    description: "Support domain"
+
+}
+
+    }
+
+BC OrderNotifications for Ordering as Generic by NotificationTeam {
+
+    description: "Generic notification service"    BC OrderProcessing for Orders as CoreDomain {
+
+    
+
+    terminology {        description: "Process and fulfill customer orders"// DomainMap uses MultiReference for each domain
+
+        term Notification: "Message sent to customer"
+
+        term NotificationChannel: "Delivery method"        DomainMap CustomerFacing {
+
+            examples: "Email", "SMS", "Push"
+
+    }        terminology {    contains Sales, Marketing, CustomerSupport
+
+}
+
+            term Order: "Customer purchase request"}
+
+// ContextMap aggregates all order-related contexts
+
+ContextMap OrderingPlatform {            term OrderLine: "Individual item in an order"// If you import another file with a "Sales" domain, this reference
+
+    contains OrderProcessing, OrderValidation, OrderNotifications
+
+            }// would resolve to BOTH Sales domains!
+
+    OrderProcessing -> OrderValidation
+
+    OrderProcessing -> OrderNotifications    }
+
+}
+
+    
+
+
+
+// ============================================================================    // ContextMap within namespace// Example 4: Real-world scenario with packages (modular architecture)
+
+// Example 4: Import scenarios (conceptual - would work with separate files)
+
+// ============================================================================    ContextMap WebStore {// -------------------------------------------------------------------
+
+// If you had multiple files:
+
+//        contains ProductSearch, OrderProcessing
+
+// File 1 (sales-context.dlang):
+
+//   Domain Sales { ... }        package acme.ecommerce {
+
+//   BC Reporting for Sales { ... }
+
+//        ProductSearch -> OrderProcessing    Domain Catalog {
+
+// File 2 (marketing-context.dlang):
+
+//   Domain Marketing { ... }    }        description: "Product catalog"
+
+//   BC Reporting for Marketing { ... }
+
+//}    }
+
+// File 3 (analytics-map.dlang):
+
+//   import "./sales-context.dlang"    
+
+//   import "./marketing-context.dlang"
+
+//   namespace Payments {    BC ProductSearch for Catalog {
+
+//   ContextMap Analytics {
+
+//     contains Reporting  // <- Resolves to BOTH Sales.Reporting and Marketing.Reporting!    Classification GenericDomain        description: "Search and browse products"
+
+//   }
+
+//        }
+
+// This multi-reference behavior allows modular, team-based modeling where
+
+// different teams can independently define their contexts and then aggregate    Domain Billing {}
+
+// them in higher-level architectural views.
+
+        description: "Payment processing"
 
 // ============================================================================
 
+// Example 5: Domain maps across business units    }package acme.payments {
+
+// ============================================================================
+
+        Domain Billing {
+
+Domain Sales {
+
+    description: "Sales domain"    BC PaymentGateway for Billing as GenericDomain {        description: "Payment processing"
+
+    classifier: Core
+
+}        description: "Process payments via external providers"    }
 
 
-// ============================================================================// 1. MODULAR ARCHITECTURE
 
-// Example 3: Strategic classifications across layers//    Different teams can define their own version of a BC in separate files,
+Domain Marketing {            
 
-// ============================================================================//    and you can reference all of them in aggregate views.
+    description: "Marketing domain"
+
+    classifier: Supporting        terminology {    BC PaymentGateway for Billing {
+
+}
+
+            term PaymentIntent: "Initiated payment request"        description: "Process payments"
+
+Domain CustomerSupport {
+
+    description: "Support domain"            term PaymentConfirmation: "Successful payment response"    }
+
+    classifier: Supporting
+
+}        }}
 
 
 
-Classification Core// 2. IMPORT SCENARIOS  
+// DomainMap uses references for each domain    }
+
+DomainMap CustomerFacingDomains {
+
+    contains Sales, Marketing, CustomerSupport}// This ContextMap references BCs from different packages
+
+}
+
+ContextMap ShoppingExperience {
+
+// If you import another file with a "Sales" domain in a different namespace,
+
+// references would resolve to all matching domains// Cross-namespace references using qualified names    contains acme.ecommerce.ProductSearch, acme.payments.PaymentGateway
+
+
+
+ContextMap FullEcommerceExperience {}
+
+// ============================================================================
+
+// Key Takeaways    contains Ecommerce.ProductSearch, Ecommerce.OrderProcessing, Payments.PaymentGateway
+
+// ============================================================================
+
+//     
+
+// 1. Multi-references enable MODULAR ARCHITECTURE:
+
+//    Different teams can define their version of a BC/Domain in separate files,    Ecommerce.OrderProcessing -> Payments.PaymentGateway// ============================================================================
+
+//    and you can reference all of them in aggregate views.
+
+//}// Why is MultiReference useful?
+
+// 2. Use NAMESPACES for organization:
+
+//    Avoid name collisions by organizing related elements in namespaces.// ============================================================================
+
+//    Use qualified names (e.g., Ecommerce.ProductSearch) for precise references.
+
+//
+
+// 3. STRATEGIC FLEXIBILITY:
+
+//    Model the same concept from multiple perspectives (Sales view vs Support view)// ============================================================================// 1. MODULAR ARCHITECTURE
+
+//    and create unified views that aggregate all perspectives.
+
+//// Example 3: Strategic classifications across layers//    Different teams can define their own version of a BC in separate files,
+
+// 4. IMPORT-FRIENDLY:
+
+//    When importing multiple files with overlapping names, references resolve// ============================================================================//    and you can reference all of them in aggregate views.
+
+//    to all matching instances instead of causing errors.
+
+//
+
+// 5. DISTRIBUTED MODELING:
+
+//    Large organizations can split modeling across teams and files, thenClassification Core// 2. IMPORT SCENARIOS  
+
+//    compose comprehensive views using multi-references and namespaces.
 
 Classification Supporting//    When you import multiple files that might have overlapping BC names,
 

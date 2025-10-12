@@ -2,7 +2,6 @@ import { modelChecks } from './model.js';
 import { domainChecks } from './domain.js';
 import { boundedContextChecks } from './bounded-context.js';
 import { classificationChecks } from './classification.js';
-import { contextGroupChecks } from './context-group.js';
 import { createImportChecks } from './import.js';
 import type { ValidationChecks } from 'langium';
 import type { DomainLangAstType } from '../generated/ast.js';
@@ -20,7 +19,6 @@ export function registerValidationChecks(services: DomainLangServices) {
         Domain: domainChecks,
         BoundedContext: boundedContextChecks,
         Classification: classificationChecks,
-        ContextGroup: contextGroupChecks,
         ImportStatement: importChecks.ImportStatement,
     };
     

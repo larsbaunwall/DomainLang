@@ -41,8 +41,7 @@ type Container = NamespaceDeclaration | Model;
 StructureElement: 
     Type |
     ObjectMap |
-    NamespaceDeclaration |
-    ContextGroup
+    NamespaceDeclaration
 ;
 
 /**
@@ -106,20 +105,6 @@ BoundedContextDocumentationBlock:
     | {RelationshipsBlock} ('relationships' | 'integrations' | 'connections') '{' (relationships += Relationship ((",")? relationships += Relationship)*)* '}'
     | {TerminologyBlock} ('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' (domainTerminology += DomainTerm (",")?)* '}'
     | {DecisionsBlock} ('decisions' | 'constraints' | 'rules' | 'policies') '{' (decisions += AbstractDecision (',')?)* '}'
-;
-
-/**
- * Context Group - Groups bounded contexts by strategic role or pattern.
- * Useful for organizing contexts by DDD patterns (Core, Supporting, Generic).
- */
-ContextGroup:
-    ('ContextGroup' | 'contextgroup') name=ID 
-    (('for' | 'in') domain=[Domain:QualifiedName])?
-    '{'
-        ('role' Assignment roleClassifier=[Classification:QualifiedName])?
-        (('contexts' | 'contains') contexts+=[+BoundedContext:QualifiedName] 
-            (',' contexts+=[+BoundedContext:QualifiedName])*)?
-    '}'
 ;
 
 // ============================================================================

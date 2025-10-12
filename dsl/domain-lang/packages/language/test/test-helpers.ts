@@ -337,11 +337,6 @@ export const TestFixtures = {
                 description: "Payment processing"
             }
             
-            ContextGroup CoreContexts for Commerce {
-                role: Core
-                contains OrderManagement
-            }
-            
             ContextMap CommerceMap {
                 contains OrderManagement, PaymentProcessing
                 OrderManagement U/D PaymentProcessing

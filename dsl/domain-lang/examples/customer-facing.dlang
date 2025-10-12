@@ -46,9 +46,4 @@ namespace CustomerFacing {
         [SK] ApplicationFramework <-> Listings : SharedKernel
         [OHS] Listings -> [ACL] ApplicationFramework
     }
-
-    ContextGroup CoreJourney for Enterprise {
-        role: CoreDomain
-        contains Listings, ApplicationFramework
-    }
 }
