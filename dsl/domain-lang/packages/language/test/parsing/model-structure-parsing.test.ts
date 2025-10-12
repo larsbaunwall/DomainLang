@@ -170,6 +170,9 @@ describe('Grammar Completeness Tests', () => {
                     Classification Core
                     Classification SaaS
                     Classification Mature
+                    Classification Architectural
+                    Classification Business
+                    Classification Technical
                     
                     BoundedContext TestBC for Test {
                         description: "Test context"
@@ -194,9 +197,9 @@ describe('Grammar Completeness Tests', () => {
                         }
                         
                         decisions {
-                            decision [architectural] EventSourcing: "Use event sourcing"
-                            policy [business] Returns: "30-day returns"
-                            rule [technical] Validation: "Validate inputs"
+                            decision [Architectural] EventSourcing: "Use event sourcing"
+                            policy [Business] Returns: "30-day returns"
+                            rule [Technical] Validation: "Validate inputs"
                         }
                     }
                 `,
@@ -401,20 +404,23 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
+                    Classification Architectural
+                    Classification Business
+                    Classification Technical
+                    Classification Compliance
+                    Classification Security
+                    Classification Operational
+                    
                     Domain Test {}
                     BoundedContext TestBC for Test {
                         decisions {
                             decision ArchDecision: "Basic decision"
-                            Decision [architectural] EventSourcing: "Use event sourcing"
-                            decision [arch] CQRS: "Command Query Responsibility Segregation"
-                            decision [business] Pricing: "Subscription model"
-                            decision [biz] Support: "24/7 support"
-                            decision [technical] Database: "Use PostgreSQL"
-                            decision [tech] Cache: "Use Redis"
-                            decision [compliance] GDPR: "Follow GDPR"
-                            decision [security] Auth: "Use OAuth2"
-                            decision [operational] Monitoring: "Use Prometheus"
-                            decision [ops] Logging: "Structured logging"
+                            Decision [Architectural] EventSourcing: "Use event sourcing"
+                            decision [Business] Pricing: "Subscription model"
+                            decision [Technical] Database: "Use PostgreSQL"
+                            decision [Compliance] GDPR: "Follow GDPR"
+                            decision [Security] Auth: "Use OAuth2"
+                            decision [Operational] Monitoring: "Use Prometheus"
                         }
                     }
                 `,
@@ -426,13 +432,17 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
+                    Classification Business
+                    Classification Compliance
+                    Classification Security
+                    
                     Domain Test {}
                     BoundedContext TestBC for Test {
                         decisions {
                             policy DefaultPolicy: "Basic policy"
-                            Policy [business] Returns: "30-day returns"
-                            policy [compliance] DataRetention: "Keep data 7 years"
-                            policy [security] Passwords: "Strong passwords required"
+                            Policy [Business] Returns: "30-day returns"
+                            policy [Compliance] DataRetention: "Keep data 7 years"
+                            policy [Security] Passwords: "Strong passwords required"
                         }
                     }
                 `,
@@ -444,12 +454,15 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
+                    Classification Technical
+                    Classification Business
+                    
                     Domain Test {}
                     BoundedContext TestBC for Test {
                         decisions {
                             rule DefaultRule: "Basic rule"
-                            Rule [technical] Validation: "Validate all inputs"
-                            rule [business] Discounts: "Max 50% discount"
+                            Rule [Technical] Validation: "Validate all inputs"
+                            rule [Business] Discounts: "Max 50% discount"
                         }
                     }
                 `,

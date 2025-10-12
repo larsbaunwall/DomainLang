@@ -64,7 +64,7 @@ Type:
  * Use `classifier` to indicate Core, Supporting, or Generic.
  */
 Domain:
-    (/** A Domain represents a sphere of knowledge, influence, or activity. In DDD, it is the subject area to which the user applies a program. Example: Sales, Shipping, Accounting. */ 'Domain' | 'domain') name=ID ('in' parentDomain=[Domain:QualifiedName])?
+    (/** A Domain represents a sphere of knowledge, influence, or activity. In DDD, it is the subject area to which the user applies a program. Example: Sales, Shipping, Accounting. */ 'Domain' | 'domain') name=ID ('in' parent=[Domain:QualifiedName])?
     '{'
         documentation+=DomainDocumentationBlock*
     '}'
@@ -85,25 +85,25 @@ BoundedContext:
     (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'boundedcontext' | 'BC' | 'Context') name=ID 
     ('for' domain=[Domain:QualifiedName])?
     (
-        (('as' | 'tagged:') inlineRole=[Classification:QualifiedName])?
-        (('by' | 'owner:') inlineTeam=[Team:QualifiedName])?
+        (('as' | 'tagged:') role=[Classification:QualifiedName])?
+        (('by' | 'owner:') team=[Team:QualifiedName])?
     )?
     ('{' documentation+=BoundedContextDocumentationBlock* '}')?
 ;
 
 BoundedContextDocumentationBlock:
       {DescriptionBlock} 'description' Assignment description=STRING
-    | {TeamBlock} (TeamAssignment | 'owner' | ('managed' 'by')) Assignment team=[Team:QualifiedName]
-    | {RoleBlock} ('role' | ('domain' 'role')) Assignment roleClassifier=[Classification:QualifiedName]
+    | {TeamBlock} (TeamAssignment | 'owner' | ('managed' 'by')) Assignment owner=[Team:QualifiedName]
+    | {RoleBlock} ('role' | ('domain' 'role')) Assignment role=[Classification:QualifiedName]
     | {BusinessModelBlock} ('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName]
     | {EvolutionBlock} ('evolution' | 'maturity') Assignment evolution=[Classification:QualifiedName]
     | {ClassifiersBlock} 'classifiers' '{'
-        (RoleAssignment Assignment roleClassifier=[Classification:QualifiedName])?
+        (RoleAssignment Assignment role=[Classification:QualifiedName])?
         (BusinessModelAssignment Assignment businessModel=[Classification:QualifiedName])?
         (EvolutionAssignment Assignment evolution=[Classification:QualifiedName])?
       '}'
     | {RelationshipsBlock} ('relationships' | 'integrations' | 'connections') '{' (relationships += Relationship ((",")? relationships += Relationship)*)* '}'
-    | {TerminologyBlock} ('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' (domainTerminology += DomainTerm (",")?)* '}'
+    | {TerminologyBlock} ('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' (terms += DomainTerm (",")?)* '}'
     | {DecisionsBlock} ('decisions' | 'constraints' | 'rules' | 'policies') '{' (decisions += AbstractDecision (',')?)* '}'
 ;
 
@@ -121,10 +121,10 @@ Team:
 
 /**
  * Classification - Reusable label for categorizing elements.
- * Examples: Core, Supporting, Generic, Strategic, Commodity.
+ * Examples: Core, Supporting, Generic, Strategic, Commodity, Architectural, Business, Technical.
  */
 Classification:
-    (/** A Classification is a reusable label for categorizing domains, contexts, or patterns (e.g., Core, Supporting, Generic). */ 'Classification' | 'classification') name=ID
+    (/** A Classification is a reusable label for categorizing domains, contexts, patterns, and decisions (e.g., Core, Supporting, Generic, Architectural, Business, Technical). */ 'Classification' | 'classification') name=ID
 ;
 
 // ============================================================================
@@ -245,29 +245,20 @@ AbstractDecision:
 
 Decision:
     (/** A documented choice or rule that affects the model or process. */ 'decision' | 'Decision') 
-    ('[' category=DecisionCategory ']')?
+    ('[' classification=[Classification:QualifiedName] ']')?
     name=ID Assignment value=STRING
 ;
 
 Policy:
     (/** A business rule or guideline that governs behavior within a context. */ 'policy' | 'Policy') 
-    ('[' category=DecisionCategory ']')?
+    ('[' classification=[Classification:QualifiedName] ']')?
     name=ID Assignment value=STRING
 ;
 
 BusinessRule:
     ('rule' | 'Rule') 
-    ('[' category=DecisionCategory ']')?
+    ('[' classification=[Classification:QualifiedName] ']')?
     name=ID Assignment value=STRING
-;
-
-DecisionCategory returns string:
-    'architectural' | 'arch'
-    | 'business' | 'biz'
-    | 'technical' | 'tech'
-    | 'compliance'
-    | 'security'
-    | 'operational' | 'ops'
 ;
 
 // ============================================================================
@@ -325,11 +316,11 @@ interface ClassifierBlock {
 }
 
 interface TeamBlock {
-    team?: @Team
+    owner?: @Team
 }
 
 interface RoleBlock {
-    roleClassifier?: @Classification
+    role?: @Classification
 }
 
 interface BusinessModelBlock {
@@ -341,7 +332,7 @@ interface EvolutionBlock {
 }
 
 interface ClassifiersBlock {
-    roleClassifier?: @Classification
+    role?: @Classification
     businessModel?: @Classification
     evolution?: @Classification
 }
@@ -351,7 +342,7 @@ interface RelationshipsBlock {
 }
 
 interface TerminologyBlock {
-    domainTerminology: DomainTerm[]
+    terms: DomainTerm[]
 }
 
 interface DecisionsBlock {

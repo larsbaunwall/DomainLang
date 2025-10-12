@@ -73,8 +73,8 @@ describe('Scoping: Edge Cases', () => {
         expect(domains).toHaveLength(3);
         
         domains.forEach(domain => {
-            if (isDomain(domain) && domain.parentDomain) {
-                expect(domain.parentDomain.ref).toBeDefined();
+            if (isDomain(domain) && domain.parent) {
+                expect(domain.parent.ref).toBeDefined();
             }
         });
     });

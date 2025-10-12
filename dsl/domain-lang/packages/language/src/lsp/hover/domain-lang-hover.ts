@@ -140,10 +140,10 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                     '📁',
                     ` **\`(domain)\` ${n.name}**`,
                     [
-                        `${n.parentDomain ? `*Part of ${this.refLink(n.parentDomain)} domain*` : ''}`,
+                        `${n.parent ? `*Part of ${this.refLink(n.parent)} domain*` : ''}`,
                         description ? `---\n\n&nbsp;\n\n*${description}*\n\n&nbsp;` : undefined,
-                        classifier ? `�� Classifier: ${this.refLink(classifierRef, classifier)}` : undefined,
-                        vision ? `�� Vision: ${vision}` : undefined
+                        classifier ? `🏷️ Classifier: ${this.refLink(classifierRef, classifier)}` : undefined,
+                        vision ? `🎯 Vision: ${vision}` : undefined
                     ],
                     commentBlock
                 );
@@ -184,17 +184,17 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
 
                 // Extract values from blocks
                 const description = descriptionBlock ? descriptionBlock.description : undefined;
-                const team = teamBlock?.team;
-                const teamLabel = team ? team.ref?.name : '';
-                const teamRef = teamBlock?.team ? teamBlock.team.ref : undefined;
+                const owner = teamBlock?.owner;
+                const ownerLabel = owner ? owner.ref?.name : '';
+                const ownerRef = teamBlock?.owner ? teamBlock.owner.ref : undefined;
                 const businessModel = classifiersBlock?.businessModel;
                 const businessModelRef = classifiersBlock?.businessModel ? classifiersBlock.businessModel.ref : undefined;
                 const evolution = classifiersBlock?.evolution;
                 const evolutionRef = classifiersBlock?.evolution ? classifiersBlock.evolution.ref : undefined;
-                const roleClassifier = classifiersBlock?.roleClassifier;
-                const roleClassifierRef = classifiersBlock?.roleClassifier ? classifiersBlock.roleClassifier.ref : undefined;
+                const role = classifiersBlock?.role;
+                const roleRef = classifiersBlock?.role ? classifiersBlock.role.ref : undefined;
                 const relationships = relationshipsBlock?.relationships ?? [];
-                const terminology = terminologyBlock?.domainTerminology ?? [];
+                const terminology = terminologyBlock?.terms ?? [];
                 const decisions = decisionsBlock?.decisions ?? [];
 
                 return this.hoverTemplate(
@@ -203,8 +203,8 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                     [
                         `${n.domain?.ref ? `*Part of ${this.refLink(n.domain.ref)} domain*` : ''}`,  
                         description ? `---\n\n&nbsp;\n\n*${description}*\n\n&nbsp;` : undefined,
-                        roleClassifier ? `🔖 Role: ${this.refLink(roleClassifierRef)}` : undefined,
-                        team ? `👥 Team: ${this.refLink(teamRef, String(teamLabel))}` : undefined,
+                        role ? `🔖 Role: ${this.refLink(roleRef)}` : undefined,
+                        owner ? `👥 Team: ${this.refLink(ownerRef, String(ownerLabel))}` : undefined,
                         businessModel ? `💼 Business Model: ${this.refLink(businessModelRef)}` : undefined,
                         evolution ? `🔄 Evolution: ${this.refLink(evolutionRef)}` : undefined,
                         relationships.length ? `---\n\n&nbsp;\n\n#### 🔗 Relationships\n${relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? '(' + r.type + ')' : ''}`).join('\n')}` : undefined,

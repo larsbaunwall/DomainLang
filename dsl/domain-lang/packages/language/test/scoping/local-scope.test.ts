@@ -40,11 +40,11 @@ describe('Scoping: Local Scope', () => {
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);
-        const teamBlock = bc.documentation?.find(d => 'team' in d);
+        const teamBlock = bc.documentation?.find(d => 'owner' in d);
         expect(teamBlock).toBeDefined();
-        if (teamBlock && 'team' in teamBlock) {
-            expect(teamBlock.team?.ref).toBeDefined();
-            expect(teamBlock.team?.ref?.name).toBe('SalesTeam');
+        if (teamBlock && 'owner' in teamBlock) {
+            expect(teamBlock.owner?.ref).toBeDefined();
+            expect(teamBlock.owner?.ref?.name).toBe('SalesTeam');
         }
     });
 
@@ -61,11 +61,11 @@ describe('Scoping: Local Scope', () => {
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);
-        const roleBlock = bc.documentation?.find(d => 'roleClassifier' in d);
+        const roleBlock = bc.documentation?.find(d => 'role' in d);
         expect(roleBlock).toBeDefined();
-        if (roleBlock && 'roleClassifier' in roleBlock) {
-            expect(roleBlock.roleClassifier?.ref).toBeDefined();
-            expect(roleBlock.roleClassifier?.ref?.name).toBe('Core');
+        if (roleBlock && 'role' in roleBlock) {
+            expect(roleBlock.role?.ref).toBeDefined();
+            expect(roleBlock.role?.ref?.name).toBe('Core');
         }
     });
 });

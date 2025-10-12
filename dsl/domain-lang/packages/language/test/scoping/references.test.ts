@@ -59,7 +59,7 @@ describe('Scoping: References', () => {
         if (!salesDomain) {
             return;
         }
-        expect(salesDomain.parentDomain?.ref).toBeDefined();
-        expect(salesDomain.parentDomain?.ref?.name).toBe('Commerce');
+        expect(salesDomain.parent?.ref).toBeDefined();
+        expect(salesDomain.parent?.ref?.name).toBe('Commerce');
     });
 });

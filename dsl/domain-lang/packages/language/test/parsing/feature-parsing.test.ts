@@ -111,13 +111,17 @@ describe('Advanced Syntax Features', () => {
     test('should parse categorized decisions', async () => {
         // Arrange
         const input = s`
+            Classification Architectural
+            Classification Business
+            Classification Technical
+            
             Domain Sales {}
             
             BoundedContext OrderContext for Sales {
                 decisions {
-                    decision [architectural] EventSourcing: "Use event sourcing"
-                    policy [business] RefundPolicy: "30-day return policy"
-                    rule [technical] UniqueIds: "All orders need unique IDs"
+                    decision [Architectural] EventSourcing: "Use event sourcing"
+                    policy [Business] RefundPolicy: "30-day return policy"
+                    rule [Technical] UniqueIds: "All orders need unique IDs"
                 }
             }
         `;
@@ -178,6 +182,8 @@ describe('Advanced Syntax Features', () => {
             namespace com.company.ecommerce {
                 Team SalesTeam
                 Classification Core
+                Classification Architectural
+                Classification Business
                 
                 Domain Commerce {
                     description: "Main commerce domain"
@@ -193,8 +199,8 @@ describe('Advanced Syntax Features', () => {
                     }
                     
                     decisions {
-                        decision [architectural] EventSourcing: "Use event sourcing"
-                        policy [business] Returns: "30-day return policy"
+                        decision [Architectural] EventSourcing: "Use event sourcing"
+                        policy [Business] Returns: "30-day return policy"
                     }
                 }
             }
