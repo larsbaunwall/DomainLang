@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, beforeAll, vi } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach, beforeAll, vi } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -43,7 +43,7 @@ let GitUrlResolver: any;
 let GitUrlParser: any;
 
 beforeAll(async () => {
-    ({ GitUrlResolver, GitUrlParser } = await import('../../src/language/services/git-url-resolver.js'));
+    ({ GitUrlResolver, GitUrlParser } = await import('../../src/services/git-url-resolver.js'));
 });
 
 describe('GitUrlResolver', () => {
@@ -60,7 +60,7 @@ describe('GitUrlResolver', () => {
         await fs.rm(tempCache, { recursive: true, force: true });
     });
 
-    it('clones repository and checks out resolved commit', async () => {
+    test('clones repository and checks out resolved commit', async () => {
         const gitInfo = GitUrlParser.parse('acme/patterns@main');
         const cachePath = path.join(tempCache, gitInfo.platform, gitInfo.owner, gitInfo.repo, 'abcdef');
 

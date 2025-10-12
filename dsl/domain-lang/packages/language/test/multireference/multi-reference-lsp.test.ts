@@ -1,20 +1,23 @@
-import { describe, test, expect } from 'vitest';
-import { createDomainLangServices } from '../../src/language/domain-lang-module.js';
-import { EmptyFileSystem, type LangiumDocument } from 'langium';
-import { parseHelper } from 'langium/test';
-import type { Model, ContextGroup, BoundedContext } from '../../src/language/generated/ast.js';
-import { isContextGroup, isBoundedContext } from '../../src/language/generated/ast.js';
+import { describe, test, expect, beforeAll } from 'vitest';
+import type { TestServices } from '../test-helpers.js';
+import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
+import type { ContextGroup, BoundedContext } from '../../src/generated/ast.js';
+import { isContextGroup } from '../../src/generated/ast.js';
 
 /**
  * This test demonstrates the practical use of multi-target references.
  * It shows how the same BC name in different contexts resolves to multiple targets.
  */
 describe('MultiReference Practical Example', () => {
-    const services = createDomainLangServices(EmptyFileSystem).DomainLang;
-    const parse = parseHelper<Model>(services);
+    let testServices: TestServices;
+
+    beforeAll(() => {
+        testServices = setupTestSuite();
+    });
 
     test('Demonstrates how multiple BCs with same name are referenced', async () => {
-        const input = `
+        // Arrange
+        const input = s`
             Domain Sales {}
             Domain Support {}
             
@@ -35,11 +38,14 @@ describe('MultiReference Practical Example', () => {
             }
         `;
 
-        const document = await parse(input);
+        // Act
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
         const model = document.parseResult.value;
         
+        // Assert
         // Find the ContextGroup
-        const group = model.children.find(c => 
+        const group = model.children.find((c): c is ContextGroup => 
             isContextGroup(c) && c.name === 'CustomerServices'
         ) as ContextGroup;
 
@@ -66,7 +72,7 @@ describe('MultiReference Practical Example', () => {
         expect(resolvedContexts.sort()).toEqual(['Sales', 'Support']);
         
         // What this means in practice:
-        console.log('\n📊 Practical Outcome:');
+        console.log('\n Practical Outcome:');
         console.log('   - Writing "contains CustomerManagement" once');
         console.log('   - Includes BOTH the Sales and Support perspectives');
         console.log('   - Enables unified views across team boundaries');
@@ -74,7 +80,8 @@ describe('MultiReference Practical Example', () => {
     });
 
     test('Shows how hover tooltips display multiple resolved targets', async () => {
-        const input = `
+        // Arrange  
+        const input = s`
             Domain Marketing {}
             Domain Sales {}
             
@@ -91,10 +98,13 @@ describe('MultiReference Practical Example', () => {
             }
         `;
 
-        const document = await parse(input);
+        // Act
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
         const model = document.parseResult.value;
         
-        const group = model.children.find(c => 
+        // Assert
+        const group = model.children.find((c): c is ContextGroup => 
             isContextGroup(c) && c.name === 'AllCampaigns'
         ) as ContextGroup;
 
@@ -108,10 +118,11 @@ describe('MultiReference Practical Example', () => {
             return `${idx + 1}. ${bc.name} (${domain}): ${bc.documentation.find(d => 'description' in d)?.description || 'N/A'}`;
         }).join('\n   ');
         
-        console.log('\n🖱️  Hover tooltip would show:');
+        console.log('\n  Hover tooltip would show:');
         console.log(`   ${hoverInfo}`);
         
         // This provides rich context about all matching BCs
         expect(campaignsRef.items.length).toBe(2);
     });
 });
+

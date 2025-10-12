@@ -1,24 +1,19 @@
-import { describe, test, expect, beforeAll, afterAll } from 'vitest';
-import { createDomainLangServices } from '../../src/language/domain-lang-module.js';
-import { EmptyFileSystem, type LangiumDocument } from 'langium';
-import { parseHelper, clearDocuments } from 'langium/test';
-import type { Model, BoundedContext, ContextMap, DomainMap, ContextGroup } from '../../src/language/generated/ast.js';
-import { isBoundedContext, isContextMap, isDomainMap, isContextGroup } from '../../src/language/generated/ast.js';
+import { describe, test, expect, beforeAll } from 'vitest';
+import type { TestServices } from '../test-helpers.js';
+import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
+import type { BoundedContext, ContextMap, DomainMap, ContextGroup } from '../../src/generated/ast.js';
+import { isBoundedContext, isContextMap, isDomainMap, isContextGroup } from '../../src/generated/ast.js';
 
-const hasNoErrors = (doc: LangiumDocument): boolean => {
-    return !doc.diagnostics || doc.diagnostics.filter(d => d.severity === 1 /* Error */).length === 0;
-};
+describe('Multi-Target References', () => {
+    let testServices: TestServices;
 
-describe('Multi-target reference tests', () => {
-    const services = createDomainLangServices(EmptyFileSystem).DomainLang;
-    const parse = parseHelper<Model>(services);
-
-    afterAll(async () => {
-        await clearDocuments(services);
+    beforeAll(() => {
+        testServices = setupTestSuite();
     });
 
     test('BoundedContext belongs to single domain (DDD compliance)', async () => {
-        const input = `
+        // Arrange
+        const input = s`
             Domain Sales {
                 description: "Sales operations"
             }
@@ -31,14 +26,15 @@ describe('Multi-target reference tests', () => {
             BC CustomerExperience for Sales {
                 description: "Sales experience"
             }
-        `;
+    `;
 
-        const document = await parse(input);
-        expect(hasNoErrors(document)).toBe(true);
-
+    // Act
+        const document = await testServices.parse(input);
+    expectValidDocument(document);
         const model = document.parseResult.value;
-        const bc = model.children.find(c => isBoundedContext(c) && c.name === 'CustomerExperience') as BoundedContext;
+    const bc = model.children.find(c => isBoundedContext(c) && c.name === 'CustomerExperience') as BoundedContext;
 
+    // Assert
         expect(bc).toBeDefined();
         expect(bc.domain).toBeDefined();
         // Single reference - a BC can only belong to ONE domain
@@ -63,8 +59,8 @@ describe('Multi-target reference tests', () => {
             }
         `;
 
-        const document = await parse(input);
-        expect(hasNoErrors(document)).toBe(true);
+        const document = await testServices.parse(input);
+            expectValidDocument(document);
 
         const model = document.parseResult.value;
         const contextMap = model.children.find(c => isContextMap(c) && c.name === 'AllOrders') as ContextMap;
@@ -98,8 +94,8 @@ describe('Multi-target reference tests', () => {
             }
         `;
 
-        const document = await parse(input);
-        expect(hasNoErrors(document)).toBe(true);
+        const document = await testServices.parse(input);
+            expectValidDocument(document);
 
         const model = document.parseResult.value;
         const domainMap = model.children.find(c => isDomainMap(c) && c.name === 'CorporatePortfolio') as DomainMap;
@@ -138,8 +134,8 @@ describe('Multi-target reference tests', () => {
             }
         `;
 
-        const document = await parse(input);
-        expect(hasNoErrors(document)).toBe(true);
+        const document = await testServices.parse(input);
+            expectValidDocument(document);
 
         const model = document.parseResult.value;
         const contextGroup = model.children.find(c => isContextGroup(c) && c.name === 'CoreDomain') as ContextGroup;
@@ -155,35 +151,45 @@ describe('Multi-target reference tests', () => {
         expect(contextNames).toEqual(['Catalog', 'Orders', 'Pricing']);
     });
 
-    // Note: MultiReference error handling may differ from single references
-    // Skipping this test as Langium may handle partial multi-ref resolution differently
-    test.skip('MultiReference reports error for unresolved references', async () => {
+    // MultiReference resolution: missing targets are simply left without a ref; existing targets still resolve
+    test('MultiReference resolves existing targets even when some are missing', async () => {
         const input = `
             Domain Sales {}
             
-            DomainMap Portfolio {
-                contains Sales, Marketing
+            BC Orders for Sales {}
+            
+            ContextMap PortfolioContexts {
+                contains Orders, __MissingBC__
             }
         `;
 
-        const document = await parse(input);
-        
-        // Should have linking error for Marketing (not defined)
-        const diagnostics = document.diagnostics?.filter(d => d.severity === 1) ?? [];
-        expect(diagnostics.length).toBeGreaterThan(0);
-        expect(diagnostics.some(d => d.message.toLowerCase().includes('marketing'))).toBe(true);
+        const document = await testServices.parse(input);
+        const model = document.parseResult.value;
+        const contextMap = model.children.find(c => isContextMap(c) && c.name === 'PortfolioContexts') as ContextMap;
+        expect(contextMap).toBeDefined();
+        expect(contextMap.boundedContexts.length).toBe(2);
+
+        const items = contextMap.boundedContexts.flatMap(d => d.items);
+        const resolved = items.filter(i => i.ref?.name).map(i => i.ref!.name).sort();
+
+        // At least one resolves to Orders; all resolved names are Orders
+        expect(resolved.length).toBeGreaterThan(0);
+        const unique = Array.from(new Set(resolved));
+        expect(unique).toEqual(['Orders']);
     });
 
-    // Note: Package scoping not fully supported in EmptyFileSystem tests
-    // Skipping this test - qualified names work in real VS Code environment
-    test.skip('MultiReference works with qualified names in packages', async () => {
+    // TODO: Namespace scoping not fully supported with EmptyFileSystem in tests.
+    // Acceptance criteria to unskip:
+    //  - ScopeProvider supports qualified name resolution across namespaces for MultiReference
+    //  - Workspace fixture or virtual FS provides namespace-aware symbol exposure
+    test.skip('MultiReference works with qualified names in namespaces', async () => {
         const input = `
-            package acme.sales {
+            namespace acme.sales {
                 Domain Sales {}
                 BC Orders for Sales {}
             }
             
-            package acme.marketing {
+            namespace acme.marketing {
                 Domain Marketing {}
                 BC Campaigns for Marketing {}
             }
@@ -193,8 +199,8 @@ describe('Multi-target reference tests', () => {
             }
         `;
 
-        const document = await parse(input);
-        expect(hasNoErrors(document)).toBe(true);
+        const document = await testServices.parse(input);
+            expectValidDocument(document);
 
         const model = document.parseResult.value;
         const contextMap = model.children.find(c => isContextMap(c) && c.name === 'Corporate') as ContextMap;
@@ -229,8 +235,8 @@ describe('Multi-target reference tests', () => {
             }
         `;
 
-        const document = await parse(input);
-        expect(hasNoErrors(document)).toBe(true);
+        const document = await testServices.parse(input);
+            expectValidDocument(document);
 
         const model = document.parseResult.value;
         const group = model.children.find(c => isContextGroup(c) && c.name === 'CustomerServices') as ContextGroup;
@@ -244,3 +250,4 @@ describe('Multi-target reference tests', () => {
         expect(customerMgmtRef.items.every((item) => item.ref?.name === 'CustomerManagement')).toBe(true);
     });
 });
+

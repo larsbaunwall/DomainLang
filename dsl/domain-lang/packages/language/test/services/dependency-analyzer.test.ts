@@ -1,14 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { DependencyAnalyzer } from '../../src/language/services/dependency-analyzer.js';
-import type { LockFile } from '../../src/language/services/git-url-resolver.js';
-import path from 'node:path';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import { DependencyAnalyzer } from '../../src/services/dependency-analyzer.js';
+import type { LockFile } from '../../src/services/git-url-resolver.js';
+import { join } from 'node:path';
 import fs from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import YAML from 'yaml';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 describe('DependencyAnalyzer', () => {
     let analyzer: DependencyAnalyzer;
@@ -18,7 +14,7 @@ describe('DependencyAnalyzer', () => {
     });
 
     describe('buildDependencyTree', () => {
-        it('builds tree from lock file with no dependencies', async () => {
+    test('should build tree from lock file with no dependencies', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {},
@@ -28,7 +24,7 @@ describe('DependencyAnalyzer', () => {
             expect(tree).toEqual([]);
         });
 
-        it('builds tree with single dependency', async () => {
+    test('should build tree with single dependency', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -48,12 +44,12 @@ describe('DependencyAnalyzer', () => {
     });
 
     describe('formatDependencyTree', () => {
-        it('formats empty tree', () => {
+        test('should format empty tree', () => {
             const formatted = analyzer.formatDependencyTree([]);
             expect(formatted).toBe('');
         });
 
-        it('formats tree with single node', () => {
+        test('should format tree with single node', () => {
             const tree = [{
                 packageKey: 'acme/patterns',
                 version: '1.0.0',
@@ -66,7 +62,7 @@ describe('DependencyAnalyzer', () => {
             expect(formatted).toContain('acme/patterns@1.0.0');
         });
 
-        it('formats tree with nested dependencies', () => {
+        test('should format tree with nested dependencies', () => {
             const tree = [{
                 packageKey: 'acme/patterns',
                 version: '1.0.0',
@@ -87,7 +83,7 @@ describe('DependencyAnalyzer', () => {
             expect(formatted).toMatch(/[├└]/); // Tree characters
         });
 
-        it('includes commit hashes when requested', () => {
+        test('should include commit hashes when requested', () => {
             const tree = [{
                 packageKey: 'acme/patterns',
                 version: '1.0.0',
@@ -102,7 +98,7 @@ describe('DependencyAnalyzer', () => {
     });
 
     describe('findReverseDependencies', () => {
-        it('finds no dependencies for unused package', async () => {
+            test('should find no dependencies for unused package', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -124,7 +120,7 @@ describe('DependencyAnalyzer', () => {
     });
 
     describe('resolveVersionPolicy', () => {
-        it('resolves "latest" policy', async () => {
+            test('should resolve "latest" policy', async () => {
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'latest',
@@ -136,7 +132,7 @@ describe('DependencyAnalyzer', () => {
             expect(result.availableVersions).toContain('v2.0.0');
         });
 
-        it('resolves "stable" policy excluding pre-releases', async () => {
+            test('should resolve "stable" policy excluding pre-releases', async () => {
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'stable',
@@ -147,7 +143,7 @@ describe('DependencyAnalyzer', () => {
             expect(result.version).toBe('v1.5.0'); // Excludes beta
         });
 
-        it('resolves pinned version', async () => {
+            test('should resolve pinned version', async () => {
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'v1.2.3',
@@ -164,7 +160,7 @@ describe('DependencyAnalyzer', () => {
         let homeSpy: ReturnType<typeof vi.spyOn>;
 
         beforeEach(async () => {
-            tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'dlang-cache-'));
+            tempHome = await fs.mkdtemp(join(os.tmpdir(), 'dlang-cache-'));
             homeSpy = vi.spyOn(os, 'homedir').mockReturnValue(tempHome);
         });
 
@@ -173,7 +169,7 @@ describe('DependencyAnalyzer', () => {
             await fs.rm(tempHome, { recursive: true, force: true });
         });
 
-        it('detects no cycles in acyclic graph', async () => {
+            test('should detect no cycles in acyclic graph', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -194,7 +190,7 @@ describe('DependencyAnalyzer', () => {
             expect(cycles).toEqual([]);
         });
 
-        it('detects simple cycle between packages', async () => {
+            test('should detect simple cycle between packages', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -211,10 +207,10 @@ describe('DependencyAnalyzer', () => {
                 },
             };
 
-            const cacheA = path.join(tempHome, '.dlang', 'cache', 'github', 'acme', 'a', 'aaa111');
+            const cacheA = join(tempHome, '.dlang', 'cache', 'github', 'acme', 'a', 'aaa111');
             await fs.mkdir(cacheA, { recursive: true });
             await fs.writeFile(
-                path.join(cacheA, 'model.yaml'),
+                join(cacheA, 'model.yaml'),
                 YAML.stringify({
                     dependencies: {
                         serviceB: { source: 'acme/b', version: '1.0.0' },
@@ -223,10 +219,10 @@ describe('DependencyAnalyzer', () => {
                 'utf-8'
             );
 
-            const cacheB = path.join(tempHome, '.dlang', 'cache', 'github', 'acme', 'b', 'bbb222');
+            const cacheB = join(tempHome, '.dlang', 'cache', 'github', 'acme', 'b', 'bbb222');
             await fs.mkdir(cacheB, { recursive: true });
             await fs.writeFile(
-                path.join(cacheB, 'model.yaml'),
+                join(cacheB, 'model.yaml'),
                 YAML.stringify({
                     dependencies: {
                         serviceA: { source: 'acme/a', version: '1.0.0' },

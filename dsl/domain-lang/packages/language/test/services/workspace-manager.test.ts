@@ -1,9 +1,9 @@
-import { beforeAll, afterAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, afterAll, beforeEach, describe, expect, test } from "vitest";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { WorkspaceManager } from "../../src/language/services/workspace-manager.js";
-import { resetGlobalOptimizer } from "../../src/language/services/performance-optimizer.js";
+import { WorkspaceManager } from "../../src/services/workspace-manager.js";
+import { resetGlobalOptimizer } from "../../src/services/performance-optimizer.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,7 +44,7 @@ describe("WorkspaceManager", () => {
         await cleanup();
     });
 
-    it("finds workspace root and loads lock file", async () => {
+    test("finds workspace root and loads lock file", async () => {
         await createLockFile();
         const manager = new WorkspaceManager({ autoResolve: false });
         await manager.initialize(TEST_ROOT);
@@ -54,14 +54,14 @@ describe("WorkspaceManager", () => {
         expect(manager.getWorkspaceRoot()).toBe(TEST_ROOT);
     });
 
-    it("returns undefined if lock file missing", async () => {
+    test("returns undefined if lock file missing", async () => {
         const manager = new WorkspaceManager({ autoResolve: false });
         await manager.initialize(TEST_ROOT);
         const lock = await manager.getLockFile();
         expect(lock).toBeUndefined();
     });
 
-    it("resolves dependency aliases from manifest", async () => {
+    test("resolves dependency aliases from manifest", async () => {
         const manager = new WorkspaceManager({ autoResolve: false });
         await manager.initialize(ALIAS_ROOT);
         const direct = await manager.resolveDependencyImport("ddd-patterns");

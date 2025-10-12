@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { PerformanceOptimizer, getGlobalOptimizer, resetGlobalOptimizer } from '../../src/language/services/performance-optimizer.js';
-import type { LockFile } from '../../src/language/services/git-url-resolver.js';
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { PerformanceOptimizer, getGlobalOptimizer, resetGlobalOptimizer } from '../../src/services/performance-optimizer.js';
+import type { LockFile } from '../../src/services/git-url-resolver.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -23,12 +23,12 @@ describe('PerformanceOptimizer', () => {
     });
 
     describe('getCachedLockFile', () => {
-        it('returns undefined when no lock file exists', async () => {
+        test('returns undefined when no lock file exists', async () => {
             const result = await optimizer.getCachedLockFile(tempDir);
             expect(result).toBeUndefined();
         });
 
-        it('loads and caches lock file from disk', async () => {
+        test('loads and caches lock file from disk', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -47,7 +47,7 @@ describe('PerformanceOptimizer', () => {
             expect(result).toEqual(lockFile);
         });
 
-        it('uses cache on second call', async () => {
+        test('uses cache on second call', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {},
@@ -68,7 +68,7 @@ describe('PerformanceOptimizer', () => {
             expect(result1).toEqual(result2); // Should be same cached value
         });
 
-        it('refreshes cache after TTL expires', async () => {
+        test('refreshes cache after TTL expires', async () => {
             const shortTTL = new PerformanceOptimizer({ cacheTTL: 10 }); // 10ms TTL
             
             const lockFile1: LockFile = {
@@ -99,7 +99,7 @@ describe('PerformanceOptimizer', () => {
     });
 
     describe('invalidateCache', () => {
-        it('removes cached entry', async () => {
+        test('removes cached entry', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {},
@@ -121,7 +121,7 @@ describe('PerformanceOptimizer', () => {
     });
 
     describe('clearAllCaches', () => {
-        it('clears all caches', async () => {
+        test('clears all caches', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {},
@@ -141,7 +141,7 @@ describe('PerformanceOptimizer', () => {
     });
 
     describe('getCacheStats', () => {
-        it('returns correct statistics', async () => {
+        test('returns correct statistics', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {},
@@ -161,7 +161,7 @@ describe('PerformanceOptimizer', () => {
     });
 
     describe('detectStaleCaches', () => {
-        it('detects when cached file is stale', async () => {
+        test('detects when cached file is stale', async () => {
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {},
@@ -191,13 +191,13 @@ describe('Global Optimizer', () => {
         resetGlobalOptimizer();
     });
 
-    it('returns singleton instance', () => {
+    test('returns singleton instance', () => {
         const opt1 = getGlobalOptimizer();
         const opt2 = getGlobalOptimizer();
         expect(opt1).toBe(opt2);
     });
 
-    it('resets singleton', () => {
+    test('resets singleton', () => {
         const opt1 = getGlobalOptimizer();
         resetGlobalOptimizer();
         const opt2 = getGlobalOptimizer();

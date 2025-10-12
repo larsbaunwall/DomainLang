@@ -1,14 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { GovernanceValidator, loadGovernancePolicy } from '../../src/language/services/governance-validator.js';
-import type { LockFile } from '../../src/language/services/git-url-resolver.js';
-import type { GovernancePolicy } from '../../src/language/services/governance-validator.js';
+import { describe, test, expect } from 'vitest';
+import { GovernanceValidator, loadGovernancePolicy } from '../../src/services/governance-validator.js';
+import type { LockFile } from '../../src/services/git-url-resolver.js';
+import type { GovernancePolicy } from '../../src/services/governance-validator.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 
 describe('GovernanceValidator', () => {
     describe('validate', () => {
-        it('passes validation with no policy', async () => {
+        test('passes validation with no policy', async () => {
             const policy: GovernancePolicy = {};
             const validator = new GovernanceValidator(policy);
 
@@ -27,7 +27,7 @@ describe('GovernanceValidator', () => {
             expect(violations).toEqual([]);
         });
 
-        it('detects blocked source', async () => {
+        test('detects blocked source', async () => {
             const policy: GovernancePolicy = {
                 allowedSources: ['github.com/acme'],
             };
@@ -50,7 +50,7 @@ describe('GovernanceValidator', () => {
             expect(violations[0].severity).toBe('error');
         });
 
-        it('detects unstable versions', async () => {
+        test('detects unstable versions', async () => {
             const policy: GovernancePolicy = {
                 requireStableVersions: true,
             };
@@ -73,7 +73,7 @@ describe('GovernanceValidator', () => {
             expect(violations[0].message).toContain('beta');
         });
 
-        it('allows stable versions', async () => {
+        test('allows stable versions', async () => {
             const policy: GovernancePolicy = {
                 requireStableVersions: true,
             };
@@ -94,7 +94,7 @@ describe('GovernanceValidator', () => {
             expect(violations).toEqual([]);
         });
 
-        it('detects blocked packages', async () => {
+        test('detects blocked packages', async () => {
             const policy: GovernancePolicy = {
                 blockedPackages: ['evil/malware', 'test/blocked'],
             };
@@ -118,7 +118,7 @@ describe('GovernanceValidator', () => {
     });
 
     describe('generateAuditReport', () => {
-        it('generates report with no violations', async () => {
+        test('generates report with no violations', async () => {
             const policy: GovernancePolicy = {};
             const validator = new GovernanceValidator(policy);
 
@@ -139,7 +139,7 @@ describe('GovernanceValidator', () => {
             expect(report).toContain('No policy violations');
         });
 
-        it('generates report with violations', async () => {
+        test('generates report with violations', async () => {
             const policy: GovernancePolicy = {
                 requireStableVersions: true,
             };
@@ -163,7 +163,7 @@ describe('GovernanceValidator', () => {
     });
 
     describe('loadGovernanceMetadata', () => {
-        it('returns empty metadata when file missing', async () => {
+        test('returns empty metadata when file missing', async () => {
             const validator = new GovernanceValidator({});
             const metadata = await validator.loadGovernanceMetadata('/nonexistent');
             expect(metadata).toEqual({});
@@ -172,12 +172,12 @@ describe('GovernanceValidator', () => {
 });
 
 describe('loadGovernancePolicy', () => {
-    it('returns empty policy when file missing', async () => {
+    test('returns empty policy when file missing', async () => {
         const policy = await loadGovernancePolicy('/nonexistent');
         expect(policy).toEqual({});
     });
 
-    it('loads governance policy from model.yaml', async () => {
+    test('loads governance policy from model.yaml', async () => {
         const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'dlang-gov-test-'));
         const manifestPath = path.join(tempDir, 'model.yaml');
         
