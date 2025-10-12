@@ -13,7 +13,7 @@ A comprehensive guide to every language feature with practical examples.
 - [Context Groups](#context-groups)
 - [Decisions, Policies, and Rules](#decisions-policies-and-rules)
 - [Imports](#imports)
-- [Groups and Packages](#groups-and-packages)
+- [Namespaces](#namespaces)
 - [Complete Real-World Example](#complete-real-world-example)
 
 ---
@@ -166,14 +166,6 @@ BC OrderProcessing for Sales {
 }
 ```
 
-### Alternative Keyword: `implements`
-
-```dlang
-BC OrderProcessing implements Sales {
-    description: "Implements the sales domain"
-}
-```
-
 ### Alternative Keywords: `tagged`, `owner`, `managed by`
 
 ```dlang
@@ -201,10 +193,10 @@ Classification SupportingDomain
 Classification GenericDomain
 ```
 
-### Classification in Groups
+### Classification in Namespaces
 
 ```dlang
-Group StrategicPatterns {
+namespace StrategicPatterns {
     Classification CoreDomain
     Classification SupportingDomain
     Classification GenericDomain
@@ -219,10 +211,10 @@ Team PlatformTeam
 Team InfrastructureTeam
 ```
 
-### Teams in Groups
+### Teams in Namespaces
 
 ```dlang
-Group Engineering {
+namespace Engineering {
     Team BackendTeam
     Team FrontendTeam
     Team DataTeam
@@ -490,7 +482,7 @@ Context Groups cluster contexts by strategic intent.
 BC Catalog for Sales { description: "Catalog" }
 BC Orders for Sales { description: "Orders" }
 
-ContextGroup CoreCapabilities {
+ContextGroup CoreCapabilities for Sales {
     contains Catalog, Orders
 }
 ```
@@ -684,14 +676,14 @@ import "https://bitbucket.org/team/domain-models@release-2.0" as DomainModels
 
 ---
 
-## Groups and Packages
+## Namespaces
 
 Organize large models with namespaces.
 
-### Basic Group
+### Basic Namespace
 
 ```dlang
-Group Shared {
+namespace Shared {
     Classification CoreDomain
     Classification SupportingDomain
     Team PlatformTeam
@@ -703,16 +695,16 @@ BC Orders for Sales as Shared.CoreDomain by Shared.PlatformTeam {
 }
 ```
 
-### Nested Groups
+### Nested Namespaces
 
 ```dlang
-Group Company {
-    Group Engineering {
+namespace Company {
+    namespace Engineering {
         Team BackendTeam
         Team FrontendTeam
     }
 
-    Group BusinessDevelopment {
+    namespace BusinessDevelopment {
         Team SalesTeam
         Team MarketingTeam
     }
@@ -723,10 +715,10 @@ BC Orders for Sales by Company.Engineering.BackendTeam {
 }
 ```
 
-### Package with Qualified Name
+### Namespace with Qualified Name
 
 ```dlang
-package acme.sales {
+namespace acme.sales {
     Domain Sales {
         description: "Sales domain"
     }
@@ -739,11 +731,11 @@ package acme.sales {
 // Fully qualified: acme.sales.Sales, acme.sales.Orders
 ```
 
-### Package with Nested Groups
+### Namespace with Shared Resources
 
 ```dlang
-package acme.platform {
-    Group Shared {
+namespace acme.platform {
+    namespace Shared {
         Classification CoreDomain
         Team PlatformGuild
     }
@@ -778,7 +770,7 @@ import "~/shared/compliance.dlang" as Compliance
 // Strategic Classifications
 // ============================================================================
 
-Group StrategicClassifications {
+namespace StrategicClassifications {
     Classification CoreDomain
     Classification SupportingDomain
     Classification GenericDomain
@@ -788,7 +780,7 @@ Group StrategicClassifications {
 // Teams
 // ============================================================================
 
-Group OrganizationStructure {
+namespace OrganizationStructure {
     Team ProductTeam
     Team CheckoutTeam
     Team FulfillmentTeam
@@ -819,7 +811,7 @@ Domain BackOffice in EcommercePlatform {
 // Core Bounded Contexts
 // ============================================================================
 
-BC ProductCatalog implements CustomerExperience
+BC ProductCatalog for CustomerExperience
     as StrategicClassifications.CoreDomain
     by OrganizationStructure.ProductTeam {
 
@@ -858,7 +850,7 @@ BC ProductCatalog implements CustomerExperience
     }
 }
 
-BC ShoppingCart implements CustomerExperience
+BC ShoppingCart for CustomerExperience
     as StrategicClassifications.CoreDomain
     by OrganizationStructure.CheckoutTeam {
 
@@ -882,7 +874,7 @@ BC ShoppingCart implements CustomerExperience
     }
 }
 
-BC Checkout implements CustomerExperience
+BC Checkout for CustomerExperience
     as StrategicClassifications.CoreDomain
     by OrganizationStructure.CheckoutTeam {
 
@@ -923,7 +915,7 @@ BC Checkout implements CustomerExperience
     }
 }
 
-BC OrderManagement implements BackOffice
+BC OrderManagement for BackOffice
     as StrategicClassifications.CoreDomain
     by OrganizationStructure.FulfillmentTeam {
 
@@ -945,7 +937,7 @@ BC OrderManagement implements BackOffice
     }
 }
 
-BC PaymentGateway implements CustomerExperience
+BC PaymentGateway for CustomerExperience
     as StrategicClassifications.SupportingDomain
     by OrganizationStructure.CheckoutTeam {
 
@@ -958,7 +950,7 @@ BC PaymentGateway implements CustomerExperience
     }
 }
 
-BC Analytics implements BackOffice
+BC Analytics for BackOffice
     as StrategicClassifications.GenericDomain
     by OrganizationStructure.DataTeam {
 
@@ -1105,7 +1097,7 @@ This document demonstrated every syntactic feature of DomainLang:
 - ✅ **Context Groups** - Strategic clustering
 - ✅ **Decisions, Policies, Rules** - Governance documentation
 - ✅ **Imports** - Local, workspace, and Git-based sharing
-- ✅ **Groups and Packages** - Namespace organization
+- ✅ **Namespaces** - Hierarchical organization
 
 For more details, see:
 - [Getting Started Guide](./getting-started.md) - Beginner tutorial

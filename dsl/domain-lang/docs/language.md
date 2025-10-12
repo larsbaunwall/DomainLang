@@ -5,19 +5,19 @@ This guide summarizes the DomainLang grammar and explains how to structure `.dla
 ## Model structure
 
 - **Entry rule**: Every file parses into a `Model` node. The model accepts an optional series of import statements followed by any number of top-level structure elements.
-- **Structure elements**: You can mix `Domain`, `BoundedContext`, `ContextGroup`, `ObjectMap` (`ContextMap` or `DomainMap`), `Group`, and `package` declarations in any order.
-- **Container semantics**: `Model`, `Group`, and `package` act as hierarchical scopes. Each child contributes to the global symbol table under its fully qualified name (FQN), formed from ancestor names.
+- **Structure elements**: You can mix `Domain`, `BoundedContext`, `ContextGroup`, `ObjectMap` (`ContextMap` or `DomainMap`), and `Namespace` declarations in any order.
+- **Container semantics**: `Model` and `Namespace` act as hierarchical scopes. Each child contributes to the global symbol table under its fully qualified name (FQN), formed from ancestor names.
 
 ```dlang
 import "./shared/classifications.dlang"
 import "acme/ddd-patterns@v2.1.0" as Patterns
 
-group Shared {
+namespace Shared {
     Classification CoreDomain
     Classification SupportingDomain
 }
 
-package acme.sales {
+namespace acme.sales {
     Domain Sales { description: "Handles all sales operations" }
 }
 ```
@@ -39,18 +39,17 @@ DomainLang supports git-native imports and workspace-relative paths:
 - Named imports bring specific symbols into the local scope while preserving their original names.
 - Manifest names declared in `model.yaml` resolve to pinned repository coordinates, ensuring deterministic cross-project linking.
 
-## Namespaces: groups and packages
+## Namespaces
 
 Use namespaces to organize large models:
 
-- `group Name { ... }` defines a hierarchical namespace that can nest any structure element.
-- `package qualified.name { ... }` creates a package with an FQN. Use packages when you want explicit dotted names like `acme.sales.Sales`.
+- `namespace Qualified.Name { ... }` defines a hierarchical container that can nest any structure element.
 
 ### Namespace semantics
 
-- Nested groups inherit the FQN of their parent, enabling deep hierarchies like `Shared.Supporting.TeamOps`.
-- Packages provide explicit dotted namespaces that behave like immutable modules. All children inside a package share its base prefix.
-- Cross-references resolve against both local and imported namespaces using shortest valid FQNs; inner scopes shadow outer scopes.
+- Nested namespaces inherit the FQN of their parent, enabling deep hierarchies like `Shared.Supporting.TeamOps`.
+- Namespaces provide explicit dotted prefixes for contained elements (for example, declarations within `namespace acme.sales` resolve to `acme.sales.*`).
+- Cross-references resolve against both local and imported namespaces using the shortest valid FQN; inner scopes shadow outer scopes.
 
 ## Type declarations
 
@@ -81,7 +80,7 @@ BC Checkout for Sales as Core by PaymentsTeam {
 ```
 
 - Declares a bounded context. The keywords `BoundedContext`, `boundedcontext`, `BC`, and `Context` are equivalent to ease authoring.
-- Optional domain association: `implements` or `for` followed by a `Domain` FQN; this informs strategic alignment and controls certain validators.
+- Optional domain association: `for` followed by a `Domain` FQN; this informs strategic alignment and controls certain validators.
 - Inline assignments let you set the primary role (`as` / `tagged:`) and owning team (`by` / `owner:`); these synthesize default documentation block entries.
 - Optional documentation block adds more metadata (see **Documentation blocks** below). When omitted, the context body may be empty, producing a pure declaration node.
 
@@ -103,7 +102,7 @@ Available blocks include:
 | Block | Purpose |
 | ----- | ------- |
 | `description` | Short human-readable summary (string literal). |
-| `vision` | Long-term intent statement. |
+| `vision` | Long-term intent statement (domains only). |
 | `classifier` / `role` / `businessModel` / `evolution` | Cross-reference to a `Classification` node. The `classifiers { ... }` block bundles multiple assignments together. |
 | `team`, `owner`, `managed by` | Cross-reference to a `Team` node. |
 | `relationships` / `integrations` / `connections` | Inline relationship definitions (see **Context maps**). |
@@ -194,7 +193,7 @@ ContextGroup CoreDomains for Sales {
 ## Qualified names and references
 
 - `QualifiedName` composes identifiers with dots (e.g., `acme.sales.Sales`). Identifiers allow underscores and hyphen sequences following the first character.
-- Every cross-reference (`[Type:QualifiedName]`) resolves against the current scope, considering namespace containers, groups, packages, and imports. Shadowing follows the usual closest-scope-wins rule.
+- Every cross-reference (`[Type:QualifiedName]`) resolves against the current scope, considering namespace containers, context groups, and imports. Shadowing follows the usual closest-scope-wins rule.
 - `this` is a special bounded-context reference that resolves to the owning context when used inside relationship blocks. It enables self-referential relationship definitions without repeating names.
 
 ## Assignment helpers
@@ -248,8 +247,8 @@ The following excerpt exercises advanced language features: nested namespaces, g
 import "acme/ddd-patterns@v2.1.0" as Patterns
 import "~/shared/model.dlang"
 
-package acme.platform.customer {
-    group SharedKnowledge {
+namespace acme.platform.customer {
+    namespace SharedKnowledge {
         Classification CoreDomain
         Classification SupportingDomain
         Team PlatformGuild
@@ -260,7 +259,7 @@ package acme.platform.customer {
         classifier: SharedKnowledge.CoreDomain
     }
 
-    BC Checkout implements Sales tagged: Patterns.CoreDomain by SharedKnowledge.PlatformGuild {
+    BC Checkout for Sales tagged: Patterns.CoreDomain by SharedKnowledge.PlatformGuild {
         description: "Order capture and payment orchestration"
         team: SharedKnowledge.PlatformGuild
         relationships {
@@ -295,7 +294,7 @@ package acme.platform.customer {
 }
 ```
 
-- Nested `package` and `group` declarations produce FQNs such as `acme.platform.customer.SharedKnowledge.CoreDomain`.
+- Nested namespace declarations produce FQNs such as `acme.platform.customer.SharedKnowledge.CoreDomain`.
 - Git imports introduce reusable classifiers (for example, `Patterns.CoreDomain`) without flattening their namespace.
 - Relationship annotations express both structural (`SharedKernel`) and role-based (`[SK]`) semantics.
 - The context group links strategic classification to the declared contexts, aligning governance with semantic intent.

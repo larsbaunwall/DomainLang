@@ -25,8 +25,7 @@ BC ContextName for DomainName {
 | Context Map | `ContextMap` | - |
 | Domain Map | `DomainMap` | - |
 | Context Group | `ContextGroup` | - |
-| Group (namespace) | `Group` | - |
-| Package | `package` | - |
+| Namespace | `namespace`, `Namespace` | - |
 
 ## Inline Syntax
 
@@ -48,7 +47,6 @@ BC Orders for Sales {
 ```dlang
 BC Orders for Sales {
     description: "Short description"
-    vision: "Long-term vision"
 
     terminology { term Order: "..." }
     language { term Order: "..." }      // alias for terminology
@@ -179,24 +177,16 @@ import "owner/repo@abc123"
 import "ddd-patterns" as Patterns
 ```
 
-## Groups and Packages
+## Namespaces
 
 ```dlang
-// Group (hierarchical namespace)
-Group Shared {
+// Namespace (hierarchical container)
+namespace Shared {
     Classification CoreDomain
     Team ProductTeam
 }
 
 // Reference: Shared.CoreDomain, Shared.ProductTeam
-
-// Package (explicit qualified name)
-package acme.sales {
-    Domain Sales { }
-    BC Orders for Sales { }
-}
-
-// Reference: acme.sales.Sales, acme.sales.Orders
 ```
 
 ## Assignment Operators
@@ -204,8 +194,8 @@ package acme.sales {
 ```dlang
 BC Orders {
     description: "..."      // colon (recommended)
-    vision = "..."          // equals
-    team is SalesTeam       // is (natural language)
+    team = SalesTeam         // equals
+    role is CoreDomain       // is (natural language)
 }
 ```
 
@@ -242,7 +232,6 @@ Domain OrderManagement in Sales { }
 
 | Primary | Alternatives |
 |---------|--------------|
-| `for` | `implements`, `in` |
 | `as` | `tagged:` |
 | `by` | `owner:`, `managed by` |
 | `terminology` | `language`, `glossary` |
@@ -323,7 +312,6 @@ BC Orders for Sales {
 ```dlang
 BC OrderManagement for Sales as CoreDomain by SalesTeam {
     description: "Process customer orders"
-    vision: "Seamless order experience"
 
     terminology {
         term Order: "Customer purchase"
@@ -370,7 +358,7 @@ ContextMap Integration {
 6. **Create context maps** to show integration patterns
 7. **Mark strategic importance** with classifications
 8. **Document decisions** with decision records
-9. **Use packages** for large models
+9. **Use namespaces** for large models
 10. **Import reusable patterns** instead of duplicating
 
 ## See Also

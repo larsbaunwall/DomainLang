@@ -21,23 +21,30 @@ DomainLang is a Domain-Driven Design (DDD) modeling language that lets you descr
 
 ## Installation
 
-Navigate to the DomainLang directory and install dependencies:
+Navigate to the repository root and bootstrap the npm workspaces:
 
 ```bash
 cd dsl/domain-lang
 npm install
 ```
 
-Generate the language parser:
+Regenerate the language parser (this runs inside the `packages/language` workspace):
 
 ```bash
 npm run langium:generate
 ```
 
-Build the project:
+Compile every package, including the language server, CLI, extension, and demo:
 
 ```bash
 npm run build
+```
+
+You can target the core language build and tests directly when iterating on the grammar:
+
+```bash
+npm run build --workspace packages/language
+npm test --workspace packages/language
 ```
 
 ## Your First Model: A Bookstore
@@ -56,6 +63,7 @@ Domain Bookstore {
 ```
 
 **What this means:**
+
 - `Domain` is the keyword that starts a domain declaration
 - `Bookstore` is the name of your domain
 - Inside the braces `{}` you add documentation
@@ -78,6 +86,7 @@ BoundedContext Catalog for Bookstore {
 ```
 
 **What this means:**
+
 - `BoundedContext` (or shorthand `BC`) declares a bounded context
 - `Catalog` is the context name
 - `for Bookstore` links this context to the Bookstore domain
@@ -102,6 +111,7 @@ BoundedContext Catalog for Bookstore {
 ```
 
 **What this means:**
+
 - `terminology` block contains domain terms
 - Each `term` has a name and description
 - `examples` provide concrete instances
@@ -128,6 +138,7 @@ BoundedContext Catalog for Bookstore by CatalogTeam {
 ```
 
 **What this means:**
+
 - `Team` declares a team (usually outside the context)
 - `by CatalogTeam` assigns ownership
 - This helps with Conway's Law alignment
@@ -178,6 +189,7 @@ ContextMap BookstoreSystem {
 ```
 
 **What this means:**
+
 - `ContextMap` defines relationships between contexts
 - `contains` lists the contexts in this map
 - `->` shows that Catalog depends on OrderManagement (upstream/downstream)
@@ -210,10 +222,32 @@ BoundedContext OrderManagement for Bookstore as CoreDomain by OrderTeam {
 ```
 
 **What this means:**
+
 - `Classification` creates reusable strategic labels
 - `as CoreDomain` marks this as a core business capability
 - Core domains are where you invest most
 - Supporting domains are necessary but not differentiating
+
+### Step 8: Organize with Namespaces
+
+Namespaces help keep large models tidy and provide predictable qualified names:
+
+```dlang
+namespace Bookstore.Core {
+    BoundedContext Catalog for Bookstore as CoreDomain by CatalogTeam { }
+    BoundedContext OrderManagement for Bookstore as CoreDomain by OrderTeam { }
+}
+
+namespace Bookstore.Supporting {
+    BoundedContext Shipping for Bookstore as SupportingDomain by ShippingTeam { }
+}
+```
+
+**What this means:**
+
+- `namespace` introduces a hierarchical container whose dotted name prefixes every child (for example, `Bookstore.Core.Catalog`).
+- Nested namespaces allow you to mirror how teams or deployment units are structured without changing the underlying context definitions.
+- Namespaces work seamlessly with imports—use the fully qualified name when referencing symbols from other files.
 
 ## Complete Example
 
@@ -235,61 +269,58 @@ Team CatalogTeam
 Team OrderTeam
 Team ShippingTeam
 
-// Bounded Contexts
-BoundedContext Catalog for Bookstore as CoreDomain by CatalogTeam {
-    description: "Manages the book catalog and inventory"
+namespace Bookstore.Core {
+    BoundedContext Catalog for Bookstore as CoreDomain by CatalogTeam {
+        description: "Manages the book catalog and inventory"
 
-    terminology {
-        term Book: "A published work available for purchase"
-            examples: "The Great Gatsby", "1984"
+        terminology {
+            term Book: "A published work available for purchase"
+                examples: "The Great Gatsby", "1984"
 
-        term ISBN: "International Standard Book Number"
-            aka: BookIdentifier
+            term ISBN: "International Standard Book Number"
+                aka: BookIdentifier
 
-        term Author: "Person who wrote the book"
+            term Author: "Person who wrote the book"
+        }
+
+        decisions {
+            decision [technical] UseElasticsearch: "Use Elasticsearch for book search"
+            policy [business] NoUsedBooks: "Only sell new books"
+        }
     }
 
-    decisions {
-        decision [technical] UseElasticsearch: "Use Elasticsearch for book search"
-        policy [business] NoUsedBooks: "Only sell new books"
+    BoundedContext OrderManagement for Bookstore as CoreDomain by OrderTeam {
+        description: "Handles customer orders and fulfillment"
+
+        terminology {
+            term Order: "Customer request to purchase books"
+            term OrderLine: "Single book in an order"
+            term ShoppingCart: "Temporary collection of books before checkout"
+        }
+
+        decisions {
+            policy [business] FreeShippingOver50: "Free shipping for orders over $50"
+        }
     }
 }
 
-BoundedContext OrderManagement for Bookstore as CoreDomain by OrderTeam {
-    description: "Handles customer orders and fulfillment"
+namespace Bookstore.Supporting {
+    BoundedContext Shipping for Bookstore as SupportingDomain by ShippingTeam {
+        description: "Manages shipping and delivery"
 
-    terminology {
-        term Order: "Customer request to purchase books"
-        term OrderLine: "Single book in an order"
-        term ShoppingCart: "Temporary collection of books before checkout"
-    }
-
-    decisions {
-        policy [business] FreeShippingOver50: "Free shipping for orders over $50"
-    }
-}
-
-BoundedContext Shipping for Bookstore as SupportingDomain by ShippingTeam {
-    description: "Manages shipping and delivery"
-
-    terminology {
-        term Shipment: "Physical delivery of an order"
-        term TrackingNumber: "Unique identifier for tracking a shipment"
+        terminology {
+            term Shipment: "Physical delivery of an order"
+            term TrackingNumber: "Unique identifier for tracking a shipment"
+        }
     }
 }
 
 // Context Map
 ContextMap BookstoreSystem {
-    contains Catalog, OrderManagement, Shipping
+    contains Bookstore.Core.Catalog, Bookstore.Core.OrderManagement, Bookstore.Supporting.Shipping
 
-    Catalog -> OrderManagement : BookLookup
-    OrderManagement -> Shipping : FulfillmentRequest
-}
-
-// Strategic Grouping
-ContextGroup CoreBusinessCapabilities for Bookstore {
-    role: CoreDomain
-    contains Catalog, OrderManagement
+    Bookstore.Core.Catalog -> Bookstore.Core.OrderManagement : BookLookup
+    Bookstore.Core.OrderManagement -> Bookstore.Supporting.Shipping : FulfillmentRequest
 }
 ```
 
@@ -298,7 +329,7 @@ ContextGroup CoreBusinessCapabilities for Bookstore {
 Run validation to check for errors:
 
 ```bash
-npm test
+npm test --workspace packages/language
 ```
 
 Or use the CLI (if available):
@@ -318,28 +349,32 @@ Congratulations! You've learned:
 - ✅ How to use **classifications** (strategic patterns)
 - ✅ How to create **context maps** (relationships)
 - ✅ How to add **decisions** (architectural choices)
+- ✅ How to structure **namespaces** (hierarchical organization)
 
 ## Next Steps
 
 ### Learn More Syntax
 
 Read the comprehensive [Language Reference](./language.md) to learn about:
+
 - Import system (local, workspace, and Git-based)
 - Domain hierarchies with `in` keyword
 - Detailed relationship patterns (OHS, ACL, SK, etc.)
-- Groups and packages for organization
+- Namespaces for organization
 - Advanced decision records
 
 ### Try Real-World Examples
 
 Explore the examples directory:
-- `examples/customer-facing.dlang` - E-commerce platform
-- `examples/domains.dlang` - Enterprise domain hierarchy
-- `static/examples/import-examples.dlang` - Import patterns
+
+- `examples/customer-facing.dlang` – E-commerce platform
+- `examples/domains.dlang` – Enterprise domain hierarchy
+- `static/examples/import-examples.dlang` – Import patterns
 
 ### Use the VS Code Extension
 
 Install the DomainLang VS Code extension for:
+
 - Syntax highlighting
 - Auto-completion
 - Hover documentation
@@ -349,6 +384,7 @@ Install the DomainLang VS Code extension for:
 ### Learn Strategic DDD
 
 Read the [DDD Compliance Guide](./DDD_COMPLIANCE_AUDIT.md) to understand:
+
 - Core vs Supporting vs Generic subdomains
 - Context mapping patterns
 - Strategic design principles
@@ -356,6 +392,7 @@ Read the [DDD Compliance Guide](./DDD_COMPLIANCE_AUDIT.md) to understand:
 ### Advanced Topics
 
 Once comfortable with basics, explore:
+
 - [Git-native imports](./language.md#imports) for sharing models
 - [Workspace management](../README.md#workspace-manifest-modelyaml) with `model.yaml`
 - [Dependency management](../README.md#cli-essentials) with lock files
@@ -410,6 +447,7 @@ Once comfortable with basics, explore:
 ## Feedback
 
 This is a living tutorial. If something was unclear or you got stuck, please open an issue on GitHub with:
+
 - What you were trying to do
 - What happened instead
 - What would have helped
