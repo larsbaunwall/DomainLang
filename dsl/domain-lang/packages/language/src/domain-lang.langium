@@ -73,7 +73,7 @@ Domain:
 DomainDocumentationBlock:
       {DescriptionBlock} 'description' Assignment description=STRING
     | {VisionBlock} 'vision' Assignment vision=STRING
-    | {ClassifierBlock} 'classifier' Assignment classifier=[Classification]
+    | {DomainClassificationBlock} 'classification' Assignment classification=[Classification]
 ;
 
 /**
@@ -82,7 +82,7 @@ DomainDocumentationBlock:
  * Belongs to exactly ONE domain (fundamental DDD principle).
  */
 BoundedContext:
-    (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'boundedcontext' | 'BC') name=ID 
+    (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'BC') name=ID 
     ('for' domain=[Domain:QualifiedName])?
     (
         ('as' role=[Classification:QualifiedName])?
@@ -93,14 +93,14 @@ BoundedContext:
 
 BoundedContextDocumentationBlock:
       {DescriptionBlock} 'description' Assignment description=STRING
-    | {TeamBlock} TeamAssignment Assignment owner=[Team:QualifiedName]
+    | {TeamBlock} TeamAssignment Assignment team=[Team:QualifiedName]
     | {RoleBlock} 'role' Assignment role=[Classification:QualifiedName]
     | {BusinessModelBlock} ('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName]
-    | {EvolutionBlock} ('evolution' | 'maturity') Assignment evolution=[Classification:QualifiedName]
-    | {ClassifiersBlock} 'classifiers' '{'
+    | {LifecycleBlock} ('lifecycle') Assignment lifecycle=[Classification:QualifiedName]
+    | {BoundedContextClassificationBlock} 'classifications' '{'
         (RoleAssignment Assignment role=[Classification:QualifiedName])?
         (BusinessModelAssignment Assignment businessModel=[Classification:QualifiedName])?
-        (EvolutionAssignment Assignment evolution=[Classification:QualifiedName])?
+        (LifecycleAssignment Assignment lifecycle=[Classification:QualifiedName])?
       '}'
     | {RelationshipsBlock} ('relationships' | 'integrations' | 'connections') '{' (relationships += Relationship ((",")? relationships += Relationship)*)* '}'
     | {TerminologyBlock} ('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' (terms += DomainTerm (",")?)* '}'
@@ -144,7 +144,7 @@ ObjectMap:
  * Shows integration patterns and team interactions.
  */
 ContextMap:
-    (/** A Context Map visualizes and documents the relationships between Bounded Contexts, including their integration patterns. */ 'ContextMap' | 'contextmap') name=ID
+    (/** A Context Map visualizes and documents the relationships between Bounded Contexts, including their integration patterns. */ 'ContextMap') name=ID
     '{'
         ('contains' boundedContexts += [+BoundedContext:QualifiedName] ((",")? boundedContexts += [+BoundedContext:QualifiedName])*)*
         (relationships += Relationship ((",")? relationships += Relationship)*)*
@@ -156,7 +156,7 @@ ContextMap:
  * Shows high-level domain organization and subdomain structure.
  */
 DomainMap:
-    (/** A Domain Map visualizes and documents the relationships between Domains. */ 'DomainMap' | 'domainmap') name=ID
+    (/** A Domain Map visualizes and documents the relationships between Domains. */ 'DomainMap') name=ID
     '{'
         ('contains' domains += [+Domain:QualifiedName] ((",")? domains += [+Domain:QualifiedName])*)*
     '}'
@@ -171,10 +171,10 @@ DomainMap:
  * Supports DDD integration patterns (ACL, OHS, PL, etc.) and relationship types.
  */
 Relationship:
-    ('[' leftRoles+=RoleEnum (',' leftRoles+=RoleEnum)* ']')? 
+    ('[' leftPatterns+=IntegrationPattern (',' leftPatterns+=IntegrationPattern)* ']')? 
     left=BoundedContextRef
     arrow=RelationshipArrow
-    ('[' rightRoles+=RoleEnum (',' rightRoles+=RoleEnum)* ']')? 
+    ('[' rightPatterns+=IntegrationPattern (',' rightPatterns+=IntegrationPattern)* ']')? 
     right=BoundedContextRef
     (Assignment type=RelationshipType)?
 ;
@@ -197,21 +197,19 @@ BoundedContextRef:
  */
 RelationshipArrow returns string:
     '<->' | '->' | '<-' | '><'  // Separate Ways
-    | 'U/D' | 'u/d'  // UpstreamDownstream
-    | 'C/S' | 'c/s'  // CustomerSupplier
 ;
 
 /**
- * DDD Integration Patterns (roles in relationships).
+ * DDD Integration Patterns (used in relationships).
  */
-RoleEnum returns string:
-    'PL'    // Published Language
-    | 'OHS' // Open Host Service
-    | 'CF'  // Conformist
-    | 'ACL' // Anti-Corruption Layer
-    | 'P'   // Partnership
-    | 'SK'  // Shared Kernel
-    | 'BBoM' // Big Ball of Mud
+IntegrationPattern returns string:
+    'PL' | 'PublishedLanguage'       // Published Language
+    | 'OHS' | 'OpenHostService'      // Open Host Service
+    | 'CF' | 'Conformist'            // Conformist
+    | 'ACL' | 'AntiCorruptionLayer'  // Anti-Corruption Layer
+    | 'P' | 'Partnership'            // Partnership
+    | 'SK' | 'SharedKernel'          // Shared Kernel
+    | 'BBoM' | 'BigBallOfMud'        // Big Ball of Mud
 ;
 
 /**
@@ -234,9 +232,9 @@ RelationshipType returns string:
  * Supports synonyms and examples for richer glossaries.
  */
 DomainTerm:
-    ('term' | 'Term') name=ID (Assignment meaning=STRING)?
+    ('Term' | 'term') name=ID (Assignment meaning=STRING)?
     (('aka' | 'synonyms') Assignment? synonyms+=ID (',' synonyms+=ID)*)?
-    (('examples' | 'e.g.') Assignment? examples+=STRING (',' examples+=STRING)*)?
+    (('examples') Assignment? examples+=STRING (',' examples+=STRING)*)?
 ;
 
 /**
@@ -318,12 +316,12 @@ interface VisionBlock {
     vision: string
 }
 
-interface ClassifierBlock {
-    classifier?: @Classification
+interface DomainClassificationBlock {
+    classification?: @Classification
 }
 
 interface TeamBlock {
-    owner?: @Team
+    team?: @Team
 }
 
 interface RoleBlock {
@@ -334,14 +332,14 @@ interface BusinessModelBlock {
     businessModel?: @Classification
 }
 
-interface EvolutionBlock {
-    evolution?: @Classification
+interface LifecycleBlock {
+    lifecycle?: @Classification
 }
 
-interface ClassifiersBlock {
+interface BoundedContextClassificationBlock {
     role?: @Classification
     businessModel?: @Classification
-    evolution?: @Classification
+    lifecycle?: @Classification
 }
 
 interface RelationshipsBlock {
@@ -365,7 +363,7 @@ interface DecisionsBlock {
  */
 fragment RoleAssignment returns string: 'role';
 fragment BusinessModelAssignment returns string: 'businessModel';
-fragment EvolutionAssignment returns string: 'evolution';
+fragment LifecycleAssignment returns string: 'lifecycle';
 fragment TeamAssignment returns string: 'team';
 
 /**

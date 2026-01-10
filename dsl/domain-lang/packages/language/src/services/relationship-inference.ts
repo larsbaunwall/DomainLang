@@ -99,22 +99,22 @@ function enrichRelationship(rel: Relationship): void {
  * @returns The inferred type or undefined if no rule matches
  */
 function inferRelationshipType(relationship: Relationship): string | undefined {
-    const leftRoles = (relationship.leftRoles ?? []).map(r => r.toUpperCase());
-    const rightRoles = (relationship.rightRoles ?? []).map(r => r.toUpperCase());
+    const leftPatterns = (relationship.leftPatterns ?? []).map((r: string) => r.toUpperCase());
+    const rightPatterns = (relationship.rightPatterns ?? []).map((r: string) => r.toUpperCase());
 
     if (relationship.arrow === '><') {
         return 'SeparateWays';
     }
     
     if (relationship.arrow === '<->') {
-        const noRoles = leftRoles.length === 0 && rightRoles.length === 0;
-        const bothPartners = leftRoles.includes('P') && rightRoles.includes('P');
+        const noPatterns = leftPatterns.length === 0 && rightPatterns.length === 0;
+        const bothPartners = leftPatterns.includes('P') && rightPatterns.includes('P');
         
-        if (noRoles || bothPartners) {
+        if (noPatterns || bothPartners) {
             return 'Partnership';
         }
         
-        if (leftRoles.includes('SK') && rightRoles.includes('SK')) {
+        if (leftPatterns.includes('SK') && rightPatterns.includes('SK')) {
             return 'SharedKernel';
         }
     }

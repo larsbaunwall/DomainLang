@@ -126,14 +126,14 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                 const n = node as ast.Domain;
                 let description = '';
                 let vision = '';
-                let classifier = '';
-                let classifierRef: Reference<ast.Classification> | undefined = undefined;
+                let classification = '';
+                let classificationRef: Reference<ast.Classification> | undefined = undefined;
                 for (const doc of n.documentation) {
                     if (ast.isDescriptionBlock(doc)) description = doc.description;
                     if (ast.isVisionBlock(doc)) vision = doc.vision;
-                    if (ast.isClassifierBlock(doc)) {
-                        classifier = this.getRefName(doc.classifier);
-                        classifierRef = doc.classifier;
+                    if (ast.isDomainClassificationBlock(doc)) {
+                        classification = this.getRefName(doc.classification);
+                        classificationRef = doc.classification;
                     }
                 }
                 return this.hoverTemplate(
@@ -142,7 +142,7 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                     [
                         `${n.parent ? `*Part of ${this.refLink(n.parent)} domain*` : ''}`,
                         description ? `---\n\n&nbsp;\n\n*${description}*\n\n&nbsp;` : undefined,
-                        classifier ? `🏷️ Classifier: ${this.refLink(classifierRef, classifier)}` : undefined,
+                        classification ? `🏷️ Classification: ${this.refLink(classificationRef, classification)}` : undefined,
                         vision ? `🎯 Vision: ${vision}` : undefined
                     ],
                     commentBlock
@@ -177,20 +177,20 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                 // Find the relevant documentation blocks
                 const descriptionBlock = n.documentation.find(ast.isDescriptionBlock);
                 const teamBlock = n.documentation.find(ast.isTeamBlock);
-                const classifiersBlock = n.documentation.find(ast.isClassifiersBlock);
+                const classifiersBlock = n.documentation.find(ast.isBoundedContextClassificationBlock);
                 const relationshipsBlock = n.documentation.find(ast.isRelationshipsBlock);
                 const terminologyBlock = n.documentation.find(ast.isTerminologyBlock);
                 const decisionsBlock = n.documentation.find(ast.isDecisionsBlock);
 
                 // Extract values from blocks
                 const description = descriptionBlock ? descriptionBlock.description : undefined;
-                const owner = teamBlock?.owner;
-                const ownerLabel = owner ? owner.ref?.name : '';
-                const ownerRef = teamBlock?.owner ? teamBlock.owner.ref : undefined;
+                const team = teamBlock?.team;
+                const ownerLabel = team ? team.ref?.name : '';
+                const ownerRef = teamBlock?.team ? teamBlock.team.ref : undefined;
                 const businessModel = classifiersBlock?.businessModel;
                 const businessModelRef = classifiersBlock?.businessModel ? classifiersBlock.businessModel.ref : undefined;
-                const evolution = classifiersBlock?.evolution;
-                const evolutionRef = classifiersBlock?.evolution ? classifiersBlock.evolution.ref : undefined;
+                const lifecycle = classifiersBlock?.lifecycle;
+                const lifecycleRef = classifiersBlock?.lifecycle ? classifiersBlock.lifecycle.ref : undefined;
                 const role = classifiersBlock?.role;
                 const roleRef = classifiersBlock?.role ? classifiersBlock.role.ref : undefined;
                 const relationships = relationshipsBlock?.relationships ?? [];
@@ -204,9 +204,9 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                         `${n.domain?.ref ? `*Part of ${this.refLink(n.domain.ref)} domain*` : ''}`,  
                         description ? `---\n\n&nbsp;\n\n*${description}*\n\n&nbsp;` : undefined,
                         role ? `🔖 Role: ${this.refLink(roleRef)}` : undefined,
-                        owner ? `👥 Team: ${this.refLink(ownerRef, String(ownerLabel))}` : undefined,
+                        team ? `👥 Team: ${this.refLink(ownerRef, String(ownerLabel))}` : undefined,
                         businessModel ? `💼 Business Model: ${this.refLink(businessModelRef)}` : undefined,
-                        evolution ? `🔄 Evolution: ${this.refLink(evolutionRef)}` : undefined,
+                        lifecycle ? `🔄 Lifecycle: ${this.refLink(lifecycleRef)}` : undefined,
                         relationships.length ? `---\n\n&nbsp;\n\n#### 🔗 Relationships\n${relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? '(' + r.type + ')' : ''}`).join('\n')}` : undefined,
                         terminology.length ? `---\n\n&nbsp;\n\n#### 🗝️ Terminology\n${terminology.map(t => `- **${t.name}**: _${t.meaning}_`).join('\n')}` : undefined,
                         decisions.length ? `---\n\n&nbsp;\n\n#### ⚖️ Decisions\n${decisions.map(d => `- **${d.name}**: _${d.value}_`).join('\n')}` : undefined
