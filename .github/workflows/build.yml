@@ -60,7 +60,9 @@ jobs:
       - name: Build VSIX
         run: |
           npm install -g @vscode/vsce
-          npm run vscode:prepublish && vsce package
+          npm run vscode:prepublish
+          cd packages/extension && vsce package --allow-missing-repository --no-update-package-json
+          mv vscode-domain-lang-*.vsix ../../domain-lang-${{ steps.get_version.outputs.version }}.vsix
         working-directory: ./dsl/domain-lang
         shell: bash
 
