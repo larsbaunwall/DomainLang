@@ -27,6 +27,7 @@
         "build": "tsc -b tsconfig.build.json && npm run build --workspaces",
         "build:clean": "npm run clean && npm run build",
         "bundle": "npm run build --workspace packages/demo",
+        "vscode:prepublish": "npm run --workspace packages/extension vscode:prepublish",
         "langium:generate": "npm run --workspace packages/language langium:generate",
         "langium:watch": "npm run --workspace packages/language langium:watch",
         "test": "npm run --workspace packages/language test"
