@@ -15,7 +15,7 @@ You are working with Langium 4.x, a framework for building DSLs with full LSP su
 
 - [Langium Documentation](https://langium.org/docs/)
 - [LSP Specification](https://microsoft.github.io/language-server-protocol/)
-- [DomainLang Grammar](packages/language/src/domain-lang.langium)
+- [DomainLang Grammar](/dsl/domain-lang/packages/language/src/domain-lang.langium)
 
 ## Core Intent
 

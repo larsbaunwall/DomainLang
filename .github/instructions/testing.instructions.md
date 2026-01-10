@@ -24,6 +24,8 @@ applyTo: "**/*.test.ts"
 
 ## Test Setup
 
+Tests should follow the Arrange-Act-Assert pattern. Here's a basic example:
+
 ```typescript
 import { describe, test, beforeAll, expect } from 'vitest';
 import type { TestServices } from '../test-helpers.js';
@@ -36,12 +38,14 @@ beforeAll(() => {
 });
 
 test('parse domain', async () => {
+    // Arrange
     const document = await testServices.parse(s`
         Domain Sales {
             vision: "Handle sales operations"
         }
     `);
 
+    // Act & Assert
     expectValidDocument(document);
 });
 ```
@@ -64,13 +68,17 @@ test('parse domain', async () => {
 
 ```typescript
 test('parse domain with vision', async () => {
+    // Arrange
     const document = await testServices.parse(s`
         Domain Sales { vision: "Handle sales" }
     `);
 
     expectValidDocument(document);
     
+    // Act
     const domain = getFirstDomain(document);
+    
+    // Assert
     expect(domain.name).toBe('Sales');
 });
 ```
@@ -79,21 +87,25 @@ test('parse domain with vision', async () => {
 
 ```typescript
 test('warns when domain lacks vision', async () => {
+    // Arrange
     const document = await testServices.parse(s`
         Domain Sales { description: "Sales operations" }
     `);
 
+    // Act & Assert
     expectValidationWarnings(document, [
         "Domain 'Sales' has no domain vision"
     ]);
 });
 
 test('detects duplicate names', async () => {
+    // Arrange
     const document = await testServices.parse(s`
         Classification Core
         Classification Core
     `);
 
+    // Act & Assert
     expectValidationErrors(document, [
         "This element is already defined elsewhere"
     ]);
@@ -104,6 +116,7 @@ test('detects duplicate names', async () => {
 
 ```typescript
 test('resolve domain reference', async () => {
+    // Arrange
     const document = await testServices.parse(s`
         Domain Sales {}
         BoundedContext Orders for Sales {}
@@ -111,7 +124,10 @@ test('resolve domain reference', async () => {
 
     expectValidDocument(document);
     
+    // Act
     const bc = getFirstBoundedContext(document);
+    
+    // Assert
     expect(bc.domain?.ref).toBeDefined();
     expect(bc.domain?.ref?.name).toBe('Sales');
 });
@@ -121,6 +137,7 @@ test('resolve domain reference', async () => {
 
 ```typescript
 test('handles forward references', async () => {
+    // Arrange
     const document = await testServices.parse(s`
         BoundedContext Orders for Sales {}  // Sales not defined yet
         Domain Sales {}                      // Defined after reference
@@ -128,7 +145,10 @@ test('handles forward references', async () => {
 
     expectValidDocument(document);
     
+    // Act
     const bc = getFirstBoundedContext(document);
+    
+    // Assert
     expect(bc.domain?.ref?.name).toBe('Sales');
 });
 ```
@@ -137,6 +157,7 @@ test('handles forward references', async () => {
 
 ```typescript
 test('ContextMap references multiple same-named BCs', async () => {
+    // Arrange
     const document = await testServices.parse(s`
         Domain Sales {}
         Domain Billing {}
@@ -148,9 +169,11 @@ test('ContextMap references multiple same-named BCs', async () => {
 
     expectValidDocument(document);
     
+    // Act
     const contextMap = document.parseResult.value.children
         .find(c => isContextMap(c)) as ContextMap;
     
+    // Assert
     expect(contextMap.boundedContexts[0].items.length).toBe(2);
 });
 ```
