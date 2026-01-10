@@ -26,6 +26,7 @@
         "watch": "tsc -b tsconfig.build.json --watch",
         "build": "tsc -b tsconfig.build.json && npm run build --workspaces",
         "build:clean": "npm run clean && npm run build",
+        "bundle": "npm run build --workspace packages/demo",
         "langium:generate": "npm run --workspace packages/language langium:generate",
         "langium:watch": "npm run --workspace packages/language langium:watch",
         "test": "npm run --workspace packages/language test"
@@ -42,6 +43,7 @@
     "workspaces": [
         "packages/language",
         "packages/cli",
-        "packages/extension"
+        "packages/extension",
+        "packages/demo"
     ]
 }
