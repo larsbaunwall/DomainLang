@@ -1,6 +1,12 @@
 # DomainLang Syntax Examples
 
-A comprehensive guide to every language feature with practical examples.
+This guide provides copy-paste examples for every language feature. Use it as a reference when you need to implement specific patterns.
+
+> **📋 Audience:** All skill levels seeking ready-to-use code snippets. Great for copy-paste workflows and learning by example.
+
+> **New to DomainLang?** Start with the [Getting Started Guide](./getting-started.md) for a hands-on tutorial.
+
+---
 
 ## Table of Contents
 
@@ -21,6 +27,15 @@ A comprehensive guide to every language feature with practical examples.
 ## Domains
 
 Domains represent spheres of knowledge, influence, or activity in your business.
+
+```mermaid
+graph TB
+    subgraph "Domain Hierarchy Example"
+        E[Enterprise] --> S[Sales]
+        E --> M[Marketing]
+        S --> OM[OrderManagement]
+    end
+```
 
 ### Basic Domain
 
@@ -46,7 +61,7 @@ Classification CoreDomain
 
 Domain Sales {
     description: "Sales and revenue generation"
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 ```
 
@@ -90,7 +105,17 @@ Domain OrderManagement in Sales {
 
 ## Bounded Contexts
 
-Bounded Contexts are boundaries within which a specific domain model is defined.
+Bounded Contexts are boundaries within which a specific domain model is defined. Each context owns its model and terminology.
+
+```mermaid
+graph LR
+    subgraph "Domain: Sales"
+        BC1["BC: OrderProcessing"]
+        BC2["BC: Notifications"]
+    end
+    T1["Team: SalesTeam"] -.->|owns| BC1
+    T2["Team: CommsTeam"] -.->|owns| BC2
+```
 
 ### Basic Bounded Context
 
@@ -148,7 +173,7 @@ BC OrderProcessing for Sales as CoreDomain by SalesTeam {
 }
 ```
 
-### Context with Multiple Classifiers
+### Context with Multiple Classifications
 
 ```dlang
 Classification CoreDomain
@@ -158,26 +183,11 @@ Classification HighTraffic
 BC OrderProcessing for Sales {
     description: "Process customer orders"
 
-    classifiers {
+    classifications {
         role: CoreDomain
         businessModel: EventSourced
-        evolution: HighTraffic
+        lifecycle: HighTraffic
     }
-}
-```
-
-### Alternative Keywords: `tagged`, `owner`, `managed by`
-
-```dlang
-Classification CoreDomain
-Team SalesTeam
-
-BC OrderProcessing for Sales tagged: CoreDomain owner: SalesTeam {
-    description: "Alternative syntax"
-}
-
-BC Notifications for Sales managed by SalesTeam {
-    description: "Using 'managed by'"
 }
 ```
 
@@ -276,7 +286,7 @@ terminology {
 ### Alternative Block Names
 
 ```dlang
-// All of these are equivalent
+// All of these are equivalent for terminology
 BC Sales for Domain1 {
     terminology { ... }
 }
@@ -295,6 +305,15 @@ BC Sales for Domain1 {
 ## Context Maps
 
 Context Maps show relationships between bounded contexts.
+
+```mermaid
+graph LR
+    subgraph "Context Map Example"
+        A["[OHS] Publisher"] -->|"Published Language"| B["[ACL] Subscriber"]
+        A <-->|"Shared Kernel"| C["Partner"]
+        D["Legacy"] -->|"Conformist"| A
+    end
+```
 
 ### Basic Context Map
 
@@ -409,13 +428,10 @@ ContextMap Patterns {
 ContextMap CustomerSupplier {
     contains Supplier, Customer
 
-    // Using shorthand
-    Supplier U/D Customer
-
-    // Or using arrows
+    // Upstream/downstream relationship
     Supplier -> Customer
 
-    // Or explicit type
+    // With explicit type label
     Supplier -> Customer : CustomerSupplier
 }
 ```
@@ -493,37 +509,37 @@ BC Orders for Sales {
 }
 ```
 
-### Decisions with Categories
+### Decisions with Classification Categories
+
+Decision categories reference declared `Classification` types:
 
 ```dlang
-decisions {
-    decision [architectural] EventSourcing: "Use event sourcing"
-    decision [technical] UseKafka: "Use Kafka for event bus"
-    decision [business] NoRefundsAfter30Days: "No refunds after 30 days"
-    decision [compliance] GDPR: "Comply with GDPR regulations"
-    decision [security] EncryptPII: "Encrypt all PII data"
-    decision [operational] 24x7Support: "Provide 24/7 support"
-}
-```
+// First declare your classification vocabulary
+Classification Architectural
+Classification Technical
+Classification Business
+Classification Compliance
+Classification Security
 
-### Shortened Categories
-
-```dlang
+// Then reference them in decisions
 decisions {
-    decision [arch] EventSourcing: "Use event sourcing"
-    decision [tech] UseKafka: "Use Kafka for event bus"
-    decision [biz] NoRefunds: "No refunds after 30 days"
-    decision [ops] AlwaysOn: "24/7 availability"
+    decision [Architectural] EventSourcing: "Use event sourcing"
+    decision [Technical] UseKafka: "Use Kafka for event bus"
+    decision [Business] NoRefundsAfter30Days: "No refunds after 30 days"
+    decision [Compliance] GDPR: "Comply with GDPR regulations"
+    decision [Security] EncryptPII: "Encrypt all PII data"
 }
 ```
 
 ### Policies
 
 ```dlang
+Classification Business
+
 BC Orders for Sales {
     decisions {
-        policy [business] FreeShipping: "Free shipping over $50"
-        policy [business] ReturnWindow: "30-day return window"
+        policy [Business] FreeShipping: "Free shipping over $50"
+        policy [Business] ReturnWindow: "30-day return window"
     }
 }
 ```
@@ -531,18 +547,21 @@ BC Orders for Sales {
 ### Rules
 
 ```dlang
+Classification Compliance
+Classification Business
+
 BC Orders for Sales {
     decisions {
-        rule [compliance] DataRetention: "Store data for 7 years"
-        rule [business] MinimumOrder: "Minimum order value is $10"
+        rule [Compliance] DataRetention: "Store data for 7 years"
+        rule [Business] MinimumOrder: "Minimum order value is $10"
     }
 }
 ```
 
-### Alternative Block Names
+### Decision Block Aliases
 
 ```dlang
-// All equivalent
+// All equivalent for governance documentation
 decisions { ... }
 constraints { ... }
 rules { ... }
@@ -579,7 +598,7 @@ import "~/domains/sales.dlang" as SalesDomain
 
 // Use with qualified names
 BC Orders for SalesDomain.Sales {
-    classifier: SharedTypes.CoreDomain
+    classification: SharedTypes.CoreDomain
 }
 ```
 
@@ -597,7 +616,7 @@ import "ddd-patterns/core"
 
 // Use patterns
 BC Orders for Sales {
-    classifiers {
+    classifications {
         role: DDDPatterns.AggregateRoot
     }
 }
@@ -690,7 +709,7 @@ namespace acme.platform {
 
     Domain Sales {
         description: "Sales domain"
-        classifier: Shared.CoreDomain
+        classification: Shared.CoreDomain
     }
 
     BC Orders for Sales by Shared.PlatformGuild {
@@ -742,17 +761,17 @@ namespace OrganizationStructure {
 Domain EcommercePlatform {
     description: "Complete e-commerce platform"
     vision: "Enable seamless online shopping experiences"
-    classifier: StrategicClassifications.CoreDomain
+    classification: StrategicClassifications.CoreDomain
 }
 
 Domain CustomerExperience in EcommercePlatform {
     description: "Customer-facing capabilities"
-    classifier: StrategicClassifications.CoreDomain
+    classification: StrategicClassifications.CoreDomain
 }
 
 Domain BackOffice in EcommercePlatform {
     description: "Internal operations and management"
-    classifier: StrategicClassifications.SupportingDomain
+    classification: StrategicClassifications.SupportingDomain
 }
 
 // ============================================================================
@@ -777,10 +796,10 @@ BC ProductCatalog for CustomerExperience
             aka: Stock, Availability
     }
 
-    classifiers {
+    classifications {
         role: StrategicClassifications.CoreDomain
         businessModel: Patterns.AggregateRoot
-        evolution: Compliance.HighTraffic
+        lifecycle: Compliance.HighTraffic
     }
 
     decisions {
@@ -838,7 +857,7 @@ BC Checkout for CustomerExperience
         term Order: "Confirmed purchase after successful payment"
     }
 
-    classifiers {
+    classifications {
         role: StrategicClassifications.CoreDomain
         businessModel: Patterns.EventSourced
     }
@@ -1021,19 +1040,25 @@ Domain Sales {
 
 This document demonstrated every syntactic feature of DomainLang:
 
-- ✅ **Domains** - Strategic business areas with hierarchy
-- ✅ **Bounded Contexts** - Model boundaries with full documentation
-- ✅ **Classifications** - Reusable strategic patterns
-- ✅ **Teams** - Ownership tracking
-- ✅ **Terminology** - Ubiquitous language with synonyms and examples
-- ✅ **Context Maps** - Relationship patterns (OHS, ACL, SK, etc.)
-- ✅ **Domain Maps** - Portfolio visualization
-- ✅ **Context Groups** - Strategic clustering
-- ✅ **Decisions, Policies, Rules** - Governance documentation
-- ✅ **Imports** - Local, workspace, and Git-based sharing
-- ✅ **Namespaces** - Hierarchical organization
+| Feature | Description |
+| ------- | ----------- |
+| **Domains** | Strategic business areas with hierarchy |
+| **Bounded Contexts** | Model boundaries with full documentation |
+| **Classifications** | Reusable strategic patterns |
+| **Teams** | Ownership tracking |
+| **Terminology** | Ubiquitous language with synonyms and examples |
+| **Context Maps** | Relationship patterns (OHS, ACL, SK, etc.) |
+| **Domain Maps** | Portfolio visualization |
+| **Decisions, Policies, Rules** | Governance documentation |
+| **Imports** | Local, workspace, and Git-based sharing |
+| **Namespaces** | Hierarchical organization |
 
-For more details, see:
-- [Getting Started Guide](./getting-started.md) - Beginner tutorial
-- [Language Reference](./language.md) - Formal syntax specification
-- [Grammar Review](./GRAMMAR_REVIEW_2025.md) - Design decisions and rationale
+---
+
+## See Also
+
+| Resource | Purpose |
+| -------- | ------- |
+| [Getting Started Guide](./getting-started.md) | Beginner tutorial |
+| [Language Reference](./language.md) | Formal syntax specification |
+| [Grammar Review](./design-docs/GRAMMAR_REVIEW_2025.md) | Design decisions and rationale |

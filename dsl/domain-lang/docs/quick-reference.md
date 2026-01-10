@@ -1,6 +1,33 @@
 # DomainLang Quick Reference
 
-A one-page cheat sheet for DomainLang syntax.
+Keep this cheat sheet open while you work. For detailed explanations, see the [Language Reference](./language.md).
+
+> **📋 Audience:** All users who need quick syntax lookups while modeling. Perfect as a second-tab reference.
+
+---
+
+## At a Glance
+
+```mermaid
+graph TB
+    subgraph Core Concepts
+        D[Domain] --> BC[BoundedContext]
+        BC --> T[terminology]
+        BC --> Dec[decisions]
+    end
+    subgraph Organization
+        CM[ContextMap] --> BC
+        NS[namespace] --> D
+        NS --> BC
+    end
+    subgraph Metadata
+        Team --> BC
+        Classification --> D
+        Classification --> BC
+    end
+```
+
+---
 
 ## Basic Structure
 
@@ -17,16 +44,20 @@ BC ContextName for DomainName {
 ## Keywords
 
 | Concept | Keywords | Shorthand |
-|---------|----------|-----------|
-| Domain | `Domain` | - |
-| Bounded Context | `BoundedContext`, `boundedcontext` | `BC` |
-| Team | `Team` | - |
-| Classification | `Classification` | - |
-| Context Map | `ContextMap` | - |
-| Domain Map | `DomainMap` | - |
-| Namespace | `namespace`, `Namespace` | - |
+| ------- | -------- | --------- |
+| Domain | `Domain` | — |
+| Bounded Context | `BoundedContext` | `BC` |
+| Team | `Team` | — |
+| Classification | `Classification` | — |
+| Context Map | `ContextMap` | — |
+| Domain Map | `DomainMap` | — |
+| Namespace | `namespace` | — |
+
+---
 
 ## Inline Syntax
+
+Write concise declarations with inline syntax:
 
 ```dlang
 BC Orders for Sales as CoreDomain by SalesTeam {
@@ -41,7 +72,11 @@ BC Orders for Sales {
 }
 ```
 
+---
+
 ## Documentation Blocks
+
+Add metadata to your types:
 
 ```dlang
 BC Orders for Sales {
@@ -60,10 +95,10 @@ BC Orders for Sales {
     integrations { A -> B }             // alias for relationships
     connections { A -> B }              // alias for relationships
 
-    classifiers {
+    classifications {
         role: CoreDomain
         businessModel: B2B
-        evolution: CustomBuilt
+        lifecycle: CustomBuilt
     }
 }
 ```
@@ -85,7 +120,7 @@ Classification CoreDomain
 Classification SupportingDomain
 
 Domain Sales {
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 
 BC Orders for Sales {
@@ -96,24 +131,25 @@ BC Orders for Sales {
 ## Decisions, Policies, Rules
 
 ```dlang
+// Declare classification categories first
+Classification Architectural
+Classification Business
+Classification Compliance
+
+// Use in decisions (category is a Classification reference)
 decisions {
     decision EventSourcing: "Use event sourcing"
-    decision [architectural] ES: "Use event sourcing"
-    decision [technical] UseKafka: "Use Kafka"
-    decision [business] FreeShipping: "Free shipping over $50"
-    decision [compliance] GDPR: "GDPR compliant"
-    decision [security] Encrypt: "Encrypt all data"
-    decision [operational] 24x7: "24/7 availability"
+    decision [Architectural] UseKafka: "Use Kafka"
+    decision [Business] FreeShipping: "Free shipping over $50"
+    decision [Compliance] GDPR: "GDPR compliant"
 }
 
-// Shortened categories: [arch], [tech], [biz], [ops]
-
 policies {
-    policy [business] NoRefunds: "No refunds after 30 days"
+    policy [Business] NoRefunds: "No refunds after 30 days"
 }
 
 rules {
-    rule [compliance] DataRetention: "Keep for 7 years"
+    rule [Compliance] DataRetention: "Keep for 7 years"
 }
 ```
 
@@ -130,7 +166,7 @@ ContextMap System {
     A >< B                              // separate ways (no integration)
 
     // Named relationships
-    A -> B
+    A -> B : IntegrationName
 
     // With DDD patterns
     [OHS] A -> [ACL] B
@@ -138,19 +174,22 @@ ContextMap System {
 }
 ```
 
+---
+
 ## DDD Relationship Patterns
 
 | Pattern | Meaning |
-|---------|---------|
+| ------- | ------- |
 | `OHS` | Open Host Service |
 | `ACL` | Anti-Corruption Layer |
 | `PL` | Published Language |
 | `SK` | Shared Kernel |
 | `CF` | Conformist |
 | `P` | Partnership |
-| `U/D` or `C/S` | Upstream/Downstream (Customer/Supplier) |
-| `BBoM` | Big Ball of Mud (separate ways) |
-| `><` | Separate Ways |
+| `BBoM` | Big Ball of Mud |
+| `><` | Separate Ways (no integration) |
+
+---
 
 ## Imports
 
@@ -219,17 +258,23 @@ Domain Sales in Enterprise { }
 Domain OrderManagement in Sales { }
 ```
 
+---
+
 ## Alternative Keywords
 
+These keywords are interchangeable:
+
 | Primary | Alternatives |
-|---------|--------------|
-| `as` | `tagged:` |
-| `by` | `owner:`, `managed by` |
+| ------- | ------------ |
 | `terminology` | `language`, `glossary` |
 | `decisions` | `constraints`, `rules`, `policies` |
 | `relationships` | `integrations`, `connections` |
 
+---
+
 ## Self-Reference
+
+Use `this` to refer to the containing context:
 
 ```dlang
 BC Orders {
@@ -238,6 +283,8 @@ BC Orders {
     }
 }
 ```
+
+---
 
 ## Comments
 
@@ -249,7 +296,11 @@ BC Orders {
  */
 ```
 
+---
+
 ## Complete Minimal Example
+
+Copy this starter template:
 
 ```dlang
 Classification CoreDomain
@@ -289,7 +340,7 @@ Classification GenericDomain
 
 // Apply to domains
 Domain Sales {
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 
 // Apply to contexts
@@ -301,6 +352,12 @@ BC Orders for Sales {
 ### Full Context Definition
 
 ```dlang
+// Define classifications (including decision categories)
+Classification CoreDomain
+Classification Architectural
+Classification Business
+Classification Compliance
+
 BC OrderManagement for Sales as CoreDomain by SalesTeam {
     description: "Process customer orders"
 
@@ -310,15 +367,15 @@ BC OrderManagement for Sales as CoreDomain by SalesTeam {
             examples: "Order #12345"
     }
 
-    classifiers {
+    classifications {
         role: CoreDomain
         businessModel: B2B
     }
 
     decisions {
-        decision [architectural] EventSourcing: "Track all changes"
-        policy [business] FreeShipping: "Free over $50"
-        rule [compliance] DataRetention: "7 years"
+        decision [Architectural] EventSourcing: "Track all changes"
+        policy [Business] FreeShipping: "Free over $50"
+        rule [Compliance] DataRetention: "7 years"
     }
 
     relationships {
@@ -339,22 +396,28 @@ ContextMap Integration {
 }
 ```
 
-## Tips
+---
 
-1. **Use `BC` shorthand** instead of `BoundedContext`
-2. **Use `:` for assignments** (most common)
-3. **Always associate contexts with domains** using `for`
-4. **Define terminology** to document ubiquitous language
-5. **Use inline syntax** (`as`, `by`) for concise models
-6. **Create context maps** to show integration patterns
-7. **Mark strategic importance** with classifications
-8. **Document decisions** with decision records
-9. **Use namespaces** for large models
-10. **Import reusable patterns** instead of duplicating
+## 💡 Tips for Success
+
+1. ✏️ **Use `BC` shorthand** — Saves typing over `BoundedContext`
+2. 📝 **Use `:` for assignments** — Most readable and common style
+3. 🔗 **Always associate contexts with domains** — Use `for DomainName`
+4. 📖 **Define terminology** — Documents your ubiquitous language
+5. ⚡ **Use inline syntax** — `as` and `by` make models concise
+6. 🗺️ **Create context maps** — Visualize integration patterns
+7. 🏷️ **Mark strategic importance** — Use classifications wisely
+8. 📋 **Document decisions** — ADRs in code!
+9. 📂 **Use namespaces** — Keep large models organized
+10. ♻️ **Import reusable patterns** — Don't duplicate common definitions
+
+---
 
 ## See Also
 
-- [Getting Started Guide](./getting-started.md) - Step-by-step tutorial
-- [Syntax Examples](./syntax-examples.md) - Comprehensive examples
-- [Language Reference](./language.md) - Complete grammar specification
-- [Real-World Examples](../examples/) - Full domain models
+| Resource | Purpose |
+| -------- | ------- |
+| [Getting Started](./getting-started.md) | Step-by-step tutorial |
+| [Syntax Examples](./syntax-examples.md) | Comprehensive examples |
+| [Language Reference](./language.md) | Complete grammar specification |
+| [Examples](../examples/) | Full domain models |
