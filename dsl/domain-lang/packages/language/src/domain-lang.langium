@@ -235,8 +235,8 @@ RelationshipType returns string:
  */
 DomainTerm:
     ('term' | 'Term') name=ID (Assignment meaning=STRING)?
-    (('aka' | 'aka:' | 'synonyms' | 'synonyms:') synonyms+=ID (',' synonyms+=ID)*)?
-    (('examples' | 'examples:' | 'e.g.' | 'e.g.:') examples+=STRING (',' examples+=STRING)*)?
+    (('aka' | 'synonyms') Assignment? synonyms+=ID (',' synonyms+=ID)*)?
+    (('examples' | 'e.g.') Assignment? examples+=STRING (',' examples+=STRING)*)?
 ;
 
 /**
