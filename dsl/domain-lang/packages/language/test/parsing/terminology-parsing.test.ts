@@ -303,28 +303,7 @@ describe('Term Examples', () => {
         expect(terminologyBlock.terms[0].examples).toEqual(['Laptop', 'Mouse']);
     });
 
-    test('should parse term with e.g. keyword', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term PaymentMethod: "Way to pay" e.g. "Credit Card", "PayPal", "Bank Transfer"
-                }
-            }
-        `;
 
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        
-        expect(terminologyBlock.terms[0].examples).toHaveLength(3);
-    });
 });
 
 // ============================================================================
@@ -368,7 +347,7 @@ describe('Complex Term Definitions', () => {
                 terminology {
                     term Order: "Purchase request" aka Purchase examples "ORD-001", "ORD-002"
                     Term LineItem: "Single product in order" synonyms OrderLine
-                    Term Discount: "Price reduction" e.g. "10% off", "Buy one get one"
+                    Term Discount: "Price reduction" examples "10% off", "Buy one get one"
                 }
             }
         `;

@@ -50,11 +50,11 @@ describe('Scoping: Local Scope', () => {
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);
-        const teamBlock = bc.documentation?.find(d => 'owner' in d);
+        const teamBlock = bc.documentation?.find(d => 'team' in d);
         expect(teamBlock).toBeDefined();
-        if (teamBlock && 'owner' in teamBlock) {
-            expect(teamBlock.owner?.ref).toBeDefined();
-            expect(teamBlock.owner?.ref?.name).toBe('SalesTeam');
+        if (teamBlock && 'team' in teamBlock) {
+            expect(teamBlock.team?.ref).toBeDefined();
+            expect(teamBlock.team?.ref?.name).toBe('SalesTeam');
         }
     });
 

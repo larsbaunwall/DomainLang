@@ -122,93 +122,7 @@ describe('Relationship Arrow Types', () => {
         expect(relationships[0].arrow).toBe('><');
     });
 
-    test('should parse U/D shorthand (uppercase)', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext U/D PaymentContext
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const relationships = getRelationships(document);
-        expect(relationships[0].arrow).toBe('U/D');
-    });
-
-    test('should parse u/d shorthand (lowercase)', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext u/d PaymentContext
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const relationships = getRelationships(document);
-        expect(relationships[0].arrow).toBe('u/d');
-    });
-
-    test('should parse C/S shorthand (uppercase)', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext C/S PaymentContext
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const relationships = getRelationships(document);
-        expect(relationships[0].arrow).toBe('C/S');
-    });
-
-    test('should parse c/s shorthand (lowercase)', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext c/s PaymentContext
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const relationships = getRelationships(document);
-        expect(relationships[0].arrow).toBe('c/s');
-    });
+    // NOTE: U/D, u/d, C/S, c/s arrow aliases removed - use symbolic arrows (-> <- <-> ><) with explicit type
 });
 
 // ============================================================================
@@ -235,7 +149,7 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('OHS');
+        expect(relationships[0].leftPatterns).toContain('OHS');
     });
 
     test('should parse Conformist [CF]', async () => {
@@ -257,7 +171,7 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].rightRoles).toContain('CF');
+        expect(relationships[0].rightPatterns).toContain('CF');
     });
 
     test('should parse Anti-Corruption Layer [ACL]', async () => {
@@ -279,7 +193,7 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('ACL');
+        expect(relationships[0].leftPatterns).toContain('ACL');
     });
 
     test('should parse Published Language [PL]', async () => {
@@ -301,7 +215,7 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('PL');
+        expect(relationships[0].leftPatterns).toContain('PL');
     });
 
     test('should parse Partnership [P]', async () => {
@@ -323,7 +237,7 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('P');
+        expect(relationships[0].leftPatterns).toContain('P');
     });
 
     test('should parse Shared Kernel [SK]', async () => {
@@ -345,7 +259,7 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('SK');
+        expect(relationships[0].leftPatterns).toContain('SK');
     });
 
     test('should parse Big Ball of Mud [BBoM]', async () => {
@@ -367,7 +281,7 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('BBoM');
+        expect(relationships[0].leftPatterns).toContain('BBoM');
     });
 
     test('should parse patterns on both sides', async () => {
@@ -389,8 +303,8 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('OHS');
-        expect(relationships[0].rightRoles).toContain('CF');
+        expect(relationships[0].leftPatterns).toContain('OHS');
+        expect(relationships[0].rightPatterns).toContain('CF');
     });
 
     test('should parse multiple patterns on one side', async () => {
@@ -412,10 +326,155 @@ describe('DDD Pattern Annotations', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('OHS');
-        expect(relationships[0].leftRoles).toContain('PL');
-        expect(relationships[0].rightRoles).toContain('CF');
-        expect(relationships[0].rightRoles).toContain('ACL');
+        expect(relationships[0].leftPatterns).toContain('OHS');
+        expect(relationships[0].leftPatterns).toContain('PL');
+        expect(relationships[0].rightPatterns).toContain('CF');
+        expect(relationships[0].rightPatterns).toContain('ACL');
+    });
+});
+
+// ============================================================================
+// DDD PATTERNS - LONG-FORM ALIASES
+// ============================================================================
+
+describe('DDD Pattern Annotations - Long-form Aliases', () => {
+    test('should parse [PublishedLanguage] (long-form of PL)', async () => {
+        const input = s`
+            Domain Sales {}
+            BC OrderContext for Sales
+            BC PaymentContext for Sales
+            
+            ContextMap TestMap {
+                contains OrderContext, PaymentContext
+                [PublishedLanguage] OrderContext -> PaymentContext
+            }
+        `;
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
+        const relationships = getRelationships(document);
+        expect(relationships[0].leftPatterns).toContain('PublishedLanguage');
+    });
+
+    test('should parse [OpenHostService] (long-form of OHS)', async () => {
+        const input = s`
+            Domain Sales {}
+            BC OrderContext for Sales
+            BC PaymentContext for Sales
+            
+            ContextMap TestMap {
+                contains OrderContext, PaymentContext
+                [OpenHostService] OrderContext -> PaymentContext
+            }
+        `;
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
+        const relationships = getRelationships(document);
+        expect(relationships[0].leftPatterns).toContain('OpenHostService');
+    });
+
+    test('should parse [Conformist] (long-form of CF)', async () => {
+        const input = s`
+            Domain Sales {}
+            BC OrderContext for Sales
+            BC PaymentContext for Sales
+            
+            ContextMap TestMap {
+                contains OrderContext, PaymentContext
+                OrderContext -> [Conformist] PaymentContext
+            }
+        `;
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
+        const relationships = getRelationships(document);
+        expect(relationships[0].rightPatterns).toContain('Conformist');
+    });
+
+    test('should parse [AntiCorruptionLayer] (long-form of ACL)', async () => {
+        const input = s`
+            Domain Sales {}
+            BC OrderContext for Sales
+            BC PaymentContext for Sales
+            
+            ContextMap TestMap {
+                contains OrderContext, PaymentContext
+                OrderContext -> [AntiCorruptionLayer] PaymentContext
+            }
+        `;
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
+        const relationships = getRelationships(document);
+        expect(relationships[0].rightPatterns).toContain('AntiCorruptionLayer');
+    });
+
+    test('should parse [Partnership] (long-form of P)', async () => {
+        const input = s`
+            Domain Sales {}
+            BC OrderContext for Sales
+            BC PaymentContext for Sales
+            
+            ContextMap TestMap {
+                contains OrderContext, PaymentContext
+                [Partnership] OrderContext <-> PaymentContext
+            }
+        `;
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
+        const relationships = getRelationships(document);
+        expect(relationships[0].leftPatterns).toContain('Partnership');
+    });
+
+    test('should parse [SharedKernel] (long-form of SK)', async () => {
+        const input = s`
+            Domain Sales {}
+            BC OrderContext for Sales
+            BC PaymentContext for Sales
+            
+            ContextMap TestMap {
+                contains OrderContext, PaymentContext
+                [SharedKernel] OrderContext <-> PaymentContext
+            }
+        `;
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
+        const relationships = getRelationships(document);
+        expect(relationships[0].leftPatterns).toContain('SharedKernel');
+    });
+
+    test('should parse [BigBallOfMud] (long-form of BBoM)', async () => {
+        const input = s`
+            Domain Sales {}
+            BC OrderContext for Sales
+            BC PaymentContext for Sales
+            
+            ContextMap TestMap {
+                contains OrderContext, PaymentContext
+                [BigBallOfMud] OrderContext -> PaymentContext
+            }
+        `;
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
+        const relationships = getRelationships(document);
+        expect(relationships[0].leftPatterns).toContain('BigBallOfMud');
+    });
+
+    test('should parse mixed short and long-form patterns', async () => {
+        const input = s`
+            Domain Sales {}
+            BC OrderContext for Sales
+            BC PaymentContext for Sales
+            
+            ContextMap TestMap {
+                contains OrderContext, PaymentContext
+                [OpenHostService, PL] OrderContext -> [Conformist, ACL] PaymentContext
+            }
+        `;
+        const document = await testServices.parse(input);
+        expectValidDocument(document);
+        const relationships = getRelationships(document);
+        expect(relationships[0].leftPatterns).toContain('OpenHostService');
+        expect(relationships[0].leftPatterns).toContain('PL');
+        expect(relationships[0].rightPatterns).toContain('Conformist');
+        expect(relationships[0].rightPatterns).toContain('ACL');
     });
 });
 
@@ -559,8 +618,8 @@ describe('Combined Patterns and Types', () => {
         // Assert
         expectValidDocument(document);
         const relationships = getRelationships(document);
-        expect(relationships[0].leftRoles).toContain('OHS');
-        expect(relationships[0].rightRoles).toContain('CF');
+        expect(relationships[0].leftPatterns).toContain('OHS');
+        expect(relationships[0].rightPatterns).toContain('CF');
         expect(relationships[0].type).toBe('CustomerSupplier');
     });
 

@@ -118,7 +118,7 @@ describe('Grammar Completeness Tests', () => {
                     Domain Test {
                         description: "Test domain"
                         vision: "Test vision"
-                        classifier: Core
+                        classification: Core
                     }
                 `,
                 'Domain with documentation'
@@ -179,12 +179,12 @@ describe('Grammar Completeness Tests', () => {
                         team: TestTeam
                         role: Core
                         businessModel: SaaS
-                        evolution: Mature
+                        lifecycle: Mature
                         
-                        classifiers {
+                        classifications {
                             role: Core
                             businessModel: SaaS
-                            evolution: Mature
+                            lifecycle: Mature
                         }
                         
                         relationships {
@@ -304,10 +304,6 @@ describe('Grammar Completeness Tests', () => {
                         BC1 <- BC2
                         BC1 <-> BC2
                         BC1 >< BC2
-                        BC1 U/D BC2
-                        BC1 u/d BC2
-                        BC1 C/S BC2
-                        BC1 c/s BC2
                     }
                 `,
                 'Relationship arrows'
@@ -599,7 +595,7 @@ describe('Grammar Completeness Tests', () => {
                     Domain Test {
                         description: "Using colon"
                         vision is "Using is keyword"  
-                        classifier = Core
+                        classification = Core
                     }
                 `,
                 'Assignment operators'

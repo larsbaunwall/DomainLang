@@ -287,10 +287,10 @@ describe('Team Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const teamBlock = bc.documentation?.find(d => 'owner' in d);
+        const teamBlock = bc.documentation?.find(d => 'team' in d);
         expect(teamBlock).toBeDefined();
-        if (teamBlock && 'owner' in teamBlock) {
-            expect(teamBlock.owner?.ref?.name).toBe('ProductTeam');
+        if (teamBlock && 'team' in teamBlock) {
+            expect(teamBlock.team?.ref?.name).toBe('ProductTeam');
         }
     });
 
@@ -314,10 +314,10 @@ describe('Team Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const teamBlock = bc.documentation?.find(d => 'owner' in d);
+        const teamBlock = bc.documentation?.find(d => 'team' in d);
         expect(teamBlock).toBeDefined();
-        if (teamBlock && 'owner' in teamBlock) {
-            expect(teamBlock.owner?.ref?.name).toBe('EngineeringTeam');
+        if (teamBlock && 'team' in teamBlock) {
+            expect(teamBlock.team?.ref?.name).toBe('EngineeringTeam');
         }
     });
 });
@@ -346,14 +346,14 @@ describe('Classification Reference Linking', () => {
         expect(bc.role?.ref?.name).toBe('Core');
     });
 
-    test('should resolve classification in domain classifier block', async () => {
+    test('should resolve classification in domain classification block', async () => {
         // Arrange
         const input = s`
             Classification Strategic
             
             Domain Sales {
                 vision: "Core sales"
-                classifier: Strategic
+                classification: Strategic
             }
         `;
 
@@ -364,8 +364,8 @@ describe('Classification Reference Linking', () => {
         expectValidDocument(document);
         const model = document.parseResult.value;
         const domain = model.children.find(c => c.$type === 'Domain') as any;
-        const classifierBlock = domain.documentation?.find((d: any) => 'classifier' in d);
-        expect(classifierBlock?.classifier?.ref?.name).toBe('Strategic');
+        const classifierBlock = domain.documentation?.find((d: any) => 'classification' in d);
+        expect(classifierBlock?.classification?.ref?.name).toBe('Strategic');
     });
 
     test('should resolve classification in decision bracket syntax', async () => {
@@ -569,8 +569,8 @@ describe('Complex Linking Scenarios', () => {
             c => isNamespaceDeclaration(c) && c.name === 'billing'
         ) as any;
         const paymentBC = billingNs?.children.find(isBoundedContext) as BoundedContext;
-        const teamBlock = paymentBC?.documentation?.find(d => 'owner' in d) as any;
-        expect(teamBlock?.owner?.ref?.name).toBe('SalesTeam');
+        const teamBlock = paymentBC?.documentation?.find(d => 'team' in d) as any;
+        expect(teamBlock?.team?.ref?.name).toBe('SalesTeam');
     });
 
     test('should resolve nested namespace qualified names', async () => {

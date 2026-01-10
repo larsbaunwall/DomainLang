@@ -73,20 +73,7 @@ describe('BoundedContext Keyword Variants', () => {
         expect(getFirstBoundedContext(document).name).toBe('OrderContext');
     });
 
-    test('should parse boundedcontext lowercase', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            boundedcontext OrderContext for Sales
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        expect(getFirstBoundedContext(document).name).toBe('OrderContext');
-    });
+    // NOTE: boundedcontext (lowercase, concatenated) alias removed - use BoundedContext or BC
 
     test('should parse BC shorthand', async () => {
         // Arrange
@@ -191,23 +178,7 @@ describe('ContextMap Keyword Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse contextmap lowercase', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            
-            contextmap SalesMap {
-                contains OrderContext
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
+    // NOTE: contextmap (lowercase, concatenated) alias removed - use ContextMap
 });
 
 // ============================================================================
@@ -234,24 +205,7 @@ describe('DomainMap Keyword Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse domainmap lowercase', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {
-                vision: "Sales domain"
-            }
-            
-            domainmap BusinessMap {
-                contains Sales
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
+    // NOTE: domainmap (lowercase, concatenated) alias removed - use DomainMap
 });
 
 // ============================================================================
@@ -407,13 +361,13 @@ describe('BC Documentation Block Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse evolution keyword', async () => {
+    test('should parse lifecycle keyword', async () => {
         // Arrange
         const input = s`
             Classification Mature
             Domain Sales {}
             BC OrderContext for Sales {
-                evolution: Mature
+                lifecycle: Mature
             }
         `;
 
@@ -424,13 +378,13 @@ describe('BC Documentation Block Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse maturity keyword', async () => {
+    test('should parse lifecycle keyword (alias)', async () => {
         // Arrange
         const input = s`
             Classification Mature
             Domain Sales {}
             BC OrderContext for Sales {
-                maturity: Mature
+                lifecycle: Mature
             }
         `;
 

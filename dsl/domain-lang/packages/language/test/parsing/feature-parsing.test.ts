@@ -145,7 +145,7 @@ describe('Advanced Syntax Features', () => {
             
             ContextMap ECommerceMap {
                 contains OrderContext, PaymentContext
-                OrderContext U/D PaymentContext
+                OrderContext -> PaymentContext : UpstreamDownstream
                 OrderContext <-> PaymentContext
             }
         `;
