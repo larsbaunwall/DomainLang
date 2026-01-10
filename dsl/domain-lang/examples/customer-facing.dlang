@@ -11,10 +11,10 @@ namespace CustomerFacing {
 
     Domain Inventory in Enterprise {
         description: "Catalog definitions, availability, and channel policies"
-        classifier: SupportingDomain
+        classification: SupportingDomain
     }
 
-    BoundedContext ApplicationFramework for Enterprise tagged: SupportingDomain by PlatformGuild {
+    BoundedContext ApplicationFramework for Enterprise as SupportingDomain by PlatformGuild {
         description: "Shared UI primitives and orchestration for edge experiences"
         terminology {
             term MicroFrontend: "Self-contained UI vertical integrated at runtime"

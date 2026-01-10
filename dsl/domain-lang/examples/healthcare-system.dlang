@@ -33,22 +33,22 @@ Team PharmacyTeam
 Domain Healthcare {
     description: "Hospital and healthcare management"
     vision: "Deliver exceptional patient care through integrated systems"
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 
 Domain PatientCare in Healthcare {
     description: "Direct patient care and treatment"
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 
 Domain Administration in Healthcare {
     description: "Hospital administration and operations"
-    classifier: SupportingDomain
+    classification: SupportingDomain
 }
 
 Domain Pharmacy in Healthcare {
     description: "Medication management and dispensing"
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 
 // ============================================================================
@@ -86,10 +86,10 @@ BC ElectronicHealthRecords for PatientCare
             examples: "Penicillin", "Peanuts", "Latex"
     }
 
-    classifiers {
+    classifications {
         role: CoreDomain
         businessModel: HIPAACompliant
-        evolution: PatientSafetyCritical
+        lifecycle: PatientSafetyCritical
     }
 
     decisions {
@@ -181,10 +181,10 @@ BC MedicationManagement for Pharmacy
             aka: DrugList
     }
 
-    classifiers {
+    classifications {
         role: CoreDomain
         businessModel: PatientSafetyCritical
-        evolution: HIPAACompliant
+        lifecycle: HIPAACompliant
     }
 
     decisions {

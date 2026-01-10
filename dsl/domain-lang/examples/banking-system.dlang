@@ -32,22 +32,22 @@ Team FraudDetectionTeam
 Domain Banking {
     description: "Core banking operations and services"
     vision: "Provide secure, reliable, and compliant banking services"
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 
 Domain CustomerAccounts in Banking {
     description: "Customer account management and transactions"
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 
 Domain Payments in Banking {
     description: "Payment processing and transfers"
-    classifier: CoreDomain
+    classification: CoreDomain
 }
 
 Domain Compliance in Banking {
     description: "Regulatory compliance and reporting"
-    classifier: SupportingDomain
+    classification: SupportingDomain
 }
 
 // ============================================================================

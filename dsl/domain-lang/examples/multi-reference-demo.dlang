@@ -408,7 +408,7 @@ Domain Sales {
 
     description: "Sales domain"    BC PaymentGateway for Billing as GenericDomain {        description: "Payment processing"
 
-    classifier: Core
+    classification: Core
 
 }        description: "Process payments via external providers"    }
 
@@ -418,7 +418,7 @@ Domain Marketing {
 
     description: "Marketing domain"
 
-    classifier: Supporting        terminology {    BC PaymentGateway for Billing {
+    classification: Supporting        terminology {    BC PaymentGateway for Billing {
 
 }
 
@@ -428,7 +428,7 @@ Domain CustomerSupport {
 
     description: "Support domain"            term PaymentConfirmation: "Successful payment response"    }
 
-    classifier: Supporting
+    classification: Supporting
 
 }        }}
 
@@ -618,17 +618,17 @@ ContextGroup CoreOrderingCapabilities for Ordering {
 
 Domain Sales {
     description: "Sales domain"
-    classifier: Core
+    classification: Core
 }
 
 Domain Marketing {
     description: "Marketing domain"
-    classifier: Supporting
+    classification: Supporting
 }
 
 Domain CustomerSupport {
     description: "Support domain"
-    classifier: Supporting
+    classification: Supporting
 }
 
 // DomainMap uses references for each domain
