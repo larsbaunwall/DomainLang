@@ -11,7 +11,7 @@ Group CustomerFacing {
 
     Domain Inventory in Enterprise {
         description: "Catalog definitions, availability, and channel policies"
-        classifier: SupportingDomain
+        classification: SupportingDomain
     }
 
     BoundedContext ApplicationFramework for Enterprise tagged: SupportingDomain by PlatformGuild {
