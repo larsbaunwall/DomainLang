@@ -92,7 +92,7 @@ Domain:
 | User guides | `dsl/domain-lang/docs/` | Language documentation |
 | Examples | `dsl/domain-lang/examples/` | `.dlang` patterns |
 | ADRs | `adr/` | Architecture decisions |
-| Changelog | `CHANGELOG.md` | Version history |
+| Changelog | `dsl/domain-lang/CHANGELOG.md` (create if missing) | Version history |
 
 ## Formatting Guidelines
 
@@ -181,7 +181,7 @@ Implement Git-native imports (like Go modules/Deno).
 
 ## Migration Guides
 
-When introducing breaking changes, provide migration guides in `docs/migrations/`:
+When introducing breaking changes, provide migration guides in `dsl/domain-lang/docs/migrations/` (create if missing):
 
 ```markdown
 # Migration: v0.x to v1.0
