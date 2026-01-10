@@ -4,6 +4,7 @@
     "version": "0.0.1",
     "displayName": "domain-lang",
     "type": "module",
+    "license": "Apache-2.0",
     "engines": {
         "vscode": "^1.67.0"
     },
