@@ -4,9 +4,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build domain-lang",
-            "command": "npm run langium:generate && npm run build",
+            "label": "Build domain-lang (language)",
+            "command": "npm run langium:generate && npm run build --workspace packages/language",
             "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/dsl/domain-lang"
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
