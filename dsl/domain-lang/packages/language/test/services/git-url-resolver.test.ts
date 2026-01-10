@@ -61,12 +61,15 @@ describe('GitUrlResolver', () => {
     });
 
     test('clones repository and checks out resolved commit', async () => {
+        // Arrange
         const gitInfo = GitUrlParser.parse('acme/patterns@main');
         const cachePath = path.join(tempCache, gitInfo.platform, gitInfo.owner, gitInfo.repo, 'abcdef');
 
+        // Act
         await (resolver as { downloadRepo: (info: unknown, commit: string, cache: string) => Promise<void> })
             .downloadRepo(gitInfo, 'abcdef', cachePath);
 
+        // Assert
         expect(execInvocations.some(cmd => cmd.startsWith('git clone'))).toBe(true);
         expect(execInvocations.some(cmd => cmd.includes('fetch --depth 1 origin abcdef'))).toBe(true);
         expect(execInvocations.some(cmd => cmd.includes('checkout') && cmd.includes('abcdef'))).toBe(true);

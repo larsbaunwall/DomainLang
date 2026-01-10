@@ -9,9 +9,9 @@ import os from 'node:os';
 describe('GovernanceValidator', () => {
     describe('validate', () => {
         test('passes validation with no policy', async () => {
+            // Arrange
             const policy: GovernancePolicy = {};
             const validator = new GovernanceValidator(policy);
-
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -23,16 +23,19 @@ describe('GovernanceValidator', () => {
                 },
             };
 
+            // Act
             const violations = await validator.validate(lockFile, '/tmp/test');
+
+            // Assert
             expect(violations).toEqual([]);
         });
 
         test('detects blocked source', async () => {
+            // Arrange
             const policy: GovernancePolicy = {
                 allowedSources: ['github.com/acme'],
             };
             const validator = new GovernanceValidator(policy);
-
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -44,18 +47,21 @@ describe('GovernanceValidator', () => {
                 },
             };
 
+            // Act
             const violations = await validator.validate(lockFile, '/tmp/test');
+
+            // Assert
             expect(violations.length).toBeGreaterThan(0);
             expect(violations[0].type).toBe('blocked-source');
             expect(violations[0].severity).toBe('error');
         });
 
         test('detects unstable versions', async () => {
+            // Arrange
             const policy: GovernancePolicy = {
                 requireStableVersions: true,
             };
             const validator = new GovernanceValidator(policy);
-
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -67,18 +73,21 @@ describe('GovernanceValidator', () => {
                 },
             };
 
+            // Act
             const violations = await validator.validate(lockFile, '/tmp/test');
+
+            // Assert
             expect(violations.length).toBeGreaterThan(0);
             expect(violations[0].type).toBe('unstable-version');
             expect(violations[0].message).toContain('beta');
         });
 
         test('allows stable versions', async () => {
+            // Arrange
             const policy: GovernancePolicy = {
                 requireStableVersions: true,
             };
             const validator = new GovernanceValidator(policy);
-
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -90,16 +99,19 @@ describe('GovernanceValidator', () => {
                 },
             };
 
+            // Act
             const violations = await validator.validate(lockFile, '/tmp/test');
+
+            // Assert
             expect(violations).toEqual([]);
         });
 
         test('detects blocked packages', async () => {
+            // Arrange
             const policy: GovernancePolicy = {
                 blockedPackages: ['evil/malware', 'test/blocked'],
             };
             const validator = new GovernanceValidator(policy);
-
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -111,7 +123,10 @@ describe('GovernanceValidator', () => {
                 },
             };
 
+            // Act
             const violations = await validator.validate(lockFile, '/tmp/test');
+
+            // Assert
             expect(violations.length).toBeGreaterThan(0);
             expect(violations[0].type).toBe('blocked-source');
         });
@@ -119,9 +134,9 @@ describe('GovernanceValidator', () => {
 
     describe('generateAuditReport', () => {
         test('generates report with no violations', async () => {
+            // Arrange
             const policy: GovernancePolicy = {};
             const validator = new GovernanceValidator(policy);
-
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -133,18 +148,21 @@ describe('GovernanceValidator', () => {
                 },
             };
 
+            // Act
             const report = await validator.generateAuditReport(lockFile, '/tmp/test');
+
+            // Assert
             expect(report).toContain('Dependency Audit Report');
             expect(report).toContain('acme/patterns');
             expect(report).toContain('No policy violations');
         });
 
         test('generates report with violations', async () => {
+            // Arrange
             const policy: GovernancePolicy = {
                 requireStableVersions: true,
             };
             const validator = new GovernanceValidator(policy);
-
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -156,7 +174,10 @@ describe('GovernanceValidator', () => {
                 },
             };
 
+            // Act
             const report = await validator.generateAuditReport(lockFile, '/tmp/test');
+
+            // Assert
             expect(report).toContain('Violations:');
             expect(report).toContain('alpha');
         });
@@ -164,8 +185,13 @@ describe('GovernanceValidator', () => {
 
     describe('loadGovernanceMetadata', () => {
         test('returns empty metadata when file missing', async () => {
+            // Arrange
             const validator = new GovernanceValidator({});
+
+            // Act
             const metadata = await validator.loadGovernanceMetadata('/nonexistent');
+
+            // Assert
             expect(metadata).toEqual({});
         });
     });
@@ -173,14 +199,20 @@ describe('GovernanceValidator', () => {
 
 describe('loadGovernancePolicy', () => {
     test('returns empty policy when file missing', async () => {
-        const policy = await loadGovernancePolicy('/nonexistent');
+        // Arrange
+        const path = '/nonexistent';
+
+        // Act
+        const policy = await loadGovernancePolicy(path);
+
+        // Assert
         expect(policy).toEqual({});
     });
 
     test('loads governance policy from model.yaml', async () => {
+        // Arrange
         const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'dlang-gov-test-'));
         const manifestPath = path.join(tempDir, 'model.yaml');
-        
         const manifest = `
 model:
   name: test
@@ -191,10 +223,12 @@ governance:
   allowedSources:
     - github.com/acme
 `;
-        
         await fs.writeFile(manifestPath, manifest, 'utf-8');
-        
+
+        // Act
         const policy = await loadGovernancePolicy(tempDir);
+
+        // Assert
         expect(policy.requireStableVersions).toBe(true);
         expect(policy.allowedSources).toEqual(['github.com/acme']);
         

@@ -9,14 +9,19 @@ describe('domain-lang naming utilities', () => {
     const { parse } = setupTestSuite();
 
     it('computes qualified names for nested namespaces', async () => {
-        const document = await parse(`
+        // Arrange
+        const input = `
             namespace strategic.core {
                 namespace operations {
                     Domain Sales {}
                 }
             }
-        `);
+        `;
 
+        // Act
+        const document = await parse(input);
+
+        // Assert
         expectValidDocument(document);
 
         const model = document.parseResult.value;
@@ -37,14 +42,19 @@ describe('domain-lang naming utilities', () => {
     });
 
     it('treats nested namespace blocks as dotted qualified names', async () => {
-        const document = await parse(`
+        // Arrange
+        const input = `
             namespace company {
                 namespace sales {
                     Domain Orders {}
                 }
             }
-        `);
+        `;
 
+        // Act
+        const document = await parse(input);
+
+        // Assert
         expectValidDocument(document);
 
         const model = document.parseResult.value;

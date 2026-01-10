@@ -45,32 +45,45 @@ describe("WorkspaceManager", () => {
     });
 
     test("finds workspace root and loads lock file", async () => {
+        // Arrange
         await createLockFile();
         const manager = new WorkspaceManager({ autoResolve: false });
+
+        // Act
         await manager.initialize(TEST_ROOT);
         const lock = await manager.getLockFile();
+
+        // Assert
         expect(lock).toBeDefined();
         expect(lock?.dependencies["acme/ddd-patterns"]).toBeDefined();
         expect(manager.getWorkspaceRoot()).toBe(TEST_ROOT);
     });
 
     test("returns undefined if lock file missing", async () => {
+        // Arrange
         const manager = new WorkspaceManager({ autoResolve: false });
+
+        // Act
         await manager.initialize(TEST_ROOT);
         const lock = await manager.getLockFile();
+
+        // Assert
         expect(lock).toBeUndefined();
     });
 
     test("resolves dependency aliases from manifest", async () => {
+        // Arrange
         const manager = new WorkspaceManager({ autoResolve: false });
         await manager.initialize(ALIAS_ROOT);
+
+        // Act
         const direct = await manager.resolveDependencyImport("ddd-patterns");
-        expect(direct).toBe("ddd-patterns/core@v2.1.0");
-
         const withSubPath = await manager.resolveDependencyImport("ddd-patterns/patterns.dlang");
-        expect(withSubPath).toBe("ddd-patterns/core@v2.1.0/patterns.dlang");
-
         const missing = await manager.resolveDependencyImport("unknown");
+
+        // Assert
+        expect(direct).toBe("ddd-patterns/core@v2.1.0");
+        expect(withSubPath).toBe("ddd-patterns/core@v2.1.0/patterns.dlang");
         expect(missing).toBeUndefined();
     });
 });

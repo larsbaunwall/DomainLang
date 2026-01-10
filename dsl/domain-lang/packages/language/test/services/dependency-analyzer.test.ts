@@ -14,17 +14,22 @@ describe('DependencyAnalyzer', () => {
     });
 
     describe('buildDependencyTree', () => {
-    test('should build tree from lock file with no dependencies', async () => {
+        test('should build tree from lock file with no dependencies', async () => {
+            // Arrange
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {},
             };
 
+            // Act
             const tree = await analyzer.buildDependencyTree(lockFile, '/tmp/test');
+
+            // Assert
             expect(tree).toEqual([]);
         });
 
-    test('should build tree with single dependency', async () => {
+        test('should build tree with single dependency', async () => {
+            // Arrange
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -36,20 +41,30 @@ describe('DependencyAnalyzer', () => {
                 },
             };
 
+            // Act
             // Note: This test would need actual cache dir with model.yaml
             // For now, we test the structure
             const tree = await analyzer.buildDependencyTree(lockFile, '/tmp/test');
+
+            // Assert
             expect(tree).toBeDefined();
         });
     });
 
     describe('formatDependencyTree', () => {
         test('should format empty tree', () => {
-            const formatted = analyzer.formatDependencyTree([]);
+            // Arrange
+            const tree: never[] = [];
+
+            // Act
+            const formatted = analyzer.formatDependencyTree(tree);
+
+            // Assert
             expect(formatted).toBe('');
         });
 
         test('should format tree with single node', () => {
+            // Arrange
             const tree = [{
                 packageKey: 'acme/patterns',
                 version: '1.0.0',
@@ -58,11 +73,15 @@ describe('DependencyAnalyzer', () => {
                 depth: 0,
             }];
 
+            // Act
             const formatted = analyzer.formatDependencyTree(tree);
+
+            // Assert
             expect(formatted).toContain('acme/patterns@1.0.0');
         });
 
         test('should format tree with nested dependencies', () => {
+            // Arrange
             const tree = [{
                 packageKey: 'acme/patterns',
                 version: '1.0.0',
@@ -77,13 +96,17 @@ describe('DependencyAnalyzer', () => {
                 depth: 0,
             }];
 
+            // Act
             const formatted = analyzer.formatDependencyTree(tree);
+
+            // Assert
             expect(formatted).toContain('acme/patterns@1.0.0');
             expect(formatted).toContain('acme/core@2.0.0');
             expect(formatted).toMatch(/[├└]/); // Tree characters
         });
 
         test('should include commit hashes when requested', () => {
+            // Arrange
             const tree = [{
                 packageKey: 'acme/patterns',
                 version: '1.0.0',
@@ -92,13 +115,17 @@ describe('DependencyAnalyzer', () => {
                 depth: 0,
             }];
 
+            // Act
             const formatted = analyzer.formatDependencyTree(tree, { showCommits: true });
+
+            // Assert
             expect(formatted).toContain('abc123d'); // First 7 chars
         });
     });
 
     describe('findReverseDependencies', () => {
-            test('should find no dependencies for unused package', async () => {
+        test('should find no dependencies for unused package', async () => {
+            // Arrange
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -110,46 +137,64 @@ describe('DependencyAnalyzer', () => {
                 },
             };
 
+            // Act
             const reverseDeps = await analyzer.findReverseDependencies(
                 'acme/unused',
                 lockFile,
                 '/tmp/test'
             );
+
+            // Assert
             expect(reverseDeps).toEqual([]);
         });
     });
 
     describe('resolveVersionPolicy', () => {
-            test('should resolve "latest" policy', async () => {
+        test('should resolve "latest" policy', async () => {
+            // Arrange
+            const versions = ['v1.0.0', 'v2.0.0', 'v1.5.0'];
+
+            // Act
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'latest',
-                ['v1.0.0', 'v2.0.0', 'v1.5.0']
+                versions
             );
 
+            // Assert
             expect(result.policy).toBe('latest');
             expect(result.version).toBe('v2.0.0');
             expect(result.availableVersions).toContain('v2.0.0');
         });
 
-            test('should resolve "stable" policy excluding pre-releases', async () => {
+        test('should resolve "stable" policy excluding pre-releases', async () => {
+            // Arrange
+            const versions = ['v1.0.0', 'v2.0.0-beta', 'v1.5.0'];
+
+            // Act
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'stable',
-                ['v1.0.0', 'v2.0.0-beta', 'v1.5.0']
+                versions
             );
 
+            // Assert
             expect(result.policy).toBe('stable');
             expect(result.version).toBe('v1.5.0'); // Excludes beta
         });
 
-            test('should resolve pinned version', async () => {
+        test('should resolve pinned version', async () => {
+            // Arrange
+            const versions = ['v1.0.0', 'v1.2.3', 'v2.0.0'];
+
+            // Act
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'v1.2.3',
-                ['v1.0.0', 'v1.2.3', 'v2.0.0']
+                versions
             );
 
+            // Assert
             expect(result.policy).toBe('pinned');
             expect(result.version).toBe('v1.2.3');
         });
@@ -169,7 +214,8 @@ describe('DependencyAnalyzer', () => {
             await fs.rm(tempHome, { recursive: true, force: true });
         });
 
-            test('should detect no cycles in acyclic graph', async () => {
+        test('should detect no cycles in acyclic graph', async () => {
+            // Arrange
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -186,11 +232,15 @@ describe('DependencyAnalyzer', () => {
                 },
             };
 
+            // Act
             const cycles = await analyzer.detectCircularDependencies(lockFile);
+
+            // Assert
             expect(cycles).toEqual([]);
         });
 
-            test('should detect simple cycle between packages', async () => {
+        test('should detect simple cycle between packages', async () => {
+            // Arrange
             const lockFile: LockFile = {
                 version: '1',
                 dependencies: {
@@ -231,7 +281,10 @@ describe('DependencyAnalyzer', () => {
                 'utf-8'
             );
 
+            // Act
             const cycles = await analyzer.detectCircularDependencies(lockFile);
+
+            // Assert
             expect(cycles).toContainEqual(['acme/a', 'acme/b', 'acme/a']);
         });
     });
