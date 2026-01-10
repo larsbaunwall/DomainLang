@@ -176,7 +176,7 @@ Relationship:
     arrow=RelationshipArrow
     ('[' rightRoles+=RoleEnum (',' rightRoles+=RoleEnum)* ']')? 
     right=BoundedContextRef
-    (':' type=RelationshipType)?
+    (Assignment type=RelationshipType)?
 ;
 
 /**

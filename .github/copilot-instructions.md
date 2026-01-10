@@ -43,6 +43,7 @@ npm test                  # Run tests
 2. **ALWAYS** run `npm run langium:generate` after editing `.langium` files
 3. **ALWAYS** run `npm run build` to compile TypeScript
 4. **ALWAYS** add test cases for parsing changes
+5. **NEVER** commit to git without my explicit approval
 
 ### Code Standards
 
