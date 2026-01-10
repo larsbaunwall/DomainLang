@@ -18,6 +18,10 @@
             "types": "./out/index.d.ts",
             "default": "./out/index.js"
         },
+            "./main-browser": {
+                "types": "./out/main-browser.d.ts",
+                "default": "./out/main-browser.js"
+            },
         "./syntaxes/domain-lang.monarch.js": {
             "types": "./out/syntaxes/domain-lang.monarch.d.ts",
             "default": "./out/syntaxes/domain-lang.monarch.js"

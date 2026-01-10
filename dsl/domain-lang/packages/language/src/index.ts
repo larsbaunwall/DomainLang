@@ -3,7 +3,6 @@ export * from './generated/ast.js';
 export * from './generated/grammar.js';
 export * from './generated/module.js';
 export * from './main.js';
-export * from './main-browser.js';
 export * from './ast-augmentation.js';
 
 // Export services
