@@ -10,12 +10,12 @@
             "type": "extensionHost",
             "request": "launch",
             "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}/packages/extension"
+                "--extensionDevelopmentPath=${workspaceFolder}/dsl/domain-lang/packages/extension"
             ],
             "sourceMaps": true,
             "outFiles": [
-                "${workspaceFolder}/packages/language/out/**/*.js",
-                "${workspaceFolder}/packages/extension/out/**/*.js"
+                "${workspaceFolder}/dsl/domain-lang/packages/language/out/**/*.js",
+                "${workspaceFolder}/dsl/domain-lang/packages/extension/out/**/*.js"
             ]
         },
         {
@@ -28,8 +28,8 @@
             ],
             "sourceMaps": true,
             "outFiles": [
-                "${workspaceFolder}/packages/language/out/**/*.js",
-                "${workspaceFolder}/packages/extension/out/**/*.js",
+                "${workspaceFolder}/dsl/domain-lang/packages/language/out/**/*.js",
+                "${workspaceFolder}/dsl/domain-lang/packages/extension/out/**/*.js",
                 "${workspaceFolder}/node_modules/langium"
             ]
         },
@@ -37,7 +37,7 @@
             "type": "node",
             "request": "launch",
             "name": "Start Monaco Demo (Vite)",
-            "cwd": "${workspaceFolder}/packages/demo",
+            "cwd": "${workspaceFolder}/dsl/domain-lang/packages/demo",
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run", "dev"],
             "console": "integratedTerminal"
