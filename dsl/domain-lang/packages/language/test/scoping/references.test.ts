@@ -13,14 +13,17 @@ describe('Scoping: References', () => {
     test('resolves bounded context references in relationships', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BoundedContext OrderContext for Sales
-            BoundedContext PaymentContext for Sales
+            Domain Sales:
+            BoundedContext OrderContext:
+                for: Sales
+            BoundedContext PaymentContext:
+                for: Sales
             
-            ContextMap SalesMap {
-                contains OrderContext, PaymentContext
-                [OHS] OrderContext -> [CF] PaymentContext : CustomerSupplier
-            }
+            ContextMap SalesMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [OHS] OrderContext -> [CF] PaymentContext : CustomerSupplier
         `;
 
         // Act
@@ -46,13 +49,12 @@ describe('Scoping: References', () => {
     test('resolves domain hierarchy parent reference', async () => {
         // Arrange
         const input = s`
-            Domain Commerce {
+            Domain Commerce:
                 description: "Main commerce domain"
-            }
             
-            Domain Sales in Commerce {
+            Domain Sales:
+                in: Commerce
                 description: "Sales subdomain"
-            }
         `;
 
         // Act

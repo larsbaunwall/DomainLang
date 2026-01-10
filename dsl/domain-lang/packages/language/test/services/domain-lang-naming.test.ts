@@ -11,11 +11,9 @@ describe('domain-lang naming utilities', () => {
     it('computes qualified names for nested namespaces', async () => {
         // Arrange
         const input = `
-            namespace strategic.core {
-                namespace operations {
-                    Domain Sales {}
-                }
-            }
+            namespace strategic.core:
+                namespace operations:
+                    Domain Sales:
         `;
 
         // Act
@@ -44,11 +42,9 @@ describe('domain-lang naming utilities', () => {
     it('treats nested namespace blocks as dotted qualified names', async () => {
         // Arrange
         const input = `
-            namespace company {
-                namespace sales {
-                    Domain Orders {}
-                }
-            }
+            namespace company:
+                namespace sales:
+                    Domain Orders:
         `;
 
         // Act

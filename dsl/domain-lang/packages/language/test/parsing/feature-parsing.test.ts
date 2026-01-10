@@ -27,11 +27,14 @@ describe('Advanced Syntax Features', () => {
     test('should parse BC shorthand with inline assignments', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             Team ProductTeam
             Classification Core
             
-            BC OrderContext for Sales as Core by ProductTeam
+            BC OrderContext:
+                for: Sales
+                as: Core
+                by: ProductTeam
         `;
         
         // Act
@@ -49,13 +52,19 @@ describe('Advanced Syntax Features', () => {
     test('should parse multiple role assignments', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             Team ProductTeam
             Classification Core
             Classification Supporting
             
-            BC OrderContext for Sales as Core by ProductTeam
-            BC PaymentContext for Sales as Supporting by ProductTeam
+            BC OrderContext:
+                for: Sales
+                as: Core
+                by: ProductTeam
+            BC PaymentContext:
+                for: Sales
+                as: Supporting
+                by: ProductTeam
         `;
         
         // Act
@@ -73,10 +82,9 @@ describe('Advanced Syntax Features', () => {
     test('should parse namespace declarations', async () => {
         // Arrange
         const input = s`
-            namespace com.example.sales {
-                Domain Sales {}
+            namespace com.example.sales:
+                Domain Sales:
                 Team SalesTeam
-            }
         `;
         
         // Act
@@ -93,10 +101,12 @@ describe('Advanced Syntax Features', () => {
     test('should parse bounded contexts', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
         `;
         
         // Act
@@ -115,15 +125,14 @@ describe('Advanced Syntax Features', () => {
             Classification Business
             Classification Technical
             
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                decisions {
-                    decision [Architectural] EventSourcing: "Use event sourcing"
-                    policy [Business] RefundPolicy: "30-day return policy"
-                    rule [Technical] UniqueIds: "All orders need unique IDs"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                decisions:
+                    - decision [Architectural] EventSourcing: "Use event sourcing"
+                    - policy [Business] RefundPolicy: "30-day return policy"
+                    - rule [Technical] UniqueIds: "All orders need unique IDs"
         `;
         
         // Act
@@ -137,17 +146,20 @@ describe('Advanced Syntax Features', () => {
     test('should parse relationship arrows', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            Domain Payment {}
+            Domain Sales:
+            Domain Payment:
             
-            BC OrderContext for Sales
-            BC PaymentContext for Payment
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Payment
             
-            ContextMap ECommerceMap {
-                contains OrderContext, PaymentContext
-                OrderContext U/D PaymentContext
-                OrderContext <-> PaymentContext
-            }
+            ContextMap ECommerceMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext U/D PaymentContext
+                - OrderContext <-> PaymentContext
         `;
         
         // Act
@@ -165,7 +177,7 @@ describe('Advanced Syntax Features', () => {
             import "owner/repo@v1.0.0" as DDD
                 import "./definitions.dlang"
             
-            Domain Sales {}
+            Domain Sales:
         `;
         
         // Act
@@ -179,31 +191,29 @@ describe('Advanced Syntax Features', () => {
     test('should parse complex nested namespace structure', async () => {
         // Arrange
         const input = s`
-            namespace com.company.ecommerce {
+            namespace com.company.ecommerce:
                 Team SalesTeam
                 Classification Core
                 Classification Architectural
                 Classification Business
                 
-                Domain Commerce {
+                Domain Commerce:
                     description: "Main commerce domain"
                     vision: "Complete e-commerce platform"
-                }
                 
-                BC OrderManagement for Commerce as Core by SalesTeam {
+                BC OrderManagement:
+                    for: Commerce
+                    as: Core
+                    by: SalesTeam
                     description: "Order processing and management"
                     
-                    terminology {
-                        term Order: "Customer purchase request"
-                        term Customer: "Person placing orders"
-                    }
+                    terminology:
+                        - Order: "Customer purchase request"
+                        - Customer: "Person placing orders"
                     
-                    decisions {
-                        decision [Architectural] EventSourcing: "Use event sourcing"
-                        policy [Business] Returns: "30-day return policy"
-                    }
-                }
-            }
+                    decisions:
+                        - decision [Architectural] EventSourcing: "Use event sourcing"
+                        - policy [Business] Returns: "30-day return policy"
         `;
         
         // Act

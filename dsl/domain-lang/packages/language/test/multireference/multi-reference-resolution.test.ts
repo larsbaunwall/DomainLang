@@ -14,18 +14,16 @@ describe('Multi-Target References', () => {
     test('BoundedContext belongs to single domain (DDD compliance)', async () => {
         // Arrange
         const input = s`
-            Domain Sales {
+            Domain Sales:
                 description: "Sales operations"
-            }
             
-            Domain Marketing {
+            Domain Marketing:
                 description: "Marketing operations"
-            }
             
             // BC belongs to exactly ONE domain per DDD principles
-            BC CustomerExperience for Sales {
+            BC CustomerExperience:
+                for: Sales
                 description: "Sales experience"
-            }
     `;
 
     // Act
@@ -43,20 +41,20 @@ describe('Multi-Target References', () => {
 
     test('ContextMap can reference multiple BoundedContexts with same name from different files', async () => {
         const input = `
-            Domain Sales {}
-            Domain Billing {}
+            Domain Sales:
+            Domain Billing:
             
-            BC Orders for Sales {
+            BC Orders:
+                for: Sales
                 description: "Sales orders"
-            }
             
-            BC Orders for Billing {
+            BC Orders:
+                for: Billing
                 description: "Billing orders"  
-            }
             
-            ContextMap AllOrders {
-                contains Orders
-            }
+            ContextMap AllOrders:
+                contains:
+                    - Orders
         `;
 
         const document = await testServices.parse(input);
@@ -77,21 +75,20 @@ describe('Multi-Target References', () => {
 
     test('DomainMap references each domain once via MultiReference', async () => {
         const input = `
-            Domain Sales {
+            Domain Sales:
                 description: "Sales domain"
-            }
             
-            Domain Marketing {
+            Domain Marketing:
                 description: "Marketing domain"
-            }
             
-            Domain Support {
+            Domain Support:
                 description: "Support domain"
-            }
             
-            DomainMap CorporatePortfolio {
-                contains Sales, Marketing, Support
-            }
+            DomainMap CorporatePortfolio:
+                contains:
+                    - Sales
+                    - Marketing
+                    - Support
         `;
 
         const document = await testServices.parse(input);
@@ -113,23 +110,25 @@ describe('Multi-Target References', () => {
 
     test('ContextMap references each BoundedContext via MultiReference', async () => {
         const input = `
-            Domain Sales {}
+            Domain Sales:
             
-            BC Orders for Sales {
+            BC Orders:
+                for: Sales
                 description: "Order management"
-            }
             
-            BC Pricing for Sales {
+            BC Pricing:
+                for: Sales
                 description: "Pricing engine"
-            }
             
-            BC Catalog for Sales {
+            BC Catalog:
+                for: Sales
                 description: "Product catalog"
-            }
             
-            ContextMap CoreSystems {
-                contains Orders, Pricing, Catalog
-            }
+            ContextMap CoreSystems:
+                contains:
+                    - Orders
+                    - Pricing
+                    - Catalog
         `;
 
         const document = await testServices.parse(input);
@@ -152,13 +151,15 @@ describe('Multi-Target References', () => {
     // MultiReference resolution: missing targets are simply left without a ref; existing targets still resolve
     test('MultiReference resolves existing targets even when some are missing', async () => {
         const input = `
-            Domain Sales {}
+            Domain Sales:
             
-            BC Orders for Sales {}
+            BC Orders:
+                for: Sales
             
-            ContextMap PortfolioContexts {
-                contains Orders, __MissingBC__
-            }
+            ContextMap PortfolioContexts:
+                contains:
+                    - Orders
+                    - __MissingBC__
         `;
 
         const document = await testServices.parse(input);
@@ -182,19 +183,20 @@ describe('Multi-Target References', () => {
     //  - Workspace fixture or virtual FS provides namespace-aware symbol exposure
     test.skip('MultiReference works with qualified names in namespaces', async () => {
         const input = `
-            namespace acme.sales {
-                Domain Sales {}
-                BC Orders for Sales {}
-            }
+            namespace acme.sales:
+                Domain Sales:
+                BC Orders:
+                    for: Sales
             
-            namespace acme.marketing {
-                Domain Marketing {}
-                BC Campaigns for Marketing {}
-            }
+            namespace acme.marketing:
+                Domain Marketing:
+                BC Campaigns:
+                    for: Marketing
             
-            ContextMap Corporate {
-                contains acme.sales.Orders, acme.marketing.Campaigns
-            }
+            ContextMap Corporate:
+                contains:
+                    - acme.sales.Orders
+                    - acme.marketing.Campaigns
         `;
 
         const document = await testServices.parse(input);
@@ -216,21 +218,21 @@ describe('Multi-Target References', () => {
 
     test('MultiReference allows partial definitions across contexts', async () => {
         const input = `
-            Domain Sales {}
-            Domain CRM {}
+            Domain Sales:
+            Domain CRM:
             
             // Same BC name, but for different domains (like partial definitions from different files)
-            BC CustomerManagement for Sales {
+            BC CustomerManagement:
+                for: Sales
                 description: "Sales perspective on customers"
-            }
             
-            BC CustomerManagement for CRM {
+            BC CustomerManagement:
+                for: CRM
                 description: "CRM perspective on customers"
-            }
             
-            ContextMap CustomerServices {
-                contains CustomerManagement
-            }
+            ContextMap CustomerServices:
+                contains:
+                    - CustomerManagement
         `;
 
         const document = await testServices.parse(input);

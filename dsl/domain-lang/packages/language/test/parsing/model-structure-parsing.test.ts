@@ -43,7 +43,7 @@ describe('Grammar Completeness Tests', () => {
                 testServices.parse,
                 s`
                     import "./types.dlang"
-                    Domain Test {}
+                    Domain Test:
                     Team TestTeam
                 `,
                 'Model'
@@ -54,18 +54,22 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain TestDomain {}
-                    BoundedContext TestBC for TestDomain
+                    Domain TestDomain:
+                    BoundedContext TestBC:
+                        for: TestDomain
                     Team TestTeam
                     Classification TestClass
-                    ContextMap TestMap { contains TestBC }
-                    DomainMap TestDomainMap { contains TestDomain }
-                    namespace grouped {
-                        namespace nested {
-                            Domain NestedDomain {}
-                        }
-                    }
-                    namespace test.pkg { Domain PkgDomain {} }
+                    ContextMap TestMap:
+                        contains:
+                            - TestBC
+                    DomainMap TestDomainMap:
+                        contains:
+                            - TestDomain
+                    namespace grouped:
+                        namespace nested:
+                            Domain NestedDomain:
+                    namespace test.pkg:
+                        Domain PkgDomain:
                 `,
                 'StructureElement'
             );
@@ -80,7 +84,7 @@ describe('Grammar Completeness Tests', () => {
         test('Domain - minimal syntax', async () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
-                `Domain Test {}`,
+                `Domain Test:`,
                 'Domain'
             );
         });
@@ -89,8 +93,9 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Parent {}
-                    Domain Child in Parent {}
+                    Domain Parent:
+                    Domain Child:
+                        in: Parent
                 `,
                 'Domain with parent'
             );
@@ -100,10 +105,10 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    namespace com.example {
-                        Domain Parent {}
-                    }
-                    Domain Child in com.example.Parent {}
+                    namespace com.example:
+                        Domain Parent:
+                    Domain Child:
+                        in: com.example.Parent
                 `,
                 'Domain with qualified parent'
             );
@@ -115,11 +120,10 @@ describe('Grammar Completeness Tests', () => {
                 s`
                     Classification Core
                     
-                    Domain Test {
+                    Domain Test:
                         description: "Test domain"
                         vision: "Test vision"
                         classifier: Core
-                    }
                 `,
                 'Domain with documentation'
             );
@@ -129,8 +133,9 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BoundedContext TestBC for Test
+                    Domain Test:
+                    BoundedContext TestBC:
+                        for: Test
                 `,
                 'BoundedContext minimal'
             );
@@ -140,8 +145,9 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BC TestBC for Test
+                    Domain Test:
+                    BC TestBC:
+                        for: Test
                 `,
                 'BoundedContext shorthand'
             );
@@ -151,11 +157,14 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
+                    Domain Test:
                     Team TestTeam
                     Classification Core
                     
-                    BoundedContext TestBC for Test as Core by TestTeam
+                    BoundedContext TestBC:
+                        for: Test
+                        as: Core
+                        by: TestTeam
                 `,
                 'BoundedContext with inline assignments'
             );
@@ -165,7 +174,7 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
+                    Domain Test:
                     Team TestTeam
                     Classification Core
                     Classification SaaS
@@ -174,34 +183,30 @@ describe('Grammar Completeness Tests', () => {
                     Classification Business
                     Classification Technical
                     
-                    BoundedContext TestBC for Test {
+                    BoundedContext TestBC:
+                        for: Test
                         description: "Test context"
                         team: TestTeam
                         role: Core
                         businessModel: SaaS
                         evolution: Mature
                         
-                        classifiers {
+                        classifiers:
                             role: Core
                             businessModel: SaaS
                             evolution: Mature
-                        }
                         
-                        relationships {
-                            [OHS] this -> [CF] TestBC : CustomerSupplier
-                        }
+                        relationships:
+                            - [OHS] this -> [CF] TestBC : CustomerSupplier
                         
-                        terminology {
-                            term Order: "Customer order"
-                            Term Product: "Item for sale" aka Item examples "Laptop", "Mouse"
-                        }
+                        terminology:
+                            - Order: "Customer order"
+                            - Product: "Item for sale" aka: Item examples: "Laptop", "Mouse"
                         
-                        decisions {
-                            decision [Architectural] EventSourcing: "Use event sourcing"
-                            policy [Business] Returns: "30-day returns"
-                            rule [Technical] Validation: "Validate inputs"
-                        }
-                    }
+                        decisions:
+                            - decision [Architectural] EventSourcing: "Use event sourcing"
+                            - policy [Business] Returns: "30-day returns"
+                            - rule [Technical] Validation: "Validate inputs"
                 `,
                 'BoundedContext with all documentation'
             );
@@ -239,13 +244,16 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BoundedContext BC1 for Test
-                    BoundedContext BC2 for Test
+                    Domain Test:
+                    BoundedContext BC1:
+                        for: Test
+                    BoundedContext BC2:
+                        for: Test
                     
-                    ContextMap TestMap {
-                        contains BC1, BC2
-                    }
+                    ContextMap TestMap:
+                        contains:
+                            - BC1
+                            - BC2
                 `,
                 'ContextMap basic'
             );
@@ -255,15 +263,18 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BoundedContext BC1 for Test
-                    BoundedContext BC2 for Test
+                    Domain Test:
+                    BoundedContext BC1:
+                        for: Test
+                    BoundedContext BC2:
+                        for: Test
                     
-                    ContextMap TestMap {
-                        contains BC1, BC2
-                        [OHS] BC1 -> [CF] BC2 : CustomerSupplier
-                        BC1 <-> BC2 : Partnership
-                    }
+                    ContextMap TestMap:
+                        contains:
+                            - BC1
+                            - BC2
+                        - [OHS] BC1 -> [CF] BC2 : CustomerSupplier
+                        - BC1 <-> BC2 : Partnership
                 `,
                 'ContextMap with relationships'
             );
@@ -273,12 +284,13 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Domain1 {}
-                    Domain Domain2 {}
+                    Domain Domain1:
+                    Domain Domain2:
                     
-                    DomainMap TestMap {
-                        contains Domain1, Domain2
-                    }
+                    DomainMap TestMap:
+                        contains:
+                            - Domain1
+                            - Domain2
                 `,
                 'DomainMap'
             );
@@ -294,21 +306,24 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BoundedContext BC1 for Test
-                    BoundedContext BC2 for Test
+                    Domain Test:
+                    BoundedContext BC1:
+                        for: Test
+                    BoundedContext BC2:
+                        for: Test
                     
-                    ContextMap TestMap {
-                        contains BC1, BC2
-                        BC1 -> BC2
-                        BC1 <- BC2
-                        BC1 <-> BC2
-                        BC1 >< BC2
-                        BC1 U/D BC2
-                        BC1 u/d BC2
-                        BC1 C/S BC2
-                        BC1 c/s BC2
-                    }
+                    ContextMap TestMap:
+                        contains:
+                            - BC1
+                            - BC2
+                        - BC1 -> BC2
+                        - BC1 <- BC2
+                        - BC1 <-> BC2
+                        - BC1 >< BC2
+                        - BC1 U/D BC2
+                        - BC1 u/d BC2
+                        - BC1 C/S BC2
+                        - BC1 c/s BC2
                 `,
                 'Relationship arrows'
             );
@@ -318,20 +333,23 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BoundedContext BC1 for Test
-                    BoundedContext BC2 for Test
+                    Domain Test:
+                    BoundedContext BC1:
+                        for: Test
+                    BoundedContext BC2:
+                        for: Test
                     
-                    ContextMap TestMap {
-                        contains BC1, BC2
-                        [PL] BC1 -> BC2
-                        [OHS] BC1 -> BC2
-                        [CF] BC1 -> BC2
-                        [ACL] BC1 -> BC2
-                        [P] BC1 -> BC2
-                        [SK] BC1 -> BC2
-                        [BBoM] BC1 -> BC2
-                    }
+                    ContextMap TestMap:
+                        contains:
+                            - BC1
+                            - BC2
+                        - [PL] BC1 -> BC2
+                        - [OHS] BC1 -> BC2
+                        - [CF] BC1 -> BC2
+                        - [ACL] BC1 -> BC2
+                        - [P] BC1 -> BC2
+                        - [SK] BC1 -> BC2
+                        - [BBoM] BC1 -> BC2
                 `,
                 'Relationship DDD patterns'
             );
@@ -341,18 +359,21 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BoundedContext BC1 for Test
-                    BoundedContext BC2 for Test
+                    Domain Test:
+                    BoundedContext BC1:
+                        for: Test
+                    BoundedContext BC2:
+                        for: Test
                     
-                    ContextMap TestMap {
-                        contains BC1, BC2
-                        BC1 -> BC2 : Partnership
-                        BC1 -> BC2 : SharedKernel
-                        BC1 -> BC2 : CustomerSupplier
-                        BC1 -> BC2 : UpstreamDownstream
-                        BC1 -> BC2 : SeparateWays
-                    }
+                    ContextMap TestMap:
+                        contains:
+                            - BC1
+                            - BC2
+                        - BC1 -> BC2 : Partnership
+                        - BC1 -> BC2 : SharedKernel
+                        - BC1 -> BC2 : CustomerSupplier
+                        - BC1 -> BC2 : UpstreamDownstream
+                        - BC1 -> BC2 : SeparateWays
                 `,
                 'Relationship types'
             );
@@ -362,12 +383,11 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BoundedContext TestBC for Test {
-                        relationships {
-                            [OHS] this -> [CF] TestBC
-                        }
-                    }
+                    Domain Test:
+                    BoundedContext TestBC:
+                        for: Test
+                        relationships:
+                            - [OHS] this -> [CF] TestBC
                 `,
                 'BoundedContextRef this'
             );
@@ -383,18 +403,17 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {}
-                    BoundedContext TestBC for Test {
-                        terminology {
-                            term Order
-                            Term Customer: "Person who buys"
-                            term Product: "Item for sale"
-                            term Service aka Offering, Alternative
-                            term Feature synonyms Capability, Function
-                            term Invoice examples "INV-001", "INV-002"
-                            Term Payment: "Money transfer" aka Transaction examples "Credit Card", "PayPal"
-                        }
-                    }
+                    Domain Test:
+                    BoundedContext TestBC:
+                        for: Test
+                        terminology:
+                            - Order
+                            - Customer: "Person who buys"
+                            - Product: "Item for sale"
+                            - Service aka: Offering, Alternative
+                            - Feature synonyms: Capability, Function
+                            - Invoice examples: "INV-001", "INV-002"
+                            - Payment: "Money transfer" aka: Transaction examples: "Credit Card", "PayPal"
                 `,
                 'DomainTerm variants'
             );
@@ -411,18 +430,17 @@ describe('Grammar Completeness Tests', () => {
                     Classification Security
                     Classification Operational
                     
-                    Domain Test {}
-                    BoundedContext TestBC for Test {
-                        decisions {
-                            decision ArchDecision: "Basic decision"
-                            Decision [Architectural] EventSourcing: "Use event sourcing"
-                            decision [Business] Pricing: "Subscription model"
-                            decision [Technical] Database: "Use PostgreSQL"
-                            decision [Compliance] GDPR: "Follow GDPR"
-                            decision [Security] Auth: "Use OAuth2"
-                            decision [Operational] Monitoring: "Use Prometheus"
-                        }
-                    }
+                    Domain Test:
+                    BoundedContext TestBC:
+                        for: Test
+                        decisions:
+                            - decision ArchDecision: "Basic decision"
+                            - Decision [Architectural] EventSourcing: "Use event sourcing"
+                            - decision [Business] Pricing: "Subscription model"
+                            - decision [Technical] Database: "Use PostgreSQL"
+                            - decision [Compliance] GDPR: "Follow GDPR"
+                            - decision [Security] Auth: "Use OAuth2"
+                            - decision [Operational] Monitoring: "Use Prometheus"
                 `,
                 'Decision categories'
             );
@@ -436,15 +454,14 @@ describe('Grammar Completeness Tests', () => {
                     Classification Compliance
                     Classification Security
                     
-                    Domain Test {}
-                    BoundedContext TestBC for Test {
-                        decisions {
-                            policy DefaultPolicy: "Basic policy"
-                            Policy [Business] Returns: "30-day returns"
-                            policy [Compliance] DataRetention: "Keep data 7 years"
-                            policy [Security] Passwords: "Strong passwords required"
-                        }
-                    }
+                    Domain Test:
+                    BoundedContext TestBC:
+                        for: Test
+                        decisions:
+                            - policy DefaultPolicy: "Basic policy"
+                            - Policy [Business] Returns: "30-day returns"
+                            - policy [Compliance] DataRetention: "Keep data 7 years"
+                            - policy [Security] Passwords: "Strong passwords required"
                 `,
                 'Policy categories'
             );
@@ -457,14 +474,13 @@ describe('Grammar Completeness Tests', () => {
                     Classification Technical
                     Classification Business
                     
-                    Domain Test {}
-                    BoundedContext TestBC for Test {
-                        decisions {
-                            rule DefaultRule: "Basic rule"
-                            Rule [Technical] Validation: "Validate all inputs"
-                            rule [Business] Discounts: "Max 50% discount"
-                        }
-                    }
+                    Domain Test:
+                    BoundedContext TestBC:
+                        for: Test
+                        decisions:
+                            - rule DefaultRule: "Basic rule"
+                            - Rule [Technical] Validation: "Validate all inputs"
+                            - rule [Business] Discounts: "Max 50% discount"
                 `,
                 'BusinessRule categories'
             );
@@ -488,7 +504,7 @@ describe('Grammar Completeness Tests', () => {
                     import "owner/repo@v1.0.0" integrity "sha256-abcd1234"
                     import { Symbol1, Symbol2 } from "./file.dlang"
                     
-                    Domain Test {}
+                    Domain Test:
                 `,
                 'ImportStatement formats'
             );
@@ -498,14 +514,13 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    namespace com.example.sales {
-                        Domain Sales {}
+                    namespace com.example.sales:
+                        Domain Sales:
                         Team SalesTeam
                         
-                        namespace orders {
-                            BoundedContext OrderContext for Sales
-                        }
-                    }
+                        namespace orders:
+                            BoundedContext OrderContext:
+                                for: Sales
                 `,
                 'Namespace nested structure'
             );
@@ -515,13 +530,12 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    namespace TopLevel {
-                        Domain ParentDomain {}
+                    namespace TopLevel:
+                        Domain ParentDomain:
                         
-                        namespace Nested {
-                            Domain ChildDomain in ParentDomain {}
-                        }
-                    }
+                        namespace Nested:
+                            Domain ChildDomain:
+                                in: ParentDomain
                 `,
                 'Namespace nested namespaces'
             );
@@ -531,11 +545,11 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    namespace com.example.deep.pkg.name {
-                        Domain Test {}
-                    }
+                    namespace com.example.deep.pkg.name:
+                        Domain Test:
                     
-                    BoundedContext TestBC for com.example.deep.pkg.name.Test
+                    BoundedContext TestBC:
+                        for: com.example.deep.pkg.name.Test
                 `,
                 'QualifiedName'
             );
@@ -551,11 +565,11 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain simple {}
-                    Domain with_underscores {}
-                    Domain with-hyphens {}
-                    Domain MixedCase123 {}
-                    Domain _startsWithUnderscore {}
+                    Domain simple:
+                    Domain with_underscores:
+                    Domain with-hyphens:
+                    Domain MixedCase123:
+                    Domain _startsWithUnderscore:
                 `,
                 'ID terminal'
             );
@@ -565,10 +579,9 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    Domain Test {
+                    Domain Test:
                         description: "Double quoted string with \\"escaped\\" quotes"
                         vision: 'Single quoted string with \\'escaped\\' quotes'
-                    }
                 `,
                 'STRING terminal'
             );
@@ -581,26 +594,24 @@ describe('Grammar Completeness Tests', () => {
                     // Single line comment
                     /* Multi-line
                        comment */
-                    Domain Test {
+                    Domain Test:
                         // Inline comment
                         description: "Test" /* Another comment */
-                    }
                 `,
                 'Comments'
             );
         });
 
-        test('Assignment operators', async () => {
+        test('Assignment operators - only colon', async () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
                     Classification Core
                     
-                    Domain Test {
+                    Domain Test:
                         description: "Using colon"
-                        vision is "Using is keyword"  
-                        classifier = Core
-                    }
+                        vision: "Vision value"
+                        classifier: Core
                 `,
                 'Assignment operators'
             );

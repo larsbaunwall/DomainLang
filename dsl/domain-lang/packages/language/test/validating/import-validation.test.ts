@@ -21,9 +21,8 @@ describe('Import Validation', () => {
         const input = s`
             import { NonExistentDomain } from "./missing.dlang"
             
-            Domain TestDomain {
+            Domain TestDomain:
                 vision: "This is a test domain."
-            }
         `;
 
         // Act
@@ -39,9 +38,8 @@ describe('Import Validation', () => {
         const input = s`
             import "./nonexistent.dlang"
             
-            Domain TestDomain {
+            Domain TestDomain:
                 vision: "This is a test domain."
-            }
         `;
 
         // Act
@@ -56,9 +54,8 @@ describe('Import Validation', () => {
         const input = s`
             import "./other.dlang" as Other
             
-            Domain TestDomain {
+            Domain TestDomain:
                 vision: "This is a test domain."
-            }
         `;
 
         // Act
@@ -73,9 +70,8 @@ describe('Import Validation', () => {
         const input = s`
             import "owner/repo@v1.0.0"
             
-            Domain TestDomain {
+            Domain TestDomain:
                 vision: "This is a test domain."
-            }
         `;
 
         // Act
@@ -88,9 +84,8 @@ describe('Import Validation', () => {
     test('should allow valid domain definition without imports', async () => {
         // Arrange
         const input = s`
-            Domain TestDomain {
+            Domain TestDomain:
                 vision: "This is a test domain."
-            }
         `;
 
         // Act

@@ -38,7 +38,7 @@ describe('Local File Imports', () => {
         const input = s`
             import "./types.dlang"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -56,7 +56,7 @@ describe('Local File Imports', () => {
         const input = s`
             import "./shared/types/base.dlang"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -73,7 +73,7 @@ describe('Local File Imports', () => {
         const input = s`
             import "../common/types.dlang"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -90,7 +90,7 @@ describe('Local File Imports', () => {
         const input = s`
             import "~/contexts/sales.dlang"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -113,7 +113,7 @@ describe('Git URL Imports', () => {
         const input = s`
             import "owner/repo@v1.0.0"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -130,7 +130,7 @@ describe('Git URL Imports', () => {
         const input = s`
             import "ddd-patterns/core@main"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -147,7 +147,7 @@ describe('Git URL Imports', () => {
         const input = s`
             import "https://github.com/owner/repo@v1.0.0"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -164,7 +164,7 @@ describe('Git URL Imports', () => {
         const input = s`
             import "https://gitlab.com/company/patterns@v2.0.0"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -187,7 +187,7 @@ describe('Import Aliases', () => {
         const input = s`
             import "owner/repo@v1.0.0" as Patterns
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -204,7 +204,7 @@ describe('Import Aliases', () => {
         const input = s`
             import "./shared/types.dlang" as Shared
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -227,7 +227,7 @@ describe('Named Imports', () => {
         const input = s`
             import { OrderContext } from "./contexts.dlang"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -245,7 +245,7 @@ describe('Named Imports', () => {
         const input = s`
             import { OrderContext, PaymentContext, InventoryContext } from "./contexts.dlang"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -271,7 +271,7 @@ describe('Import Integrity', () => {
         const input = s`
             import "owner/repo@v1.0.0" integrity "sha256-abc123def456"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -288,7 +288,7 @@ describe('Import Integrity', () => {
         const input = s`
             import "owner/repo@v1.0.0" integrity "sha512-xyz789" as Patterns
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -314,7 +314,7 @@ describe('Multiple Imports', () => {
             import "./shared/base.dlang"
             import "owner/repo@v1.0.0" as DDD
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -334,7 +334,7 @@ describe('Multiple Imports', () => {
             import "github/patterns@v1.0.0" as Patterns
             import "secure/module@v2.0.0" integrity "sha256-secure"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -359,8 +359,9 @@ describe('Import Position', () => {
             
             Classification Core
             Team SalesTeam
-            Domain Sales {}
-            BC OrderContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
         `;
 
         // Act
@@ -377,13 +378,12 @@ describe('Import Position', () => {
             import "./teams.dlang"
             import "patterns/ddd@v1.0.0"
             
-            Domain Sales {
+            Domain Sales:
                 vision: "Sales domain"
-            }
             
-            BC OrderContext for Sales {
+            BC OrderContext:
+                for: Sales
                 description: "Order management"
-            }
         `;
 
         // Act
@@ -406,7 +406,7 @@ describe('Import Edge Cases', () => {
         const input = s`
             import './types.dlang'
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act
@@ -421,7 +421,7 @@ describe('Import Edge Cases', () => {
         const input = s`
             import "./my folder/types.dlang"
             
-            Domain Sales {}
+            Domain Sales:
         `;
 
         // Act

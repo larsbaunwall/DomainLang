@@ -1,26 +1,24 @@
-namespace StrategicLandscape {
+namespace StrategicLandscape:
     Classification CoreDomain
     Classification SupportingDomain
-}
 
-Domain Enterprise {
+Domain Enterprise:
     description: "Enterprise product organization"
     vision: "Align every bounded context to a unified customer narrative"
     classifier: StrategicLandscape.CoreDomain
-}
 
-Domain Marketplace in Enterprise {
+Domain Marketplace:
+    in: Enterprise
     description: "Digital marketplace for buyers and sellers"
     vision: "Enable third-party catalogs with curated governance"
     classifier: StrategicLandscape.CoreDomain
-}
 
-Domain Inventory in Marketplace {
+Domain Inventory:
+    in: Marketplace
     description: "Availability, allocation, and stock reconciliation"
     classifier: StrategicLandscape.SupportingDomain
-}
 
-Domain Users in Marketplace {
+Domain Users:
+    in: Marketplace
     description: "Accounts, profiles, and access policies"
     classifier: StrategicLandscape.SupportingDomain
-}

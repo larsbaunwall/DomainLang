@@ -23,13 +23,12 @@ describe('Basic Terminology Parsing', () => {
     test('should parse simple term definition', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Order: "A customer purchase request"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Order: "A customer purchase request"
         `;
 
         // Act
@@ -49,13 +48,12 @@ describe('Basic Terminology Parsing', () => {
     test('should parse term without meaning', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Order
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Order
         `;
 
         // Act
@@ -73,15 +71,14 @@ describe('Basic Terminology Parsing', () => {
     test('should parse multiple terms', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Order: "A customer purchase request"
-                    term Customer: "A person who places orders"
-                    term Product: "An item available for purchase"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Order: "A customer purchase request"
+                    - Customer: "A person who places orders"
+                    - Product: "An item available for purchase"
         `;
 
         // Act
@@ -105,13 +102,12 @@ describe('Term Keyword Variants', () => {
     test('should parse Term with capital T', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    Term Order: "A customer purchase request"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Order: "A customer purchase request"
         `;
 
         // Act
@@ -133,13 +129,12 @@ describe('Terminology Block Keyword Variants', () => {
     test('should parse language keyword', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                language {
-                    term Order: "A customer purchase request"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                language:
+                    - Order: "A customer purchase request"
         `;
 
         // Act
@@ -155,13 +150,12 @@ describe('Terminology Block Keyword Variants', () => {
     test('should parse glossary keyword', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                glossary {
-                    term Order: "A customer purchase request"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                glossary:
+                    - Order: "A customer purchase request"
         `;
 
         // Act
@@ -177,13 +171,12 @@ describe('Terminology Block Keyword Variants', () => {
     test('should parse ubiquitous language keyword', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                ubiquitous language {
-                    term Order: "A customer purchase request"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                ubiquitous language:
+                    - Order: "A customer purchase request"
         `;
 
         // Act
@@ -205,13 +198,12 @@ describe('Term Synonyms', () => {
     test('should parse term with aka keyword', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Customer: "A person who places orders" aka Client
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Customer: "A person who places orders" aka: Client
         `;
 
         // Act
@@ -229,13 +221,12 @@ describe('Term Synonyms', () => {
     test('should parse term with multiple synonyms using aka', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Customer: "A person who places orders" aka Client, Buyer, Purchaser
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Customer: "A person who places orders" aka: Client, Buyer, Purchaser
         `;
 
         // Act
@@ -253,13 +244,12 @@ describe('Term Synonyms', () => {
     test('should parse term with synonyms keyword', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Product: "An item for sale" synonyms Item, Good, Merchandise
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Product: "An item for sale" synonyms: Item, Good, Merchandise
         `;
 
         // Act
@@ -282,13 +272,12 @@ describe('Term Examples', () => {
     test('should parse term with examples keyword', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Product: "An item for sale" examples "Laptop", "Mouse"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Product: "An item for sale" examples: "Laptop", "Mouse"
         `;
 
         // Act
@@ -306,13 +295,12 @@ describe('Term Examples', () => {
     test('should parse term with e.g. keyword', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term PaymentMethod: "Way to pay" e.g. "Credit Card", "PayPal", "Bank Transfer"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - PaymentMethod: "Way to pay" e.g.: "Credit Card", "PayPal", "Bank Transfer"
         `;
 
         // Act
@@ -335,13 +323,12 @@ describe('Complex Term Definitions', () => {
     test('should parse term with meaning, synonyms, and examples', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Customer: "A person or organization that purchases products" aka Client, Buyer examples "Acme Corp", "John Doe"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Customer: "A person or organization that purchases products" aka: Client, Buyer examples: "Acme Corp", "John Doe"
         `;
 
         // Act
@@ -362,15 +349,14 @@ describe('Complex Term Definitions', () => {
     test('should parse multiple complex terms', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Order: "Purchase request" aka Purchase examples "ORD-001", "ORD-002"
-                    Term LineItem: "Single product in order" synonyms OrderLine
-                    Term Discount: "Price reduction" e.g. "10% off", "Buy one get one"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Order: "Purchase request" aka: Purchase examples: "ORD-001", "ORD-002"
+                    - LineItem: "Single product in order" synonyms: OrderLine
+                    - Discount: "Price reduction" e.g.: "10% off", "Buy one get one"
         `;
 
         // Act
@@ -396,13 +382,12 @@ describe('Term Assignment Operators', () => {
     test('should parse term with colon assignment', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Order: "A purchase request"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Order: "A purchase request"
         `;
 
         // Act
@@ -412,43 +397,8 @@ describe('Term Assignment Operators', () => {
         expectValidDocument(document);
     });
 
-    test('should parse term with is assignment', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Order is "A purchase request"
-                }
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
-
-    test('should parse term with equals assignment', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Order = "A purchase request"
-                }
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
+    // Note: 'is' and '=' assignment operators were removed in YAML-like syntax
+    // Only colon ':' is now supported
 });
 
 // ============================================================================
@@ -459,11 +409,11 @@ describe('Terminology Edge Cases', () => {
     test('should handle empty terminology block', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology { }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
         `;
 
         // Act
@@ -479,13 +429,12 @@ describe('Terminology Edge Cases', () => {
     test('should parse terms with hyphens in names', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term line-item: "A single line in an order"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - line-item: "A single line in an order"
         `;
 
         // Act
@@ -501,13 +450,12 @@ describe('Terminology Edge Cases', () => {
     test('should parse terms with underscores in names', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term order_id: "Unique order identifier"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - order_id: "Unique order identifier"
         `;
 
         // Act
@@ -520,17 +468,16 @@ describe('Terminology Edge Cases', () => {
         expect(terminologyBlock.terms[0].name).toBe('order_id');
     });
 
-    test('should handle terms with comma separators', async () => {
+    test('should handle terms with multiple list items', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    term Order: "A purchase request",
-                    term Customer: "A person placing orders"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                terminology:
+                    - Order: "A purchase request"
+                    - Customer: "A person placing orders"
         `;
 
         // Act

@@ -13,13 +13,12 @@ describe('Scoping: Edge Cases', () => {
     test('handles forward references', async () => {
         // Arrange
         const input = s`
-            BoundedContext OrderContext for Sales {
+            BoundedContext OrderContext:
+                for: Sales
                 description: "Order management"
-            }
             
-            Domain Sales {
+            Domain Sales:
                 description: "Sales domain - defined after BC"
-            }
         `;
 
         // Act
@@ -36,15 +35,16 @@ describe('Scoping: Edge Cases', () => {
     test('resolves this reference in relationships', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BoundedContext OrderContext for Sales
-            BoundedContext PaymentContext for Sales
+            Domain Sales:
+            BoundedContext OrderContext:
+                for: Sales
+            BoundedContext PaymentContext:
+                for: Sales
             
-            BoundedContext OrderContext for Sales {
-                relationships {
-                    [OHS] this -> [CF] PaymentContext : CustomerSupplier
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                relationships:
+                    - [OHS] this -> [CF] PaymentContext : CustomerSupplier
         `;
 
         // Act
@@ -71,9 +71,12 @@ describe('Scoping: Edge Cases', () => {
     test('handles circular references gracefully', async () => {
         // Arrange
         const input = s`
-            Domain A in B {}
-            Domain B in C {}
-            Domain C in A {}
+            Domain A:
+                in: B
+            Domain B:
+                in: C
+            Domain C:
+                in: A
         `;
 
         // Act
@@ -96,10 +99,10 @@ describe('Scoping: Edge Cases', () => {
     test('handles missing references gracefully', async () => {
         // Arrange
         const input = s`
-            BoundedContext OrderContext for NonExistentDomain {
+            BoundedContext OrderContext:
+                for: NonExistentDomain
                 team: NonExistentTeam
                 role: NonExistentClassification
-            }
         `;
 
         // Act

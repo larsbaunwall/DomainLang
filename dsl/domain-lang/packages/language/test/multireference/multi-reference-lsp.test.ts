@@ -21,24 +21,24 @@ describe('MultiReference Practical Examples', () => {
     test('Multiple BCs with same name resolve to all targets', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            Domain Support {}
+            Domain Sales:
+            Domain Support:
             
             // Two different BCs with the same name "CustomerManagement"
             // Each serves a different domain with different responsibilities
-            BC CustomerManagement for Sales {
+            BC CustomerManagement:
+                for: Sales
                 description: "Manages sales leads and opportunities"
-            }
             
-            BC CustomerManagement for Support {
+            BC CustomerManagement:
+                for: Support
                 description: "Manages support tickets and SLAs"
-            }
             
             // The ContextMap references "CustomerManagement"
             // With MultiReference, this resolves to BOTH BCs above!
-            ContextMap CustomerServices {
-                contains CustomerManagement
-            }
+            ContextMap CustomerServices:
+                contains:
+                    - CustomerManagement
         `;
 
         // Act
@@ -74,20 +74,20 @@ describe('MultiReference Practical Examples', () => {
     test('MultiReference with multiple resolved targets for hover tooltips', async () => {
         // Arrange
         const input = s`
-            Domain Marketing {}
-            Domain Sales {}
+            Domain Marketing:
+            Domain Sales:
             
-            BC Campaigns for Marketing {
+            BC Campaigns:
+                for: Marketing
                 description: "Marketing campaigns"
-            }
             
-            BC Campaigns for Sales {
+            BC Campaigns:
+                for: Sales
                 description: "Sales campaigns"  
-            }
             
-            ContextMap AllCampaigns {
-                contains Campaigns
-            }
+            ContextMap AllCampaigns:
+                contains:
+                    - Campaigns
         `;
 
         // Act
@@ -118,15 +118,15 @@ describe('MultiReference Practical Examples', () => {
     test('Single BC resolves to single target', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
+            Domain Sales:
             
-            BC OrderContext for Sales {
+            BC OrderContext:
+                for: Sales
                 description: "Order management"
-            }
             
-            ContextMap OrdersMap {
-                contains OrderContext
-            }
+            ContextMap OrdersMap:
+                contains:
+                    - OrderContext
         `;
 
         // Act

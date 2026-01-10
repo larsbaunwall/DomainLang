@@ -30,363 +30,359 @@ Team PharmacyTeam
 // Domain Hierarchy
 // ============================================================================
 
-Domain Healthcare {
+Domain Healthcare:
     description: "Hospital and healthcare management"
     vision: "Deliver exceptional patient care through integrated systems"
     classifier: CoreDomain
-}
 
-Domain PatientCare in Healthcare {
+Domain PatientCare:
+    in: Healthcare
+    vision: "Comprehensive management of patient health services"
     description: "Direct patient care and treatment"
     classifier: CoreDomain
-}
 
-Domain Administration in Healthcare {
+Domain Administration:
+    in: Healthcare
     description: "Hospital administration and operations"
     classifier: SupportingDomain
-}
 
-Domain Pharmacy in Healthcare {
+Domain Pharmacy:
+    in: Healthcare
     description: "Medication management and dispensing"
     classifier: CoreDomain
-}
 
 // ============================================================================
 // Clinical Bounded Contexts
 // ============================================================================
 
-BC ElectronicHealthRecords for PatientCare
-    as CoreDomain
-    by ClinicalTeam {
+BC ElectronicHealthRecords:
+    for: PatientCare
+    as: CoreDomain
+    by: ClinicalTeam
 
     description: "Patient medical records and health history"
 
-    terminology {
-        term Patient: "Individual receiving medical care"
+    terminology:
+        - Patient: "Individual receiving medical care"
             aka: MedicalPatient, HealthcarePatient
 
-        term MedicalRecord: "Complete health history of patient"
+        - MedicalRecord: "Complete health history of patient"
             aka: EHR, EMR, PatientRecord
             examples: "Patient #12345 Medical History"
 
-        term Encounter: "Single visit or interaction with healthcare provider"
+        - Encounter: "Single visit or interaction with healthcare provider"
             aka: Visit, Appointment, Consultation
 
-        term Diagnosis: "Medical condition identification"
+        - Diagnosis: "Medical condition identification"
             aka: MedicalDiagnosis, Condition
             examples: "Type 2 Diabetes", "Hypertension", "Acute Bronchitis"
 
-        term Treatment: "Medical intervention for condition"
+        - Treatment: "Medical intervention for condition"
             aka: TherapeuticIntervention, MedicalTreatment
 
-        term VitalSigns: "Basic health measurements"
+        - VitalSigns: "Basic health measurements"
             examples: "Blood Pressure: 120/80", "Temperature: 98.6°F", "Pulse: 72 bpm"
 
-        term Allergy: "Adverse reaction to substance"
+        - Allergy: "Adverse reaction to substance"
             examples: "Penicillin", "Peanuts", "Latex"
-    }
 
-    classifiers {
+    classifiers:
         role: CoreDomain
         businessModel: HIPAACompliant
         evolution: PatientSafetyCritical
-    }
 
-    decisions {
-        decision [architectural] HL7FHIR:
+    decisions:
+        - decision [architectural] HL7FHIR:
             "Use HL7 FHIR standard for healthcare data exchange"
 
-        decision [technical] PostgreSQL:
+        - decision [technical] PostgreSQL:
             "Use PostgreSQL with point-in-time recovery for data safety"
 
-        decision [security] EndToEndEncryption:
+        - decision [security] EndToEndEncryption:
             "Encrypt all PHI (Protected Health Information) end-to-end"
 
-        policy [business] RecordRetention:
+        - policy [business] RecordRetention:
             "Retain medical records for minimum 7 years after last encounter"
 
-        rule [compliance] HIPAAPrivacy:
+        - rule [compliance] HIPAAPrivacy:
             "Comply with HIPAA Privacy Rule for PHI protection"
 
-        rule [compliance] HIPAASecurity:
+        - rule [compliance] HIPAASecurity:
             "Implement HIPAA Security Rule safeguards"
 
-        rule [compliance] AuditLogging:
+        - rule [compliance] AuditLogging:
             "Log all access to patient records with user identity and timestamp"
 
-        rule [clinical] AllergyChecking:
+        - rule [clinical] AllergyChecking:
             "Check patient allergies before prescribing medications"
-    }
-}
 
-BC AppointmentScheduling for Administration
-    as SupportingDomain
-    by AdministrativeTeam {
+BC AppointmentScheduling:
+    for: Administration
+    as: SupportingDomain
+    by: AdministrativeTeam
 
     description: "Patient appointment booking and management"
 
-    terminology {
-        term Appointment: "Scheduled patient visit"
+    terminology:
+        - Appointment: "Scheduled patient visit"
             aka: Visit, Booking
 
-        term Slot: "Available time slot for appointments"
+        - Slot: "Available time slot for appointments"
             aka: TimeSlot, AvailableSlot
 
-        term Provider: "Healthcare professional seeing patients"
+        - Provider: "Healthcare professional seeing patients"
             aka: Doctor, Physician, Practitioner
             examples: "Dr. Smith", "Nurse Johnson"
 
-        term AppointmentType: "Category of appointment"
+        - AppointmentType: "Category of appointment"
             examples: "Initial Consultation", "Follow-up", "Annual Physical", "Emergency"
 
-        term WaitingList: "Queue of patients waiting for appointments"
-    }
+        - WaitingList: "Queue of patients waiting for appointments"
 
-    decisions {
-        decision [technical] CalendarSync:
+    decisions:
+        - decision [technical] CalendarSync:
             "Sync with provider calendars using CalDAV protocol"
 
-        policy [business] CancellationPolicy:
+        - policy [business] CancellationPolicy:
             "Allow cancellations up to 24 hours before appointment"
 
-        policy [business] NoShowPolicy:
+        - policy [business] NoShowPolicy:
             "Mark no-shows after 15 minutes past appointment time"
 
-        policy [business] OverbookingStrategy:
+        - policy [business] OverbookingStrategy:
             "Allow 10% overbooking for high no-show appointment types"
-    }
-}
 
-BC MedicationManagement for Pharmacy
-    as CoreDomain
-    by PharmacyTeam {
+BC MedicationManagement:
+    for: Pharmacy
+    as: CoreDomain
+    by: PharmacyTeam
 
     description: "Prescription management and medication dispensing"
 
-    terminology {
-        term Prescription: "Medical order for medication"
+    terminology:
+        - Prescription: "Medical order for medication"
             aka: Rx, MedicationOrder
 
-        term Medication: "Drug prescribed to patient"
+        - Medication: "Drug prescribed to patient"
             aka: Drug, Pharmaceutical
             examples: "Amoxicillin 500mg", "Lisinopril 10mg"
 
-        term Dosage: "Amount and frequency of medication"
+        - Dosage: "Amount and frequency of medication"
             examples: "Take 2 tablets twice daily", "Apply once daily"
 
-        term DrugInteraction: "Potential adverse effect when combining medications"
+        - DrugInteraction: "Potential adverse effect when combining medications"
             aka: MedicationInteraction
 
-        term Formulary: "List of approved medications"
+        - Formulary: "List of approved medications"
             aka: DrugList
-    }
 
-    classifiers {
+    classifiers:
         role: CoreDomain
         businessModel: PatientSafetyCritical
         evolution: HIPAACompliant
-    }
 
-    decisions {
-        decision [technical] DrugDatabase:
+    decisions:
+        - decision [technical] DrugDatabase:
             "Use FDA drug database for interaction checking"
 
-        decision [technical] BarcodeScanning:
+        - decision [technical] BarcodeScanning:
             "Use barcode scanning for medication verification"
 
-        policy [clinical] DoubleCh eck:
+        - policy [clinical] DoubleCheck:
             "Require pharmacist double-check for high-risk medications"
 
-        rule [compliance] DEACompliance:
+        - rule [compliance] DEACompliance:
             "Comply with DEA regulations for controlled substances"
 
-        rule [clinical] InteractionChecking:
+        - rule [clinical] InteractionChecking:
             "Check for drug interactions before dispensing"
 
-        rule [clinical] AllergyVerification:
+        - rule [clinical] AllergyVerification:
             "Verify patient has no allergies to prescribed medication"
-    }
-}
 
-BC LaboratoryInformationSystem for PatientCare
-    as CoreDomain
-    by ClinicalTeam {
+BC LaboratoryInformationSystem:
+    for: PatientCare
+    as: CoreDomain
+    by: ClinicalTeam
 
     description: "Laboratory test ordering, results, and reporting"
 
-    terminology {
-        term LabOrder: "Request for laboratory test"
+    terminology:
+        - LabOrder: "Request for laboratory test"
             aka: TestOrder, LabRequest
 
-        term LabResult: "Outcome of laboratory test"
+        - LabResult: "Outcome of laboratory test"
             aka: TestResult
 
-        term Specimen: "Biological sample for testing"
+        - Specimen: "Biological sample for testing"
             examples: "Blood sample", "Urine sample", "Tissue biopsy"
 
-        term TestPanel: "Group of related laboratory tests"
+        - TestPanel: "Group of related laboratory tests"
             examples: "Complete Blood Count", "Metabolic Panel", "Lipid Panel"
 
-        term ReferenceRange: "Normal range for test results"
+        - ReferenceRange: "Normal range for test results"
             aka: NormalRange
-    }
 
-    decisions {
-        decision [technical] HL7Integration:
+    decisions:
+        - decision [technical] HL7Integration:
             "Use HL7 v2.x for lab instrument integration"
 
-        policy [clinical] CriticalResultNotification:
+        - policy [clinical] CriticalResultNotification:
             "Immediately notify physician of critical abnormal results"
 
-        rule [clinical] QualityControl:
+        - rule [clinical] QualityControl:
             "Run quality control tests daily before processing patient samples"
-    }
-}
 
-BC RadiologyInformationSystem for PatientCare
-    as CoreDomain
-    by ClinicalTeam {
+BC RadiologyInformationSystem:
+    for: PatientCare
+    as: CoreDomain
+    by: ClinicalTeam
 
     description: "Medical imaging ordering and PACS integration"
 
-    terminology {
-        term ImagingStudy: "Medical imaging examination"
+    terminology:
+        - ImagingStudy: "Medical imaging examination"
             aka: RadiologyStudy, Scan
             examples: "Chest X-Ray", "Brain MRI", "CT Scan"
 
-        term DICOM: "Digital Imaging and Communications in Medicine standard"
+        - DICOM: "Digital Imaging and Communications in Medicine standard"
 
-        term RadiologyReport: "Radiologist's interpretation of imaging study"
+        - RadiologyReport: "Radiologist's interpretation of imaging study"
             aka: ImagingReport
 
-        term PACS: "Picture Archiving and Communication System"
-    }
+        - PACS: "Picture Archiving and Communication System"
 
-    decisions {
-        decision [architectural] DICOMStandard:
+    decisions:
+        - decision [architectural] DICOMStandard:
             "Use DICOM standard for all medical imaging"
 
-        decision [technical] PACSIntegration:
+        - decision [technical] PACSIntegration:
             "Integrate with enterprise PACS for image storage"
 
-        rule [compliance] ImageRetention:
+        - rule [compliance] ImageRetention:
             "Retain imaging studies for minimum 10 years"
-    }
-}
 
-BC PatientBilling for Administration
-    as SupportingDomain
-    by BillingTeam {
+BC PatientBilling:
+    for: Administration
+    as: SupportingDomain
+    by: BillingTeam
 
     description: "Medical billing and insurance claims"
 
-    terminology {
-        term Claim: "Insurance claim for medical services"
+    terminology:
+        - Claim: "Insurance claim for medical services"
             aka: InsuranceClaim
 
-        term CPTCode: "Current Procedural Terminology code for services"
+        - CPTCode: "Current Procedural Terminology code for services"
             aka: ProcedureCode
 
-        term ICDCode: "International Classification of Diseases diagnosis code"
+        - ICDCode: "International Classification of Diseases diagnosis code"
             aka: DiagnosisCode
 
-        term Charge: "Cost of medical service"
+        - Charge: "Cost of medical service"
             aka: MedicalCharge
 
-        term Payment: "Payment received from patient or insurer"
-    }
+        - Payment: "Payment received from patient or insurer"
 
-    decisions {
-        decision [technical] EDI837:
+    decisions:
+        - decision [technical] EDI837:
             "Use EDI 837 format for electronic claims submission"
 
-        policy [business] TimelyClaims:
+        - policy [business] TimelyClaims:
             "Submit claims within 48 hours of service"
 
-        rule [compliance] HIPAATransactions:
+        - rule [compliance] HIPAATransactions:
             "Comply with HIPAA transaction standards for billing"
-    }
-}
 
-BC PatientPortal for PatientCare
-    as SupportingDomain
-    by AdministrativeTeam {
+BC PatientPortal:
+    for: PatientCare
+    as: SupportingDomain
+    by: AdministrativeTeam
 
     description: "Patient self-service portal for accessing records and scheduling"
 
-    terminology {
-        term PatientAccount: "Patient's online account"
+    terminology:
+        - PatientAccount: "Patient's online account"
 
-        term MedicalRecordAccess: "Patient viewing their own health information"
+        - MedicalRecordAccess: "Patient viewing their own health information"
 
-        term SecureMessaging: "Encrypted communication with healthcare providers"
+        - SecureMessaging: "Encrypted communication with healthcare providers"
 
-        term OnlineScheduling: "Patient self-booking appointments"
-    }
+        - OnlineScheduling: "Patient self-booking appointments"
 
-    decisions {
-        decision [security] TwoFactorAuth:
+    decisions:
+        - decision [security] TwoFactorAuth:
             "Require 2FA for patient portal access"
 
-        policy [compliance] AccessLogging:
+        - policy [compliance] AccessLogging:
             "Log all patient portal access for HIPAA compliance"
 
-        rule [compliance] PatientRights:
+        - rule [compliance] PatientRights:
             "Provide patients right to access records within 30 days"
-    }
-}
 
 // ============================================================================
 // Context Maps
 // ============================================================================
 
-ContextMap ClinicalWorkflow {
-    contains ElectronicHealthRecords, MedicationManagement, LaboratoryInformationSystem, RadiologyInformationSystem
+ContextMap ClinicalWorkflow:
+    contains:
+        - ElectronicHealthRecords
+        - MedicationManagement
+        - LaboratoryInformationSystem
+        - RadiologyInformationSystem
+    relationships:
+        // EHR is central to clinical workflow
+        - [OHS, PL] ElectronicHealthRecords -> [ACL] MedicationManagement
+        - [OHS, PL] ElectronicHealthRecords -> [ACL] LaboratoryInformationSystem
+        - [OHS, PL] ElectronicHealthRecords -> [ACL] RadiologyInformationSystem
 
-    // EHR is central to clinical workflow
-    [OHS, PL] ElectronicHealthRecords -> [ACL] MedicationManagement
-    [OHS, PL] ElectronicHealthRecords -> [ACL] LaboratoryInformationSystem
-    [OHS, PL] ElectronicHealthRecords -> [ACL] RadiologyInformationSystem
+        // Results flow back to EHR
+        - LaboratoryInformationSystem -> ElectronicHealthRecords
+        - RadiologyInformationSystem -> ElectronicHealthRecords
+        - MedicationManagement -> ElectronicHealthRecords
 
-    // Results flow back to EHR
-    LaboratoryInformationSystem -> ElectronicHealthRecords
-    RadiologyInformationSystem -> ElectronicHealthRecords
-    MedicationManagement -> ElectronicHealthRecords
-}
+ContextMap PatientExperience:
+    contains:
+        - AppointmentScheduling
+        - PatientPortal
+        - ElectronicHealthRecords
+    relationships:
+        // Patient portal integrates with scheduling and records
+        - [OHS] AppointmentScheduling -> [ACL] PatientPortal
+        - [OHS] ElectronicHealthRecords -> [ACL] PatientPortal
 
-ContextMap PatientExperience {
-    contains AppointmentScheduling, PatientPortal, ElectronicHealthRecords
+        // Patients book appointments
+        - PatientPortal -> AppointmentScheduling
 
-    // Patient portal integrates with scheduling and records
-    [OHS] AppointmentScheduling -> [ACL] PatientPortal
-    [OHS] ElectronicHealthRecords -> [ACL] PatientPortal
+ContextMap RevenueCycle:
+    contains:
+        - PatientBilling
+        - ElectronicHealthRecords
+        - AppointmentScheduling
+    relationships:
+        // Billing needs clinical and appointment data
+        - [OHS] ElectronicHealthRecords -> [ACL] PatientBilling
+        - AppointmentScheduling -> PatientBilling
 
-    // Patients book appointments
-    PatientPortal -> AppointmentScheduling
-}
+ContextMap MedicationSafety:
+    contains:
+        - MedicationManagement
+        - ElectronicHealthRecords
+        - LaboratoryInformationSystem
+    relationships:
+        // Medication management checks allergies and interactions
+        - [SK] MedicationManagement <-> ElectronicHealthRecords : SharedKernel
 
-ContextMap RevenueCycle {
-    contains PatientBilling, ElectronicHealthRecords, AppointmentScheduling
-
-    // Billing needs clinical and appointment data
-    [OHS] ElectronicHealthRecords -> [ACL] PatientBilling
-    AppointmentScheduling -> PatientBilling
-}
-
-ContextMap MedicationSafety {
-    contains MedicationManagement, ElectronicHealthRecords, LaboratoryInformationSystem
-
-    // Medication management checks allergies and interactions
-    [SK] MedicationManagement <-> ElectronicHealthRecords : SharedKernel
-
-    // Lab results influence medication decisions
-    LaboratoryInformationSystem -> MedicationManagement
-}
+        // Lab results influence medication decisions
+        - LaboratoryInformationSystem -> MedicationManagement
 
 // ============================================================================
 // Domain Map
 // ============================================================================
 
-DomainMap HealthcareEnterprise {
-    contains Healthcare, PatientCare, Administration, Pharmacy
-}
+DomainMap HealthcareEnterprise:
+    contains:
+        - Healthcare
+        - PatientCare
+        - Administration
+        - Pharmacy

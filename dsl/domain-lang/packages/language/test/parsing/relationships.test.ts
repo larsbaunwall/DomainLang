@@ -37,14 +37,17 @@ describe('Relationship Arrow Types', () => {
     test('should parse downstream arrow (->) ', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext -> PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext -> PaymentContext
         `;
 
         // Act
@@ -59,14 +62,17 @@ describe('Relationship Arrow Types', () => {
     test('should parse upstream arrow (<-)', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext <- PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext <- PaymentContext
         `;
 
         // Act
@@ -81,14 +87,17 @@ describe('Relationship Arrow Types', () => {
     test('should parse bidirectional arrow (<->)', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext <-> PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext <-> PaymentContext
         `;
 
         // Act
@@ -103,14 +112,17 @@ describe('Relationship Arrow Types', () => {
     test('should parse mutual dependency arrow (><)', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext >< PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext >< PaymentContext
         `;
 
         // Act
@@ -125,14 +137,17 @@ describe('Relationship Arrow Types', () => {
     test('should parse U/D shorthand (uppercase)', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext U/D PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext U/D PaymentContext
         `;
 
         // Act
@@ -147,14 +162,17 @@ describe('Relationship Arrow Types', () => {
     test('should parse u/d shorthand (lowercase)', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext u/d PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext u/d PaymentContext
         `;
 
         // Act
@@ -169,14 +187,17 @@ describe('Relationship Arrow Types', () => {
     test('should parse C/S shorthand (uppercase)', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext C/S PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext C/S PaymentContext
         `;
 
         // Act
@@ -191,14 +212,17 @@ describe('Relationship Arrow Types', () => {
     test('should parse c/s shorthand (lowercase)', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext c/s PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext c/s PaymentContext
         `;
 
         // Act
@@ -219,14 +243,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse Open Host Service [OHS]', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [OHS] OrderContext -> PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [OHS] OrderContext -> PaymentContext
         `;
 
         // Act
@@ -241,14 +268,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse Conformist [CF]', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext -> [CF] PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext -> [CF] PaymentContext
         `;
 
         // Act
@@ -263,14 +293,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse Anti-Corruption Layer [ACL]', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [ACL] OrderContext -> PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [ACL] OrderContext -> PaymentContext
         `;
 
         // Act
@@ -285,14 +318,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse Published Language [PL]', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [PL] OrderContext -> PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [PL] OrderContext -> PaymentContext
         `;
 
         // Act
@@ -307,14 +343,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse Partnership [P]', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [P] OrderContext <-> PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [P] OrderContext <-> PaymentContext
         `;
 
         // Act
@@ -329,14 +368,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse Shared Kernel [SK]', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [SK] OrderContext <-> PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [SK] OrderContext <-> PaymentContext
         `;
 
         // Act
@@ -351,14 +393,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse Big Ball of Mud [BBoM]', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [BBoM] OrderContext -> PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [BBoM] OrderContext -> PaymentContext
         `;
 
         // Act
@@ -373,14 +418,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse patterns on both sides', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [OHS] OrderContext -> [CF] PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [OHS] OrderContext -> [CF] PaymentContext
         `;
 
         // Act
@@ -396,14 +444,17 @@ describe('DDD Pattern Annotations', () => {
     test('should parse multiple patterns on one side', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [OHS, PL] OrderContext -> [CF, ACL] PaymentContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [OHS, PL] OrderContext -> [CF, ACL] PaymentContext
         `;
 
         // Act
@@ -427,14 +478,17 @@ describe('Relationship Types', () => {
     test('should parse Partnership type', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext <-> PaymentContext : Partnership
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext <-> PaymentContext : Partnership
         `;
 
         // Act
@@ -449,14 +503,17 @@ describe('Relationship Types', () => {
     test('should parse SharedKernel type', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext <-> PaymentContext : SharedKernel
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext <-> PaymentContext : SharedKernel
         `;
 
         // Act
@@ -471,14 +528,17 @@ describe('Relationship Types', () => {
     test('should parse CustomerSupplier type', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext -> PaymentContext : CustomerSupplier
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext -> PaymentContext : CustomerSupplier
         `;
 
         // Act
@@ -493,14 +553,17 @@ describe('Relationship Types', () => {
     test('should parse UpstreamDownstream type', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext -> PaymentContext : UpstreamDownstream
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext -> PaymentContext : UpstreamDownstream
         `;
 
         // Act
@@ -515,14 +578,17 @@ describe('Relationship Types', () => {
     test('should parse SeparateWays type', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext >< PaymentContext : SeparateWays
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext >< PaymentContext : SeparateWays
         `;
 
         // Act
@@ -543,14 +609,17 @@ describe('Combined Patterns and Types', () => {
     test('should parse patterns with relationship type', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                [OHS] OrderContext -> [CF] PaymentContext : CustomerSupplier
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - [OHS] OrderContext -> [CF] PaymentContext : CustomerSupplier
         `;
 
         // Act
@@ -567,17 +636,22 @@ describe('Combined Patterns and Types', () => {
     test('should parse multiple relationships in one context map', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            BC InventoryContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
+            BC InventoryContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext, InventoryContext
-                [OHS] OrderContext -> [CF] PaymentContext : CustomerSupplier
-                OrderContext <-> InventoryContext : Partnership
-                [ACL] PaymentContext <- InventoryContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                    - InventoryContext
+                - [OHS] OrderContext -> [CF] PaymentContext : CustomerSupplier
+                - OrderContext <-> InventoryContext : Partnership
+                - [ACL] PaymentContext <- InventoryContext
         `;
 
         // Act
@@ -598,13 +672,13 @@ describe('BC Internal Relationships', () => {
     test('should parse this reference on left side', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales {
-                relationships {
-                    this -> OrderContext
-                }
-            }
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
+                relationships:
+                    - this -> OrderContext
         `;
 
         // Act
@@ -617,13 +691,13 @@ describe('BC Internal Relationships', () => {
     test('should parse this reference with patterns', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales {
-                relationships {
-                    [OHS] this -> [CF] OrderContext : CustomerSupplier
-                }
-            }
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
+                relationships:
+                    - [OHS] this -> [CF] OrderContext : CustomerSupplier
         `;
 
         // Act
@@ -636,15 +710,16 @@ describe('BC Internal Relationships', () => {
     test('should parse multiple relationships in BC', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC InventoryContext for Sales
-            BC PaymentContext for Sales {
-                relationships {
-                    this -> OrderContext
-                    this <-> InventoryContext
-                }
-            }
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC InventoryContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
+                relationships:
+                    - this -> OrderContext
+                    - this <-> InventoryContext
         `;
 
         // Act
@@ -657,15 +732,18 @@ describe('BC Internal Relationships', () => {
     test('should parse relationships with commas', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            Domain Sales:
+            BC OrderContext:
+                for: Sales
+            BC PaymentContext:
+                for: Sales
             
-            ContextMap TestMap {
-                contains OrderContext, PaymentContext
-                OrderContext -> PaymentContext,
-                PaymentContext <- OrderContext
-            }
+            ContextMap TestMap:
+                contains:
+                    - OrderContext
+                    - PaymentContext
+                - OrderContext -> PaymentContext
+                - PaymentContext <- OrderContext
         `;
 
         // Act

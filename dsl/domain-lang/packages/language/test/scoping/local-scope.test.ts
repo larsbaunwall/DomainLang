@@ -12,13 +12,12 @@ describe('Scoping: Local Scope', () => {
     test('resolves domain reference in bounded context', async () => {
         // Arrange
         const input = s`
-            Domain Sales {
+            Domain Sales:
                 description: "Sales domain"
-            }
             
-            BoundedContext OrderContext for Sales {
+            BoundedContext OrderContext:
+                for: Sales
                 description: "Order management"
-            }
         `;
 
         // Act
@@ -36,11 +35,11 @@ describe('Scoping: Local Scope', () => {
         // Arrange
         const input = s`
             Team SalesTeam
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
+            BoundedContext OrderContext:
+                for: Sales
                 team: SalesTeam
-            }
         `;
 
         // Act
@@ -62,11 +61,11 @@ describe('Scoping: Local Scope', () => {
         // Arrange
         const input = s`
             Classification Core
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
+            BoundedContext OrderContext:
+                for: Sales
                 role: Core
-            }
         `;
 
         // Act

@@ -7,7 +7,7 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 import type { TestServices } from '../test-helpers.js';
 import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
-import { isBoundedContext, isClassification } from '../../src/generated/ast.js';
+import { isBoundedContext, isClassification, isNamespaceDeclaration } from '../../src/generated/ast.js';
 
 describe('Decision Classification', () => {
     let testServices: TestServices;
@@ -43,14 +43,13 @@ describe('Decision Classification', () => {
             Classification Architectural
             Classification Business
             
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales {
-                decisions {
-                    decision [Architectural] UseEventSourcing: "We will use event sourcing for order history",
-                    policy [Business] RefundWindow: "Refunds allowed within 30 days"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                decisions:
+                    - decision [Architectural] UseEventSourcing: "We will use event sourcing for order history"
+                    - policy [Business] RefundWindow: "Refunds allowed within 30 days"
         `;
         
         // Act
@@ -71,27 +70,27 @@ describe('Decision Classification', () => {
     test('should support qualified names for decision Classification', async () => {
         // Arrange
         const input = s`
-            namespace governance {
+            Domain Sales:
+
+            namespace governance:
                 Classification Architectural
                 Classification Business
-            }
-            
-            Domain Sales {}
-            
-            BoundedContext OrderContext for Sales {
-                decisions {
-                    decision [governance.Architectural] UseEventSourcing: "Event sourcing for audit trail"
-                }
-            }
+
+                BoundedContext OrderContext:
+                    for: Sales
+                    decisions:
+                        - decision [governance.Architectural] UseEventSourcing: "Event sourcing for audit trail"
         `;
         
         // Act
         const document = await testServices.parse(input);
         expectValidDocument(document);
         const model = document.parseResult.value;
-        const bc = model.children.find(isBoundedContext);
+        const ns = model.children.find(isNamespaceDeclaration);
+        const bc = ns?.children.find(isBoundedContext);
         
         // Assert
+        expect(ns).toBeDefined();
         expect(bc).toBeDefined();
         const decisionsBlock = bc!.documentation.find(d => d.$type === 'DecisionsBlock');
         expect(decisionsBlock).toBeDefined();
@@ -104,14 +103,14 @@ describe('Decision Classification', () => {
             Classification Core
             Classification Architectural
             
-            Domain Sales {}
+            Domain Sales:
             
-            BoundedContext OrderContext for Sales as Core {
-                decisions {
-                    decision [Architectural] EventSourcing: "Use event sourcing",
-                    decision [Core] DomainEvents: "Publish domain events"
-                }
-            }
+            BoundedContext OrderContext:
+                for: Sales
+                as: Core
+                decisions:
+                    - decision [Architectural] EventSourcing: "Use event sourcing"
+                    - decision [Core] DomainEvents: "Publish domain events"
         `;
         
         // Act

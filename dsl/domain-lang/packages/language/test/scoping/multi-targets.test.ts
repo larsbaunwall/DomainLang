@@ -13,20 +13,20 @@ describe('Scoping: Multi-Target References', () => {
     test('resolves multiple bounded contexts with same name', async () => {
         // Arrange
         const input = s`
-            Domain Sales {}
-            Domain Support {}
+            Domain Sales:
+            Domain Support:
             
-            BoundedContext CustomerManagement for Sales {
+            BoundedContext CustomerManagement:
+                for: Sales
                 description: "Sales customer management"
-            }
             
-            BoundedContext CustomerManagement for Support {
+            BoundedContext CustomerManagement:
+                for: Support
                 description: "Support customer management"
-            }
             
-            ContextMap AllCustomerContexts {
-                contains CustomerManagement
-            }
+            ContextMap AllCustomerContexts:
+                contains:
+                    - CustomerManagement
         `;
 
         // Act
@@ -50,20 +50,20 @@ describe('Scoping: Multi-Target References', () => {
     test('handles same-named contexts in different domains', async () => {
         // Arrange
         const input = s`
-            Domain Marketing {}
-            Domain Sales {}
+            Domain Marketing:
+            Domain Sales:
             
-            BoundedContext Campaigns for Marketing {
+            BoundedContext Campaigns:
+                for: Marketing
                 description: "Marketing campaigns"
-            }
             
-            BoundedContext Campaigns for Sales {
+            BoundedContext Campaigns:
+                for: Sales
                 description: "Sales campaigns"
-            }
             
-            ContextMap AllCampaigns {
-                contains Campaigns
-            }
+            ContextMap AllCampaigns:
+                contains:
+                    - Campaigns
         `;
 
         // Act
