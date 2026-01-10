@@ -8,7 +8,6 @@
 import { describe, test, beforeAll, expect } from 'vitest';
 import type { TestServices } from '../test-helpers.js';
 import { setupTestSuite, expectValidDocument, getFirstBoundedContext, getFirstDomain, s } from '../test-helpers.js';
-import { isContextMap, isDomainMap, isNamespaceDeclaration } from '../../src/generated/ast.js';
 
 let testServices: TestServices;
 
@@ -94,21 +93,6 @@ describe('BoundedContext Keyword Variants', () => {
         const input = s`
             Domain Sales {}
             BC OrderContext for Sales
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        expect(getFirstBoundedContext(document).name).toBe('OrderContext');
-    });
-
-    test('should parse Context keyword', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            Context OrderContext for Sales
         `;
 
         // Act
@@ -332,46 +316,12 @@ describe('BC Inline Assignment Variants', () => {
         expect(bc.role?.ref?.name).toBe('Core');
     });
 
-    test('should parse tagged: for role', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            Classification Core
-            BC OrderContext for Sales tagged: Core
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const bc = getFirstBoundedContext(document);
-        expect(bc.role?.ref?.name).toBe('Core');
-    });
-
     test('should parse by keyword for team', async () => {
         // Arrange
         const input = s`
             Domain Sales {}
             Team SalesTeam
             BC OrderContext for Sales by SalesTeam
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const bc = getFirstBoundedContext(document);
-        expect(bc.team?.ref?.name).toBe('SalesTeam');
-    });
-
-    test('should parse owner: for team', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            Team SalesTeam
-            BC OrderContext for Sales owner: SalesTeam
         `;
 
         // Act
@@ -406,26 +356,6 @@ describe('BC Documentation Block Variants', () => {
         expectValidDocument(document);
     });
 
-    // Note: 'owner' alone is not a valid keyword per grammar
-    // Use 'owner:' as inline syntax or 'managed by' in documentation block
-
-    test('should parse managed by keywords', async () => {
-        // Arrange
-        const input = s`
-            Team SalesTeam
-            Domain Sales {}
-            BC OrderContext for Sales {
-                managed by: SalesTeam
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
-
     test('should parse role keyword', async () => {
         // Arrange
         const input = s`
@@ -433,23 +363,6 @@ describe('BC Documentation Block Variants', () => {
             Domain Sales {}
             BC OrderContext for Sales {
                 role: Core
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
-
-    test('should parse domain role keywords', async () => {
-        // Arrange
-        const input = s`
-            Classification Core
-            Domain Sales {}
-            BC OrderContext for Sales {
-                domain role: Core
             }
         `;
 

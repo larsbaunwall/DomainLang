@@ -82,19 +82,19 @@ DomainDocumentationBlock:
  * Belongs to exactly ONE domain (fundamental DDD principle).
  */
 BoundedContext:
-    (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'boundedcontext' | 'BC' | 'Context') name=ID 
+    (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'boundedcontext' | 'BC') name=ID 
     ('for' domain=[Domain:QualifiedName])?
     (
-        (('as' | 'tagged:') role=[Classification:QualifiedName])?
-        (('by' | 'owner:') team=[Team:QualifiedName])?
+        ('as' role=[Classification:QualifiedName])?
+        ('by' team=[Team:QualifiedName])?
     )?
     ('{' documentation+=BoundedContextDocumentationBlock* '}')?
 ;
 
 BoundedContextDocumentationBlock:
       {DescriptionBlock} 'description' Assignment description=STRING
-    | {TeamBlock} (TeamAssignment | 'owner' | ('managed' 'by')) Assignment owner=[Team:QualifiedName]
-    | {RoleBlock} ('role' | ('domain' 'role')) Assignment role=[Classification:QualifiedName]
+    | {TeamBlock} TeamAssignment Assignment owner=[Team:QualifiedName]
+    | {RoleBlock} 'role' Assignment role=[Classification:QualifiedName]
     | {BusinessModelBlock} ('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName]
     | {EvolutionBlock} ('evolution' | 'maturity') Assignment evolution=[Classification:QualifiedName]
     | {ClassifiersBlock} 'classifiers' '{'
@@ -188,9 +188,15 @@ BoundedContextRef:
 
 /**
  * Relationship arrows - symbolic and named types.
+ * 
+ * Arrow semantics:
+ *   ->   Upstream to downstream (left provides, right consumes)
+ *   <-   Downstream to upstream (right provides, left consumes)
+ *   <->  Bidirectional/Partnership (mutual dependency)
+ *   ><   Separate Ways (no integration, teams go their own way)
  */
 RelationshipArrow returns string:
-    '<->' | '->' | '<-' | '><'
+    '<->' | '->' | '<-' | '><'  // Separate Ways
     | 'U/D' | 'u/d'  // UpstreamDownstream
     | 'C/S' | 'c/s'  // CustomerSupplier
 ;
@@ -228,7 +234,7 @@ RelationshipType returns string:
  * Supports synonyms and examples for richer glossaries.
  */
 DomainTerm:
-    ('term' | 'Term' | 'define') name=ID (Assignment meaning=STRING)?
+    ('term' | 'Term') name=ID (Assignment meaning=STRING)?
     (('aka' | 'aka:' | 'synonyms' | 'synonyms:') synonyms+=ID (',' synonyms+=ID)*)?
     (('examples' | 'examples:' | 'e.g.' | 'e.g.:') examples+=STRING (',' examples+=STRING)*)?
 ;
@@ -279,8 +285,9 @@ BusinessRule:
 ImportStatement:
     /** Imports types or namespaces from another file or module, enabling reuse and modularity. */ 'import' (
         '{' symbols+=ID (',' symbols+=ID)* '}' 'from' uri=STRING
-        | uri=STRING ('as' alias=ID)?
+        | uri=STRING
         ('integrity' integrity=STRING)?
+        ('as' alias=ID)?
     )
 ;
 

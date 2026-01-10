@@ -286,7 +286,7 @@ describe('Import Integrity', () => {
     test('should parse import with alias and integrity', async () => {
         // Arrange
         const input = s`
-            import "owner/repo@v1.0.0" as Patterns integrity "sha512-xyz789"
+            import "owner/repo@v1.0.0" integrity "sha512-xyz789" as Patterns
             
             Domain Sales {}
         `;

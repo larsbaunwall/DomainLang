@@ -123,28 +123,6 @@ describe('Term Keyword Variants', () => {
         const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
         expect(terminologyBlock.terms[0].name).toBe('Order');
     });
-
-    test('should parse define keyword', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            
-            BoundedContext OrderContext for Sales {
-                terminology {
-                    define Order: "A customer purchase request"
-                }
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock.terms[0].name).toBe('Order');
-    });
 });
 
 // ============================================================================
@@ -361,7 +339,7 @@ describe('Complex Term Definitions', () => {
             
             BoundedContext OrderContext for Sales {
                 terminology {
-                    define Customer: "A person or organization that purchases products" aka Client, Buyer examples "Acme Corp", "John Doe"
+                    term Customer: "A person or organization that purchases products" aka Client, Buyer examples "Acme Corp", "John Doe"
                 }
             }
         `;
@@ -389,7 +367,7 @@ describe('Complex Term Definitions', () => {
             BoundedContext OrderContext for Sales {
                 terminology {
                     term Order: "Purchase request" aka Purchase examples "ORD-001", "ORD-002"
-                    define LineItem: "Single product in order" synonyms OrderLine
+                    Term LineItem: "Single product in order" synonyms OrderLine
                     Term Discount: "Price reduction" e.g. "10% off", "Buy one get one"
                 }
             }

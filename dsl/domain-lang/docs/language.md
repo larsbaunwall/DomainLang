@@ -79,9 +79,9 @@ BC Checkout for Sales as Core by PaymentsTeam {
 }
 ```
 
-- Declares a bounded context. The keywords `BoundedContext`, `boundedcontext`, `BC`, and `Context` are equivalent to ease authoring.
+- Declares a bounded context. The keywords `BoundedContext`, `boundedcontext`, and `BC` are equivalent to ease authoring.
 - Optional domain association: `for` followed by a `Domain` FQN; this informs strategic alignment and controls certain validators.
-- Inline assignments let you set the primary role (`as` / `tagged:`) and owning team (`by` / `owner:`); these synthesize default documentation block entries.
+- Inline assignments let you set the primary role (`as`) and owning team (`by`); these synthesize default documentation block entries.
 - Optional documentation block adds more metadata (see **Documentation blocks** below). When omitted, the context body may be empty, producing a pure declaration node.
 
 ### Classification and Team
@@ -104,7 +104,7 @@ Available blocks include:
 | `description` | Short human-readable summary (string literal). |
 | `vision` | Long-term intent statement (domains only). |
 | `classifier` / `role` / `businessModel` / `evolution` | Cross-reference to a `Classification` node. The `classifiers { ... }` block bundles multiple assignments together. |
-| `team`, `owner`, `managed by` | Cross-reference to a `Team` node. |
+| `team` | Cross-reference to a `Team` node. |
 | `relationships` / `integrations` / `connections` | Inline relationship definitions (see **Context maps**). |
 | `terminology` / `language` / `glossary` | Collection of `term` declarations. |
 | `decisions` / `constraints` / `rules` / `policies` | Governance decisions, policies, or rules. |
@@ -172,7 +172,7 @@ DomainMap CorporatePortfolio {
 ### Relationship syntax
 
 - Roles: choose from `PL`, `OHS`, `CF`, `ACL`, `P`, `SK`, or `BBoM`.
-- Arrows: `<->`, `->`, `<-`, `><`, or shorthand semantics `U/D`, `C/S` in uppercase or lowercase.
+- Arrows: `<->`, `->`, `<-`, `><` (Separate Ways - no integration), or shorthand semantics `U/D`, `C/S` in uppercase or lowercase.
 - Type label: optional identifier like `Partnership`, `SharedKernel`, `CustomerSupplier`, `UpstreamDownstream`, or `SeparateWays`.
 - Context references accept `this` via the `BoundedContextRef` special rule.
 

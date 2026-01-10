@@ -193,7 +193,7 @@ describe('Grammar Completeness Tests', () => {
                         
                         terminology {
                             term Order: "Customer order"
-                            define Product: "Item for sale" aka Item examples "Laptop", "Mouse"
+                            Term Product: "Item for sale" aka Item examples "Laptop", "Mouse"
                         }
                         
                         decisions {
@@ -388,11 +388,11 @@ describe('Grammar Completeness Tests', () => {
                         terminology {
                             term Order
                             Term Customer: "Person who buys"
-                            define Product: "Item for sale"
+                            term Product: "Item for sale"
                             term Service aka Offering, Alternative
                             term Feature synonyms Capability, Function
                             term Invoice examples "INV-001", "INV-002"
-                            define Payment: "Money transfer" aka Transaction examples "Credit Card", "PayPal"
+                            Term Payment: "Money transfer" aka Transaction examples "Credit Card", "PayPal"
                         }
                     }
                 `,

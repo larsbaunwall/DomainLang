@@ -19,7 +19,7 @@ BC ContextName for DomainName {
 | Concept | Keywords | Shorthand |
 |---------|----------|-----------|
 | Domain | `Domain` | - |
-| Bounded Context | `BoundedContext`, `boundedcontext` | `BC`, `Context` |
+| Bounded Context | `BoundedContext`, `boundedcontext` | `BC` |
 | Team | `Team` | - |
 | Classification | `Classification` | - |
 | Context Map | `ContextMap` | - |
@@ -127,6 +127,7 @@ ContextMap System {
     A -> B                              // upstream -> downstream
     A <- B                              // downstream <- upstream
     A <-> B                             // bidirectional
+    A >< B                              // separate ways (no integration)
 
     // Named relationships
     A -> B
