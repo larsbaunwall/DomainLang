@@ -37,13 +37,17 @@ npm test                  # Run tests
 
 ## Critical Rules
 
+### Git operations
+
+1. **NEVER** commit to git without my explicit approval
+2. **ALWAYS** use conventional commit messages
+
 ### 🔴 Grammar Changes
 
 1. **NEVER** edit `packages/language/src/generated/**` files
 2. **ALWAYS** run `npm run langium:generate` after editing `.langium` files
 3. **ALWAYS** run `npm run build` to compile TypeScript
 4. **ALWAYS** add test cases for parsing changes
-5. **NEVER** commit to git without my explicit approval
 
 ### Code Standards
 
