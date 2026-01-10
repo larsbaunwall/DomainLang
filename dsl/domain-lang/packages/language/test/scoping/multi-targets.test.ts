@@ -11,7 +11,8 @@ beforeAll(() => {
 
 describe('Scoping: Multi-Target References', () => {
     test('resolves multiple bounded contexts with same name', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Domain Sales {}
             Domain Support {}
             
@@ -26,8 +27,12 @@ describe('Scoping: Multi-Target References', () => {
             ContextMap AllCustomerContexts {
                 contains CustomerManagement
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const contextMap = document.parseResult.value.children.find(child => isContextMap(child));
@@ -43,7 +48,8 @@ describe('Scoping: Multi-Target References', () => {
     });
 
     test('handles same-named contexts in different domains', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Domain Marketing {}
             Domain Sales {}
             
@@ -58,8 +64,12 @@ describe('Scoping: Multi-Target References', () => {
             ContextMap AllCampaigns {
                 contains Campaigns
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const contextMap = document.parseResult.value.children.find(child => isContextMap(child));

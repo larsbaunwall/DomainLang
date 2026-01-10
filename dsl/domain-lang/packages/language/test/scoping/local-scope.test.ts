@@ -10,7 +10,8 @@ beforeAll(() => {
 
 describe('Scoping: Local Scope', () => {
     test('resolves domain reference in bounded context', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Domain Sales {
                 description: "Sales domain"
             }
@@ -18,8 +19,12 @@ describe('Scoping: Local Scope', () => {
             BoundedContext OrderContext for Sales {
                 description: "Order management"
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);
@@ -28,15 +33,20 @@ describe('Scoping: Local Scope', () => {
     });
 
     test('resolves team reference in bounded context', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Team SalesTeam
             Domain Sales {}
             
             BoundedContext OrderContext for Sales {
                 team: SalesTeam
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);
@@ -49,15 +59,20 @@ describe('Scoping: Local Scope', () => {
     });
 
     test('resolves classification reference', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Classification Core
             Domain Sales {}
             
             BoundedContext OrderContext for Sales {
                 role: Core
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);

@@ -11,7 +11,8 @@ beforeAll(() => {
 
 describe('Scoping: Edge Cases', () => {
     test('handles forward references', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             BoundedContext OrderContext for Sales {
                 description: "Order management"
             }
@@ -19,8 +20,12 @@ describe('Scoping: Edge Cases', () => {
             Domain Sales {
                 description: "Sales domain - defined after BC"
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);
@@ -29,7 +34,8 @@ describe('Scoping: Edge Cases', () => {
     });
 
     test('resolves this reference in relationships', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Domain Sales {}
             BoundedContext OrderContext for Sales
             BoundedContext PaymentContext for Sales
@@ -39,8 +45,12 @@ describe('Scoping: Edge Cases', () => {
                     [OHS] this -> [CF] PaymentContext : CustomerSupplier
                 }
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         // 'this' should resolve to the containing bounded context
@@ -59,13 +69,17 @@ describe('Scoping: Edge Cases', () => {
     });
 
     test('handles circular references gracefully', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Domain A in B {}
             Domain B in C {}
             Domain C in A {}
-        `);
+        `;
 
-        // Should parse but may generate validation warnings
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert - Should parse but may generate validation warnings
         expectValidDocument(document);
         
         // All domain references should still resolve
@@ -80,14 +94,18 @@ describe('Scoping: Edge Cases', () => {
     });
 
     test('handles missing references gracefully', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             BoundedContext OrderContext for NonExistentDomain {
                 team: NonExistentTeam
                 role: NonExistentClassification
             }
-        `);
+        `;
 
-        // Should parse but references won't resolve
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert - Should parse but references won't resolve
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);

@@ -10,6 +10,7 @@ beforeAll(() => {
 
 describe('Scoping: Performance', () => {
     test('handles large number of elements efficiently', async () => {
+        // Arrange
         const domainDefinitions = Array.from({ length: 50 }, (_, i) => 
             `Domain Domain${i} {}`
         ).join('\n');
@@ -18,11 +19,15 @@ describe('Scoping: Performance', () => {
             `BoundedContext BC${i} for Domain${i % 50}`
         ).join('\n');
         
-        const document = await testServices.parse(s`
+        const input = s`
             ${domainDefinitions}
             ${bcDefinitions}
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const boundedContexts = getAllBoundedContexts(document);

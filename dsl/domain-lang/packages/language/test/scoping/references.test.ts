@@ -11,7 +11,8 @@ beforeAll(() => {
 
 describe('Scoping: References', () => {
     test('resolves bounded context references in relationships', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Domain Sales {}
             BoundedContext OrderContext for Sales
             BoundedContext PaymentContext for Sales
@@ -20,8 +21,12 @@ describe('Scoping: References', () => {
                 contains OrderContext, PaymentContext
                 [OHS] OrderContext -> [CF] PaymentContext : CustomerSupplier
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const contextMap = document.parseResult.value.children.find(isContextMap);
@@ -39,7 +44,8 @@ describe('Scoping: References', () => {
     });
 
     test('resolves domain hierarchy parent reference', async () => {
-        const document = await testServices.parse(s`
+        // Arrange
+        const input = s`
             Domain Commerce {
                 description: "Main commerce domain"
             }
@@ -47,8 +53,12 @@ describe('Scoping: References', () => {
             Domain Sales in Commerce {
                 description: "Sales subdomain"
             }
-        `);
+        `;
 
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
         expectValidDocument(document);
         
         const salesDomain = document.parseResult.value.children
