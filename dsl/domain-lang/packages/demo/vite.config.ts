@@ -22,7 +22,9 @@ export default defineConfig((): UserConfig => {
                 'node:fs/promises': path.resolve(__dirname, 'src/shims/node-fs-promises.ts'),
                 'node:fs': path.resolve(__dirname, 'src/shims/node-fs.ts'),
                 'node:os': path.resolve(__dirname, 'src/shims/node-os.ts'),
-                'node:worker_threads': path.resolve(__dirname, 'src/shims/node-worker-threads.ts')
+                'node:worker_threads': path.resolve(__dirname, 'src/shims/node-worker-threads.ts'),
+                'node:util': path.resolve(__dirname, 'src/shims/node-util.ts'),
+                'node:child_process': path.resolve(__dirname, 'src/shims/node-child-process.ts')
             }
         },
         optimizeDeps: {
