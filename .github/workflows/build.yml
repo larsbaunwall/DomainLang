@@ -53,10 +53,6 @@ jobs:
         id: get_version
         run: echo "version=$(node -p "require('./dsl/domain-lang/package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Build web version
-        run: npm run bundle
-        working-directory: ./dsl/domain-lang
-
       - name: Build VSIX
         run: |
           mkdir -p ./dist
