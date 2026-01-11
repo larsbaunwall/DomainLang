@@ -179,14 +179,14 @@ describe('DomainMap Keyword Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse dm shorthand', async () => {
+    test('should parse dmap shorthand', async () => {
         // Arrange
         const input = s`
             Domain Sales {
                 vision: "Sales domain"
             }
             
-            dm BusinessMap {
+            dmap BusinessMap {
                 contains Sales
             }
         `;

@@ -49,8 +49,8 @@ bc ContextName for DomainName {
 | Bounded Context | `BoundedContext` | `bc` |
 | Team | `Team` | — |
 | Classification | `Classification` | — |
-| Context Map | `ContextMap` | `cm` |
-| Domain Map | `DomainMap` | `dm` |
+| Context Map | `ContextMap` | `cmap` |
+| Domain Map | `DomainMap` | `dmap` |
 | Namespace | `Namespace` | `ns` |
 | Import | `Import` | `import` |
 

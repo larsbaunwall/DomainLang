@@ -144,7 +144,7 @@ ObjectMap:
  * Shows integration patterns and team interactions.
  */
 ContextMap:
-    (/** A Context Map visualizes and documents the relationships between Bounded Contexts, including their integration patterns. */ 'ContextMap' | 'cm') name=ID
+    (/** A Context Map visualizes and documents the relationships between Bounded Contexts, including their integration patterns. */ 'ContextMap' | 'cmap') name=ID
     '{'
         ('contains' boundedContexts += [+BoundedContext:QualifiedName] ((",")? boundedContexts += [+BoundedContext:QualifiedName])*)*
         (relationships += Relationship ((",")? relationships += Relationship)*)*
@@ -156,7 +156,7 @@ ContextMap:
  * Shows high-level domain organization and subdomain structure.
  */
 DomainMap:
-    (/** A Domain Map visualizes and documents the relationships between Domains. */ 'DomainMap' | 'dm') name=ID
+    (/** A Domain Map visualizes and documents the relationships between Domains. */ 'DomainMap' | 'dmap') name=ID
     '{'
         ('contains' domains += [+Domain:QualifiedName] ((",")? domains += [+Domain:QualifiedName])*)*
     '}'
