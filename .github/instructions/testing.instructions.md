@@ -21,6 +21,7 @@ applyTo: "**/*.test.ts"
 - **Use validation helpers** instead of manual error checks
 - **One assertion focus** per test
 - **Never change original code** just to make it easier to test
+- **Document the feature** - If adding feature tests, also update docs (see Documentation Checklist below)
 
 ## Test Setup
 
@@ -353,6 +354,28 @@ test('handles large number of elements', async () => {
 - Use `DocumentBuilder.build()` explicitly
 - Use vague test names like `test('test1', ...)`
 - Write tests that always pass
+
+## Documentation Checklist
+
+**For new grammar features, keywords, or DSL constructs, update documentation alongside tests:**
+
+- [ ] **language.md** — Add section explaining feature, syntax, and semantics
+- [ ] **quick-reference.md** — Add concise example suitable for quick lookup
+- [ ] **syntax-examples.md** — Add comprehensive examples showing usage patterns
+- [ ] **Examples** — Create `.dlang` example files demonstrating real-world usage
+- [ ] **JSDoc** — Document validation rules and AST interfaces with JSDoc
+
+**Examples of features requiring documentation:**
+- New keywords or grammar rules (e.g., `metadata`, `Metadata`)
+- New documentation blocks (e.g., `terminology`, `decisions`)
+- New DSL constructs or top-level elements
+- New validation rules or semantic constraints
+- New cross-reference types
+
+**Not requiring documentation updates:**
+- Bug fixes that don't add new syntax
+- Internal refactoring
+- Performance optimizations
 
 ## Quality Checklist
 

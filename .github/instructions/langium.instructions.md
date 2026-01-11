@@ -358,9 +358,32 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
 1. Edit `.langium` grammar
 2. Run `npm run langium:generate`
 3. Implement/update services
-4. Write tests
-5. Run `npm run build`
-6. Run `npm test`
+4. **Update documentation** (see below)
+5. Write tests
+6. Run `npm run build`
+7. Run `npm test`
+
+## Documentation Requirements for Grammar Changes
+
+**When adding new keywords, rules, or grammar constructs:**
+
+- [ ] Update language documentation with syntax explanation and semantics
+- [ ] Add concise example to quick reference guide
+- [ ] Add comprehensive examples to syntax examples documentation
+- [ ] Create `.dlang` example files in the examples directory
+- [ ] Add JSDoc comments to grammar rules and generated types
+- [ ] Document any new validation rules in the rule's JSDoc
+
+**Documentation files to update (in `dsl/domain-lang/docs/`):**
+- `language.md` - Full syntax and semantics
+- `quick-reference.md` - Concise examples for quick lookup
+- `syntax-examples.md` - Comprehensive, copy-paste ready examples
+- `examples/*.dlang` - Real-world example models
+
+**Skip documentation for:**
+- Internal refactoring with no syntax changes
+- Bug fixes that don't add new syntax
+- Performance optimizations
 
 ## Validation
 

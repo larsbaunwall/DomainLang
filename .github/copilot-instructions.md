@@ -9,6 +9,10 @@
 - Write readable, self-documenting code
 - Every change must have tests
 
+## Critical tools
+
+- Use the perplexity tools to do research on unfamiliar topics and search the web for relevant information 
+
 ## Project Context
 
 - **What:** Compilable DSL for DDD specification with LSP tooling
@@ -54,6 +58,16 @@ npm test                  # Run tests
 2. **ALWAYS** run `npm run langium:generate` after editing `.langium` files
 3. **ALWAYS** run `npm run build` to compile TypeScript
 4. **ALWAYS** add test cases for parsing changes
+5. **ALWAYS** update documentation for new keywords/constructs (see below)
+
+### 📚 Documentation Requirements
+
+**For new grammar features, keywords, or DSL constructs:**
+- **language.md** - Full explanation, syntax, semantics, and usage examples
+- **quick-reference.md** - Concise example suitable for quick lookup
+- **syntax-examples.md** - Comprehensive examples with multiple patterns
+- **Example files** - Create `.dlang` example files demonstrating real-world usage
+- **JSDoc** - Comment grammar rules and validation functions
 
 ### Code Quality & Linting
 
