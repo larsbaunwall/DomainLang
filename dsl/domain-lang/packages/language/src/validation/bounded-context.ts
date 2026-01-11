@@ -1,6 +1,6 @@
 import type { ValidationAcceptor } from 'langium';
 import type { BoundedContext, BoundedContextDocumentationBlock } from '../generated/ast.js';
-import { isDescriptionBlock } from '../generated/ast.js';
+import { isDescriptionBlock, isRoleBlock, isTeamBlock, isBoundedContextClassificationBlock } from '../generated/ast.js';
 import { ValidationMessages } from './constants.js';
 
 /**
@@ -24,4 +24,59 @@ function validateBoundedContextHasDescription(
     }
 }
 
-export const boundedContextChecks = [validateBoundedContextHasDescription]; 
+/**
+ * Validates conflicts between inline and block properties in a bounded context.
+ * Inline assignments ('as', 'by') should not be duplicated in documentation blocks.
+ * When both forms are used, inline values take precedence.
+ *
+ * FR-2.3: Inline/Block Conflict Validation
+ */
+function validateBoundedContextInlineBlockConflicts(
+    bc: BoundedContext,
+    accept: ValidationAcceptor
+): void {
+    // Role conflict: inline 'as' vs block 'role' or classifications.role
+    const inlineRoleName = bc.role?.ref?.name;
+    let blockRoleName: string | undefined;
+    if (bc.documentation) {
+        for (const block of bc.documentation) {
+            if (isRoleBlock(block) && block.role?.ref?.name) {
+                blockRoleName = block.role.ref.name;
+                break;
+            }
+            if (isBoundedContextClassificationBlock(block) && block.role?.ref?.name) {
+                blockRoleName = block.role.ref.name;
+                break;
+            }
+        }
+    }
+    if (inlineRoleName && blockRoleName) {
+        accept('warning', ValidationMessages.BOUNDED_CONTEXT_ROLE_CONFLICT(bc.name, inlineRoleName, blockRoleName), {
+            node: bc,
+            property: 'documentation'
+        });
+    }
+
+    // Team conflict: inline 'by' vs block 'team'
+    const inlineTeamName = bc.team?.ref?.name;
+    let blockTeamName: string | undefined;
+    if (bc.documentation) {
+        for (const block of bc.documentation) {
+            if (isTeamBlock(block) && block.team?.ref?.name) {
+                blockTeamName = block.team.ref.name;
+                break;
+            }
+        }
+    }
+    if (inlineTeamName && blockTeamName) {
+        accept('warning', ValidationMessages.BOUNDED_CONTEXT_TEAM_CONFLICT(bc.name, inlineTeamName, blockTeamName), {
+            node: bc,
+            property: 'documentation'
+        });
+    }
+}
+
+export const boundedContextChecks = [
+    validateBoundedContextHasDescription,
+    validateBoundedContextInlineBlockConflicts
+]; 
