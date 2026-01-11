@@ -21,8 +21,12 @@
 ```bash
 npm run langium:generate  # REQUIRED after .langium changes
 npm run build             # Full build of all workspaces
+npm run lint              # Check code quality (MUST be clean)
+npm run lint:fix          # Auto-fix fixable violations
 npm test                  # Run tests
 ```
+
+**⚠️ CRITICAL:** Every code change MUST pass `npm run lint` with zero violations before committing.
 
 ## Architecture
 
@@ -50,6 +54,28 @@ npm test                  # Run tests
 2. **ALWAYS** run `npm run langium:generate` after editing `.langium` files
 3. **ALWAYS** run `npm run build` to compile TypeScript
 4. **ALWAYS** add test cases for parsing changes
+
+### Code Quality & Linting
+
+**Linting is mandatory and non-negotiable:**
+- Every change must pass `npm run lint` with **0 errors, 0 warnings**
+- Use `npm run lint:fix` to auto-fix most violations
+- If a warning must be suppressed, add ESLint disable comment with reason
+- Test files can have pragmatic exceptions for setup code (document why)
+
+**ESLint Rules Enforced:**
+- ✅ No implicit `any` types (use `unknown` with type guards)
+- ✅ No unused variables (prefix unused params with `_`)
+- ✅ No unsafe `!` assertions in production code
+- ✅ No `console.log()` in libraries (only `warn`/`error`)
+- ✅ Explicit return types on public functions
+
+**Before ANY commit:**
+```bash
+npm run lint              # Must report: 0 errors, 0 warnings
+npm run build             # Must succeed
+npm test                  # Must pass
+```
 
 ### Code Standards
 
@@ -91,9 +117,15 @@ test('should parse domain with vision', async () => {
 ### Before Committing
 
 ```bash
-npm run build  # Must succeed
-npm test       # Must pass
+npm run lint              # Must pass: 0 errors, 0 warnings
+npm run build             # Must succeed
+npm test                  # Must pass
 ```
+
+**If linting fails, fix immediately:**
+1. Run `npm run lint:fix` to auto-fix
+2. For warnings that can't auto-fix, understand why and suppress with comment
+3. Never commit code with linting violations
 
 ## Language Quick Reference
 

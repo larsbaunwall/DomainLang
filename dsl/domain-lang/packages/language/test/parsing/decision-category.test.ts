@@ -3,6 +3,7 @@
  * 
  * Tests that decisions can be categorized using Classification labels.
  */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { beforeAll, describe, expect, test } from 'vitest';
 import type { TestServices } from '../test-helpers.js';

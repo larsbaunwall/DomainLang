@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, expect, it } from 'vitest';
 import { setupTestSuite, expectValidDocument } from '../test-helpers.js';
 import { QualifiedNameProvider, toQualifiedName } from '../../src/lsp/domain-lang-naming.js';

@@ -73,13 +73,38 @@ Every feature flows through three layers:
 3. **Regenerate:** `npm run langium:generate`
 4. **Implement services:** Validation, scoping, LSP features
 5. **Write tests:** Ask to "design test strategy" for test collaboration
-6. **Verify:** `npm run build && npm test`
+6. **Run linting:** `npm run lint` - must pass with 0 violations
+7. **Verify:** `npm run build && npm test`
 
 ## Code Quality Standards
+
+### Linting is Non-Negotiable
+
+**Every code change MUST pass linting before review:**
+- Run `npm run lint` - must report **0 errors, 0 warnings**
+- Use `npm run lint:fix` to automatically fix most violations
+- For warnings that can't auto-fix:
+  - Understand the rule and why it exists
+  - Fix the underlying issue if possible
+  - Only suppress with ESLint comment if truly pragmatic
+  - Document the reason for suppression
+  
+**ESLint Rules Enforced:**
+- ✅ **No implicit `any`** - Use `unknown` with proper type guards
+- ✅ **No unused variables** - Prefix unused params with `_`
+- ✅ **No unsafe assertions** - Avoid `!` in production code
+- ✅ **No debug console** - Use `console.warn()` or `console.error()` only
+- ✅ **Explicit return types** - Public functions must have return type annotations
+
+**Test Files Have Pragmatic Exceptions:**
+- May use non-null assertions (`!`) for test setup
+- May omit return types on helper functions
+- Always suppress via file-level `/* eslint-disable */` with reason
 
 ### Code Review Checklist
 
 **Before approving:**
+- [ ] Linting passes: `npm run lint` shows 0 errors, 0 warnings
 - [ ] Follows `.github/instructions/` standards
 - [ ] Tests are comprehensive (happy path + edge cases)
 - [ ] Documentation updated
@@ -96,6 +121,9 @@ Every feature flows through three layers:
 
 | Issue | Response |
 |-------|----------|
+| Linting violations | Request fixes before review continues - paste `npm run lint` output |
+| Unused variable | Request either use or prefix with `_` |
+| Missing type | Request explicit return type or type annotation |
 | Missing tests | Request coverage for happy path + edge cases |
 | Complex function (>50 lines) | Suggest extraction into smaller functions |
 | Unclear naming | Propose more descriptive names |
@@ -109,8 +137,16 @@ Every feature flows through three layers:
 1. **NEVER** edit `src/generated/**` files
 2. **ALWAYS** run `langium:generate` after `.langium` changes
 3. **ALWAYS** add tests for new behavior
-4. Use TypeScript strict mode
-5. Use type guards over assertions
+4. **ALWAYS** run `npm run lint` and fix violations before committing
+5. Use TypeScript strict mode
+6. Use type guards over assertions
+
+**Pre-commit Checklist:**
+```bash
+npm run lint    # 0 errors, 0 warnings required
+npm run build   # Must succeed
+npm test        # Must pass
+```
 
 ## Performance Optimization
 
@@ -189,8 +225,9 @@ test('validates large file in < 100ms', async () => {
 
 Quality indicators for your work:
 - **Test coverage:** ≥80% for new code
+- **Linting:** Always 0 errors, 0 warnings (non-negotiable)
 - **Build status:** Always green
-- **Type safety:** No `any` types, proper guards
+- **Type safety:** No `any` types, proper guards, explicit return types
 - **Error handling:** Graceful degradation, helpful messages
 - **Performance:** No regressions, optimizations measured
 

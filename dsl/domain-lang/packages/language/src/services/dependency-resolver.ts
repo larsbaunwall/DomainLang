@@ -116,7 +116,9 @@ export class DependencyResolver {
         const visited = new Set<string>();
 
         while (queue.length > 0) {
-            const { packageKey, versionConstraint, parent } = queue.shift()!;
+            const entry = queue.shift();
+            if (!entry) break;
+            const { packageKey, versionConstraint, parent } = entry;
 
             // Skip if already processed
             if (visited.has(packageKey)) {
@@ -235,7 +237,7 @@ export class DependencyResolver {
 
             dependencies[packageKey] = {
                 version: node.resolvedVersion,
-                resolved: node.repoUrl!,
+                resolved: node.repoUrl || '',
                 commit: node.commitHash,
                 // Future: Calculate integrity hash
             };
@@ -256,7 +258,7 @@ export class DependencyResolver {
         try {
             const yamlContent = await fs.readFile(yamlPath, 'utf-8');
             return this.parseYaml(yamlContent);
-        } catch (error) {
+        } catch {
             // No model.yaml found
             return {};
         }

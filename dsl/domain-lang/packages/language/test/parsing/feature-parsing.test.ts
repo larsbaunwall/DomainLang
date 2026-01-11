@@ -11,6 +11,7 @@
  * - Enhanced imports
  * - Relationship arrow shorthands (U/D, C/S)
  */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { beforeAll, describe, expect, test } from 'vitest';
 import type { TestServices } from '../test-helpers.js';

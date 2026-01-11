@@ -7,7 +7,7 @@ import type { ValidationChecks } from 'langium';
 import type { DomainLangAstType } from '../generated/ast.js';
 import { DomainLangServices } from '../domain-lang-module.js';
 
-export function registerValidationChecks(services: DomainLangServices) {
+export function registerValidationChecks(services: DomainLangServices): void {
     const registry = services.validation.ValidationRegistry;
     
     // Get import checks

@@ -20,7 +20,7 @@ connection.onInitialize(async (params) => {
             // Initialize workspace manager
             const workspaceManager = DomainLang.imports.WorkspaceManager;
             await workspaceManager.initialize(workspaceRoot);
-            console.log(`DomainLang workspace initialized: ${workspaceRoot}`);
+            console.warn(`DomainLang workspace initialized: ${workspaceRoot}`);
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             console.warn(`Failed to initialize workspace: ${message}`);
@@ -51,7 +51,7 @@ if (entryFile) {
                 entryFile, 
                 shared.workspace.LangiumDocuments
             );
-            console.log(`Successfully loaded import graph from ${entryFile}`);
+            console.warn(`Successfully loaded import graph from ${entryFile}`);
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             console.error(`Failed to preload import graph from ${entryFile}: ${message}`);

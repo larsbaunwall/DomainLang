@@ -48,7 +48,8 @@
         "build:clean": "npm run clean && npm run build",
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
-        "test": "vitest run"
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage"
     },
     "dependencies": {
         "langium": "~4.1.0"

@@ -60,7 +60,7 @@ export class DependencyAnalyzer {
         const manifestPath = path.join(workspaceRoot, 'model.yaml');
         
         // Load root manifest to get direct dependencies
-        let rootDeps: Record<string, string> = {};
+        const rootDeps: Record<string, string> = {};
         try {
             const content = await fs.readFile(manifestPath, 'utf-8');
             const manifest = YAML.parse(content) as {
@@ -205,7 +205,7 @@ export class DependencyAnalyzer {
     formatDependencyTree(nodes: DependencyTreeNode[], options: { showCommits?: boolean } = {}): string {
         const lines: string[] = [];
 
-        const formatNode = (node: DependencyTreeNode, prefix: string, isLast: boolean) => {
+        const formatNode = (node: DependencyTreeNode, prefix: string, isLast: boolean): void => {
             const branch = isLast ? '└── ' : '├── ';
             const versionStr = options.showCommits
                 ? `${node.version} (${node.commit.substring(0, 7)})`

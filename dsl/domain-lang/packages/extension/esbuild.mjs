@@ -1,3 +1,4 @@
+/* global process console */
 //@ts-check
 import * as esbuild from 'esbuild';
 

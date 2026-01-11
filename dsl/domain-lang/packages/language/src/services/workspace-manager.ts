@@ -117,7 +117,7 @@ export class WorkspaceManager {
         if (!this.lockFile) {
             // Try loading from cache first
             const optimizer = getGlobalOptimizer();
-            const cached = await optimizer.getCachedLockFile(this.workspaceRoot!);
+            const cached = await optimizer.getCachedLockFile(this.workspaceRoot || '');
             
             if (cached) {
                 this.lockFile = cached;
@@ -304,7 +304,7 @@ export class WorkspaceManager {
         return undefined;
     }
 
-    private async tryReadLockFile(filePath: string, filename: string): Promise<LockFile | undefined> {
+    private async tryReadLockFile(filePath: string, _filename: string): Promise<LockFile | undefined> {
         try {
             const content = await fs.readFile(filePath, 'utf-8');
             return this.parseJsonLockFile(content);

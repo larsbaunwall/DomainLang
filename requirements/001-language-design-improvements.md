@@ -1,12 +1,61 @@
 # PRS-001: Language Design Improvements (2025 Review)
 
-Status: Draft
+Status: Superseded - Divided into focused requirements
 Priority: High
 Target Version: 2.0.0
 Review Date: October 8, 2025
+Last Updated: January 11, 2026
 Reviewers: Language Designer Agent, Software Architect Agent
 
-## Overview
+---
+
+## ⚠️ Status Update (January 2026)
+
+**This document has been divided into smaller, focused requirement documents** for better tracking and implementation. The original comprehensive review remains valuable for context, but active development should reference the focused documents below.
+
+### Focused Requirements Documents
+
+| PRS | Title | Status | Priority | Focus Area |
+|-----|-------|--------|----------|------------|
+| [PRS-002](./002-language-consistency.md) | Language Consistency and Validation | Active | High | Keyword canonicalization, operator semantics, validation improvements |
+| [PRS-003](./003-tactical-ddd-patterns.md) | Tactical DDD Pattern Support | Planned | High | Aggregates, Entities, ValueObjects, Events, Commands |
+| [PRS-004](./004-implementation-bridge.md) | Implementation Bridge | Planned | Medium | Implementation metadata, API specs, SLOs, lifecycle markers |
+| [PRS-005](./005-developer-experience.md) | Developer Experience Enhancements | Planned | Medium | Learning materials, error messages, snippets, natural language syntax |
+
+### Implementation Status at a Glance
+
+✅ **Implemented:**
+- Strategic DDD (Domains, BoundedContexts, ContextMaps, DomainMaps)
+- Git-native import system
+- Multi-target references
+- Basic validation (missing descriptions)
+- Test coverage measurement (Vitest with v8)
+- Canonical keywords (`BC`, `BoundedContext`, `Domain`)
+
+⚠️ **Partially Implemented:**
+- Assignment operators exist but no semantic conventions
+- ESLint configured but rules empty
+- Documentation exists but not progressively structured
+
+❌ **Not Implemented:**
+- Tactical DDD patterns (Aggregates, Entities, ValueObjects)
+- Implementation metadata blocks
+- Enhanced error messages
+- VS Code snippets
+- Natural language relationship syntax
+- Inline/block conflict validation
+
+### For New Work
+
+When implementing features from the original review:
+1. Reference the appropriate focused PRS document
+2. Update that document's status
+3. Link issues/PRs to the focused PRS
+4. Keep this document as historical reference only
+
+---
+
+## Original Overview
 
 Based on comprehensive language design and architectural reviews conducted in October 2025, this PRS captures critical improvements needed to enhance DomainLang's ease of use, consistency, completeness, and developer experience. The reviews identified DomainLang as having excellent foundational design (4/5 rating for language, 7.5/10 for architecture) with specific gaps that prevent it from achieving best-in-class status.
 

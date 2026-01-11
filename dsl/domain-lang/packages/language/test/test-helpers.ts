@@ -7,6 +7,7 @@
  * - Validation utilities
  * - AST assertion helpers
  */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { afterEach, expect } from 'vitest';
 import { EmptyFileSystem, type LangiumDocument } from 'langium';

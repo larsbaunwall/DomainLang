@@ -11,6 +11,12 @@ export default defineConfig({
             reporter: ['text', 'html'],
             include: ['src'],
             exclude: ['**/generated'],
+            thresholds: {
+                lines: 80,
+                functions: 80,
+                branches: 75,
+                statements: 80
+            }
         },
         deps: {
             interopDefault: true

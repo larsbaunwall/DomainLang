@@ -173,7 +173,7 @@ export async function resolveImportPath(
   // Verify file exists
   try {
     await fs.access(normalized);
-  } catch (error) {
+  } catch {
     throw new Error(
       `Import file not found: ${rawImportPath} (resolved to ${normalized})`
     );

@@ -1,6 +1,7 @@
 import { WorkspaceManager } from './workspace-manager.js';
 import { URI } from 'langium';
 import type { DomainLangServices } from '../domain-lang-module.js';
+import type { LockFile } from './git-url-resolver.js';
 
 /**
  * ImportResolver resolves import statements using WorkspaceManager and GitUrlResolver.
@@ -23,7 +24,7 @@ export class ImportResolver {
     /**
      * Get the current lock file (if loaded).
      */
-    async getLockFile() {
+    async getLockFile(): Promise<LockFile | undefined> {
         return this.workspaceManager.getLockFile();
     }
 }

@@ -2,6 +2,18 @@
 
 This directory contains Product Requirement Specifications (PRSs) for DomainLang features and capabilities. PRSs document **what** needs to be built and **why**, without prescribing **how**.
 
+## Active Requirements
+
+| PRS | Title | Status | Priority | Effort |
+|-----|-------|--------|----------|--------|
+| [002](./002-language-consistency.md) | Language Consistency and Validation | Active | High | 3 weeks |
+| [003](./003-tactical-ddd-patterns.md) | Tactical DDD Pattern Support | Planned | High | 8 weeks |
+| [004](./004-implementation-bridge.md) | Implementation Bridge | Planned | Medium | 4 weeks |
+| [005](./005-developer-experience.md) | Developer Experience Enhancements | Planned | Medium | 3 weeks |
+| [001](./001-language-design-improvements.md) | Language Design Improvements (2025 Review) | Superseded | - | - |
+
+**Note**: PRS-001 was divided into PRS-002 through PRS-005 for better focus and tracking.
+
 ## What is a PRS?
 
 A Product Requirement Specification captures the requirements for a feature or capability. PRSs help:

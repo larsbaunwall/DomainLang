@@ -89,7 +89,7 @@ export class ImportValidator {
                     );
                 }
             }
-        } catch (error) {
+        } catch {
             // Import path error already reported by checkImportPath
             return;
         }
@@ -125,8 +125,8 @@ export class ImportValidator {
      */
     checkUnusedImports(
         imp: ImportStatement,
-        accept: ValidationAcceptor,
-        model: Model
+        _accept: ValidationAcceptor,
+        _model: Model
     ): void {
         // Skip check for wildcard imports (no named imports)
         if (!imp.symbols || imp.symbols.length === 0) {
@@ -142,7 +142,7 @@ export class ImportValidator {
 /**
  * Creates validation checks for import statements.
  */
-export function createImportChecks(services: DomainLangServices): ValidationChecks<DomainLangAstType> {
+export function createImportChecks(_services: DomainLangServices): ValidationChecks<DomainLangAstType> {
 
     return {
         ImportStatement: (imp, accept) => {

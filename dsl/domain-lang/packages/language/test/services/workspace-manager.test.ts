@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { beforeAll, afterAll, beforeEach, describe, expect, test } from "vitest";
 import path from "node:path";
 import fs from "node:fs/promises";
@@ -29,7 +30,9 @@ async function createLockFile() {
 
 // Helper: clean up lock file
 async function cleanup() {
-    try { await fs.unlink(LOCK_FILE); } catch {}
+    try { await fs.unlink(LOCK_FILE); } catch {
+        // File doesn't exist, ignore
+    }
 }
 
 describe("WorkspaceManager", () => {

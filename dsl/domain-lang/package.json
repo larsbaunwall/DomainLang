@@ -33,12 +33,20 @@
         "vscode:prepublish": "npm run --workspace packages/extension vscode:prepublish",
         "langium:generate": "npm run --workspace packages/language langium:generate",
         "langium:watch": "npm run --workspace packages/language langium:watch",
-        "test": "npm run --workspace packages/language test"
+        "test": "npm run --workspace packages/language test",
+        "test:coverage": "npm run --workspace packages/language test:coverage",
+        "lint": "eslint packages --ext .ts,.tsx",
+        "lint:fix": "eslint packages --ext .ts,.tsx --fix"
     },
     "devDependencies": {
+        "@eslint/js": "^9.39.2",
         "@types/node": "~20.17.48",
+        "@typescript-eslint/eslint-plugin": "^8.0.0",
+        "@typescript-eslint/parser": "^8.0.0",
+        "eslint": "^9.0.0",
         "shx": "~0.4.0",
-        "typescript": "~5.8.3"
+        "typescript": "~5.8.3",
+        "typescript-eslint": "^8.52.0"
     },
     "volta": {
         "node": "20.19.2",
