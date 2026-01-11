@@ -39,12 +39,8 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
           
       - name: Install dependencies
-        run: |
-          npm ci --prefer-offline --no-audit
-          npm audit fix --audit-level=moderate || true
+        run: npm ci --prefer-offline --no-audit
         working-directory: ./dsl/domain-lang
-        env:
-          NODE_ENV: production
 
       - name: Build project
         run: npm run langium:generate && npm run build
