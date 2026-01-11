@@ -154,4 +154,4 @@ Feedback is especially welcome if you have experience with language design or do
 
 ## 📄 License
 
-[MIT](./LICENSE)
+[Apache 2.0](./LICENSE)

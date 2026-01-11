@@ -54,7 +54,7 @@ graph TD
     M --> S[Structure Elements]
     S --> D[Domain]
     S --> BC[BoundedContext]
-    S --> CM[ContextMap / DomainMap]
+    S --> CMAP[ContextMap / DomainMap]
     S --> NS[Namespace]
     NS --> S
 ```

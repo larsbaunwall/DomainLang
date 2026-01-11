@@ -16,7 +16,7 @@ graph TB
         BC --> Dec[decisions]
     end
     subgraph Organization
-        CM[ContextMap] --> BC
+        CMAP[ContextMap] --> BC
         NS[Namespace] --> D
         NS --> BC
     end
