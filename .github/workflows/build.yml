@@ -46,8 +46,16 @@ jobs:
         run: npm run langium:generate && npm run build
         working-directory: ./dsl/domain-lang
 
+      - name: Lint code
+        run: npm run lint
+        working-directory: ./dsl/domain-lang
+
       - name: Run tests
         run: npm test
+        working-directory: ./dsl/domain-lang
+      
+      - name: Check test coverage
+        run: npm run test:coverage --workspace packages/language
         working-directory: ./dsl/domain-lang
       
       - name: Get version
