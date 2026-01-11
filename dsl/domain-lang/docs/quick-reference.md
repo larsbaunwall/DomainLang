@@ -101,6 +101,37 @@ bc Orders for Sales {
         businessModel: B2B
         lifecycle: CustomBuilt
     }
+```
+
+## Metadata
+
+Declare available metadata keys, then use them in bounded contexts:
+
+```dlang
+// Declare metadata keys first
+Metadata Language
+Metadata Framework
+Metadata Database
+Metadata Owner
+Metadata Tier
+
+// Use in bounded contexts
+bc PaymentService for Payments {
+    metadata {
+        Language: "Go"
+        Framework: "Echo"
+        Database: "PostgreSQL"
+        Owner: "Payments Team"
+        Tier: "Critical"
+    }
+}
+
+// Short form with 'meta' keyword
+bc NotificationService for Notifications {
+    meta {
+        Language: "TypeScript"
+        Framework: "NestJS"
+    }
 }
 ```
 

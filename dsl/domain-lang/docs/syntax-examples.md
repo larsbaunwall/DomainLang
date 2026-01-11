@@ -13,6 +13,7 @@ This guide provides copy-paste examples for every language feature. Use it as a 
 - [Domains](#domains)
 - [Bounded Contexts](#bounded-contexts)
 - [Classifications and Teams](#classifications-and-teams)
+- [Metadata](#metadata)
 - [Terminology](#terminology)
 - [Context Maps](#context-maps)
 - [Domain Maps](#domain-maps)

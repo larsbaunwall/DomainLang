@@ -244,6 +244,7 @@ Documentation blocks enrich types with metadata. They're optional and can contai
 | `vision` | Long-term intent statement | Domain only |
 | `classification` / `role` / `businessModel` / `lifecycle` | Reference to a Classification | Both |
 | `team` | Reference to a Team | BC |
+| `metadata` / `meta` | Key-value metadata for operational metadata | BC |
 | `relationships` / `integrations` / `connections` | Inline relationship definitions | BC |
 | `terminology` / `language` / `glossary` | Collection of term declarations | BC |
 | `decisions` / `constraints` / `rules` / `policies` | Governance documentation | BC |
@@ -277,6 +278,150 @@ bc OrderManagement for Sales {
 ```
 
 > **Assignment operators:** Use `:`, `is`, or `=` interchangeably. String values must be quoted.
+
+---
+
+## Metadata
+
+Metadata allows you to capture operational, technical, and contextual information about bounded contexts using custom, application-defined keys.
+
+### Declaring Metadata Keys
+
+Before using metadata in a bounded context, declare the metadata keys you want to use at the top level:
+
+```dlang
+Metadata Language
+Metadata Framework
+Metadata Database
+Metadata Owner
+Metadata Tier
+```
+
+Metadata declarations are similar to Teams and Classifications—they define keys that can be referenced throughout your model.
+
+### Using Metadata in Bounded Contexts
+
+Add metadata blocks to bounded contexts using the `metadata` keyword (or its alias `meta`):
+
+```dlang
+Metadata Language
+Metadata Framework
+Metadata Database
+
+Domain Sales {
+    description: "Order and payment processing"
+}
+
+bc OrderContext for Sales {
+    description: "Manages order lifecycle"
+    
+    metadata {
+        Language: "TypeScript"
+        Framework: "NestJS"
+        Database: "PostgreSQL"
+    }
+}
+```
+
+### Metadata Block Syntax
+
+Metadata blocks are flexible and support two entry syntaxes:
+
+```dlang
+// Long form
+metadata {
+    Language: "TypeScript"
+    Framework: "NestJS"
+    Database: "PostgreSQL"
+    Owner: "Platform Team"
+}
+
+// Short alias (equivalent)
+meta {
+    Language: "Java"
+    Framework: "Spring Boot"
+    Database: "Oracle"
+}
+
+// Single and double quotes both work
+metadata {
+    Repository: 'github.com/company/service'
+    Url: "https://api.example.com:8080"
+}
+```
+
+### Real-World Example
+
+```dlang
+// Define available metadata keys
+Metadata Language
+Metadata Framework
+Metadata Database
+Metadata MessageQueue
+Metadata Monitoring
+Metadata Owner
+
+Domain Payments {
+    description: "Payment processing and financial transactions"
+}
+
+bc CardPayments for Payments {
+    description: "Credit and debit card processing"
+    team: PaymentTeam
+    
+    metadata {
+        Language: "Go"
+        Framework: "Echo"
+        Database: "PostgreSQL"
+        MessageQueue: "RabbitMQ"
+        Monitoring: "Prometheus + Grafana"
+        Owner: "Payment Platform Team"
+    }
+}
+
+bc WalletService for Payments {
+    description: "Digital wallet management"
+    team: PaymentTeam
+    
+    metadata {
+        Language: "TypeScript"
+        Framework: "NestJS"
+        Database: "MongoDB"
+        MessageQueue: "Kafka"
+        Monitoring: "DataDog"
+        Owner: "Payments Backend Team"
+    }
+}
+```
+
+### Combining with Other Documentation Blocks
+
+Metadata blocks work seamlessly with other documentation blocks:
+
+```dlang
+bc OrderManagement for Sales {
+    description: "Complete order lifecycle"
+    team: SalesTeam
+    
+    metadata {
+        Language: "Java"
+        Framework: "Spring Boot"
+        Database: "MySQL"
+    }
+    
+    terminology {
+        term Order: "Customer purchase request"
+        term Fulfillment: "Order processing and delivery"
+    }
+    
+    decisions {
+        decision [Architectural] EventSourcing: "Use event sourcing for audit trail"
+        decision [Business] TaxCalculation: "Calculate tax per region"
+    }
+}
+```
+
+> **Note:** Metadata values are always treated as strings. Complex structures should be flattened into separate metadata keys.
 
 ---
 
