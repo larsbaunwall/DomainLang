@@ -14,11 +14,11 @@ With Langium 4.0's `[+Type]` syntax, **one reference can point to multiple AST n
 │  Domain Sales {}                                                │
 │  Domain Support {}                                              │
 │                                                                 │
-│  BC CustomerManagement for Sales {        ┐                    │
+│  bc CustomerManagement for Sales {        ┐                    │
 │      description: "Leads & deals"         │ Same name!         │
 │  }                                         │                    │
 │                                            │                    │
-│  BC CustomerManagement for Support {      │                    │
+│  bc CustomerManagement for Support {      │                    │
 │      description: "Tickets & SLAs"        ┘                    │
 │  }                                                               │
 │                                                                 │
@@ -38,10 +38,10 @@ With Langium 4.0's `[+Type]` syntax, **one reference can point to multiple AST n
 │      ↓                                                          │
 │      items: [                                                   │
 │          {                                                      │
-│              ref: BC CustomerManagement (Sales)    ← Target 1  │
+│              ref: bc CustomerManagement (Sales)    ← Target 1  │
 │          },                                                     │
 │          {                                                      │
-│              ref: BC CustomerManagement (Support)  ← Target 2  │
+│              ref: bc CustomerManagement (Support)  ← Target 2  │
 │          }                                                      │
 │      ]                                                          │
 │                                                                 │
@@ -57,8 +57,8 @@ With Langium 4.0's `[+Type]` syntax, **one reference can point to multiple AST n
 Domain Sales {}
 Domain Billing {}
 
-BC Orders for Sales {}
-BC Orders for Billing {}  // ⚠️ Name conflict!
+bc Orders for Sales {}
+bc Orders for Billing {}  // ⚠️ Name conflict!
 
 ContextMap AllOrders {
     contains Orders  // ❌ Which one? Ambiguous!
@@ -72,8 +72,8 @@ ContextMap AllOrders {
 Domain Sales {}
 Domain Billing {}
 
-BC Orders for Sales {}
-BC Orders for Billing {}
+bc Orders for Sales {}
+bc Orders for Billing {}
 
 ContextMap AllOrders {
     contains Orders  // ✅ References BOTH! 🎉
@@ -88,17 +88,17 @@ Different teams model the same concept from their perspective:
 
 ```dlang
 // Team A (Sales perspective)
-BC Customer for Sales {
+bc Customer for Sales {
     description: "Lead tracking, conversion, deals"
 }
 
 // Team B (Support perspective)  
-BC Customer for Support {
+bc Customer for Support {
     description: "Ticket history, satisfaction scores"
 }
 
 // Team C (Marketing perspective)
-BC Customer for Marketing {
+bc Customer for Marketing {
     description: "Segments, campaigns, preferences"
 }
 
@@ -116,10 +116,10 @@ When importing models from different sources:
 
 ```dlang
 // file: sales-contexts.dlang
-BC Checkout for Sales {}
+bc Checkout for Sales {}
 
 // file: billing-contexts.dlang  
-BC Checkout for Billing {}
+bc Checkout for Billing {}
 
 // file: architecture.dlang
 import "./sales-contexts.dlang"
@@ -138,11 +138,11 @@ Organizing by business capability with qualified names:
 
 ```dlang
 package acme.sales {
-    BC OrderManagement {}
+    bc OrderManagement {}
 }
 
 package acme.fulfillment {
-    BC OrderManagement {}  // Different package, same name
+    bc OrderManagement {}  // Different package, same name
 }
 
 ContextMap SupplyChain {
@@ -154,18 +154,18 @@ ContextMap SupplyChain {
 
 ### 4. **Partial Definitions**
 
-Split a BC definition across multiple files (future feature):
+Split a bc definition across multiple files (future feature):
 
 ```dlang
 // file: customer-sales.dlang
-BC Customer for Sales {
+bc Customer for Sales {
     terminology {
         term Lead: "Potential customer"
     }
 }
 
 // file: customer-support.dlang
-BC Customer for Support {
+bc Customer for Support {
     terminology {
         term Ticket: "Support request"
     }
@@ -280,11 +280,11 @@ interface MultiReference<T> {
 3. `DomainMap.domains` - Reference domains in maps ✅
 
 **Where it's NOT used (DDD Compliance):**
-- ❌ `BoundedContext.domain` - A BC can only belong to **ONE** domain (fundamental DDD principle)
+- ❌ `BoundedContext.domain` - A bc can only belong to **ONE** domain (fundamental DDD principle)
 
 ## Why BC.domain is Single Reference
 
-In Domain-Driven Design, a **Bounded Context defines a boundary** within which a particular model is valid. This boundary is inherently singular—a BC cannot span multiple domains without violating its core purpose of establishing clear boundaries.
+In Domain-Driven Design, a **Bounded Context defines a boundary** within which a particular model is valid. This boundary is inherently singular—a bc cannot span multiple domains without violating its core purpose of establishing clear boundaries.
 
 **DDD Principles:**
 - A Bounded Context belongs to exactly one Domain (or subdomain)
@@ -294,11 +294,11 @@ In Domain-Driven Design, a **Bounded Context defines a boundary** within which a
 **Correct approach:**
 ```dlang
 // ✅ Two separate BCs for different domains
-BC CustomerManagement for Sales {
+bc CustomerManagement for Sales {
     description: "Manages sales leads"
 }
 
-BC CustomerManagement for Support {
+bc CustomerManagement for Support {
     description: "Manages support tickets"
 }
 
@@ -311,9 +311,9 @@ ContextGroup CustomerServices {
 **Incorrect approach:**
 ```dlang
 // ❌ Would violate DDD if allowed
-BC CustomerManagement for Sales, Support {  // NOT SUPPORTED!
+bc CustomerManagement for Sales, Support {  // NOT SUPPORTED!
     // Which domain's model applies? Unclear boundaries!
 }
 ```
 
-**The key insight**: Instead of forcing unique names everywhere, MultiReference embraces the reality that different teams might use the same name for different things, and provides tools to work with that productively—but only where it makes semantic sense (aggregation, visualization), not where it would violate DDD principles (BC boundary definition).
+**The key insight**: Instead of forcing unique names everywhere, MultiReference embraces the reality that different teams might use the same name for different things, and provides tools to work with that productively—but only where it makes semantic sense (aggregation, visualization), not where it would violate DDD principles (bc boundary definition).

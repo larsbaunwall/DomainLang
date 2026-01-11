@@ -174,14 +174,14 @@ describe('Validation Tests', () => {
     // ========================================================================
 
     describe('Namespace Declaration Validation', () => {
-        test('should detect duplicate namespace names', async () => {
+        test('should detect duplicate Namespace names', async () => {
             // Arrange
             const input = s`
-                namespace TestNamespace {
+                Namespace TestNamespace {
                     Domain Domain1 {}
                 }
                 
-                namespace TestNamespace {
+                Namespace TestNamespace {
                     Domain Domain2 {}
                 }
             `;
@@ -195,14 +195,14 @@ describe('Validation Tests', () => {
             ]);
         });
 
-        test('accepts unique namespace names', async () => {
+        test('accepts unique Namespace names', async () => {
             // Arrange
             const input = s`
-                namespace Namespace1 {
+                Namespace Namespace1 {
                     Domain Domain1 {}
                 }
                 
-                namespace Namespace2 {
+                Namespace Namespace2 {
                     Domain Domain2 {}
                 }
             `;
@@ -514,7 +514,7 @@ describe('Validation Tests', () => {
         test('should handle qualified name resolution', async () => {
             // Arrange
             const input = s`
-                namespace com.example {
+                Namespace com.example {
                     Domain Sales {}
                 }
                 
@@ -531,7 +531,7 @@ describe('Validation Tests', () => {
         test('should detect invalid qualified name', async () => {
             // Arrange
             const input = s`
-                namespace com.example {
+                Namespace com.example {
                     Domain Sales {}
                 }
                 
@@ -546,13 +546,13 @@ describe('Validation Tests', () => {
             expectValidDocument(document); // Remove when qualified name validation works
         });
 
-        test('should validate nested namespace access', async () => {
+        test('should validate nested Namespace access', async () => {
             // Arrange
             const input = s`
-                namespace com.example.sales {
+                Namespace com.example.sales {
                     Domain Sales {}
                     
-                    namespace orders {
+                    Namespace orders {
                         BoundedContext OrderContext for Sales
                     }
                 }

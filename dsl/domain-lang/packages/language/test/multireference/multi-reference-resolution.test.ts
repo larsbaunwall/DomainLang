@@ -23,7 +23,7 @@ describe('Multi-Target References', () => {
             }
             
             // BC belongs to exactly ONE domain per DDD principles
-            BC CustomerExperience for Sales {
+            bc CustomerExperience for Sales {
                 description: "Sales experience"
             }
     `;
@@ -46,11 +46,11 @@ describe('Multi-Target References', () => {
             Domain Sales {}
             Domain Billing {}
             
-            BC Orders for Sales {
+            bc Orders for Sales {
                 description: "Sales orders"
             }
             
-            BC Orders for Billing {
+            bc Orders for Billing {
                 description: "Billing orders"  
             }
             
@@ -115,15 +115,15 @@ describe('Multi-Target References', () => {
         const input = `
             Domain Sales {}
             
-            BC Orders for Sales {
+            bc Orders for Sales {
                 description: "Order management"
             }
             
-            BC Pricing for Sales {
+            bc Pricing for Sales {
                 description: "Pricing engine"
             }
             
-            BC Catalog for Sales {
+            bc Catalog for Sales {
                 description: "Product catalog"
             }
             
@@ -154,7 +154,7 @@ describe('Multi-Target References', () => {
         const input = `
             Domain Sales {}
             
-            BC Orders for Sales {}
+            bc Orders for Sales {}
             
             ContextMap PortfolioContexts {
                 contains Orders, __MissingBC__
@@ -182,14 +182,14 @@ describe('Multi-Target References', () => {
     //  - Workspace fixture or virtual FS provides namespace-aware symbol exposure
     test.skip('MultiReference works with qualified names in namespaces', async () => {
         const input = `
-            namespace acme.sales {
+            Namespace acme.sales {
                 Domain Sales {}
-                BC Orders for Sales {}
+                bc Orders for Sales {}
             }
             
-            namespace acme.marketing {
+            Namespace acme.marketing {
                 Domain Marketing {}
-                BC Campaigns for Marketing {}
+                bc Campaigns for Marketing {}
             }
             
             ContextMap Corporate {
@@ -220,11 +220,11 @@ describe('Multi-Target References', () => {
             Domain CRM {}
             
             // Same BC name, but for different domains (like partial definitions from different files)
-            BC CustomerManagement for Sales {
+            bc CustomerManagement for Sales {
                 description: "Sales perspective on customers"
             }
             
-            BC CustomerManagement for CRM {
+            bc CustomerManagement for CRM {
                 description: "CRM perspective on customers"
             }
             

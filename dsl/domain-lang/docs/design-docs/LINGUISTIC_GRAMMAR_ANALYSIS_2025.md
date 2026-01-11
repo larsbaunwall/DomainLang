@@ -56,7 +56,7 @@ This analysis examines DomainLang through a **linguistic lens**, evaluating how 
 Context Sales { ... }
 
 // ✅ Clear - explicitly a bounded context
-BC Sales { ... }
+bc Sales { ... }
 BoundedContext Sales { ... }
 ```
 
@@ -65,12 +65,12 @@ BoundedContext Sales { ... }
 ---
 
 **"implements" (removed) vs "for"**
-- **Previous**: `BC Sales implements SalesDomain`
+- **Previous**: `bc Sales implements SalesDomain`
   - Semantic mapping: CLASS IMPLEMENTS INTERFACE (OOP metaphor)
   - Connotation: Technical, implementation-focused
   - DDD alignment: ❌ Wrong conceptual domain
   
-- **Current**: `BC Sales for SalesDomain`
+- **Current**: `bc Sales for SalesDomain`
   - Semantic mapping: PURPOSE/MEMBERSHIP relation
   - Connotation: Serving, belonging to
   - Natural language: "This context is **for** the sales domain"
@@ -182,7 +182,7 @@ description is "value"  // Copula (natural language)
 **Example demonstrating semantic nuance**:
 ```dlang
 // Labels and values (properties of objects)
-BC Sales {
+bc Sales {
     description: "Handles customer purchases"  // ✅ Natural
 }
 
@@ -226,13 +226,13 @@ Domain CustomerExperience {
     classifier is CoreDomain
 }
 
-BC Checkout for CustomerExperience {
+bc Checkout for CustomerExperience {
     description: "Payment orchestration"
     role is Strategic
 }
 
 // Developer style (technical-focused)
-BC Checkout {
+bc Checkout {
     implementation {
         language = "TypeScript"
         framework = "NestJS"
@@ -251,10 +251,10 @@ BC Checkout {
 
 | Preposition | Semantic Field | Example | Natural Language Meaning |
 |-------------|----------------|---------|-------------------------|
-| `for` | Purpose/Benefit | `BC Sales for Domain1` | "on behalf of", "in service of" |
+| `for` | Purpose/Benefit | `bc Sales for Domain1` | "on behalf of", "in service of" |
 | `in` | Containment | `Domain Sales in Enterprise` | "inside", "part of" |
-| `by` | Agency | `BC Sales by Team1` | "created by", "owned by" |
-| `as` | Role/Classification | `BC Sales as Core` | "in the role of", "categorized as" |
+| `by` | Agency | `bc Sales by Team1` | "created by", "owned by" |
+| `as` | Role/Classification | `bc Sales as Core` | "in the role of", "categorized as" |
 | `contains` | Possession | `ContextMap contains BC1` | "has", "includes" |
 
 **Linguistic consistency check**: ✅ All prepositions follow natural English usage patterns.
@@ -263,14 +263,14 @@ BC Checkout {
 
 ```dlang
 // Current: Limited relationship expression
-BC Orders {
+bc Orders {
     relationships {
         [OHS] this -> [ACL] Billing
     }
 }
 
 // Enhanced: More expressive prepositions
-BC Orders {
+bc Orders {
     depends-on Inventory        // DEPENDENCY relation
     publishes-to Billing        // PUBLICATION relation
     subscribes-to Catalog       // SUBSCRIPTION relation
@@ -295,7 +295,7 @@ BC Orders {
 ```dlang
 // Subject      Verb(implied)  Object
 Domain         contains       subdomain
-BC Sales       for            SalesDomain
+bc Sales       for            SalesDomain
 ContextGroup   contains       BC1, BC2
 ```
 
@@ -308,7 +308,7 @@ ContextGroup   contains       BC1, BC2
 **Current pattern**: Modifiers generally follow head nouns
 ```dlang
 Domain Sales in Enterprise     // Domain [HEAD] + in Enterprise [MODIFIER]
-BC Checkout for Sales as Core  // BC [HEAD] + for Sales [MODIFIER] + as Core [MODIFIER]
+bc Checkout for Sales as Core  // BC [HEAD] + for Sales [MODIFIER] + as Core [MODIFIER]
 ```
 
 **Linguistic principle**: English typically uses post-modification for prepositional phrases.
@@ -323,12 +323,12 @@ BC Checkout for Sales as Core  // BC [HEAD] + for Sales [MODIFIER] + as Core [MO
 
 **Current syntax allows**:
 ```dlang
-BC Checkout for Sales as Core by Team1
+bc Checkout for Sales as Core by Team1
 ```
 
 **Parsing ambiguity**:
-- Is it: `[BC Checkout [for Sales] [as Core] [by Team1]]`? ✅
-- Or: `[BC Checkout for [Sales as Core by Team1]]`? ❌
+- Is it: `[bc Checkout [for Sales] [as Core] [by Team1]]`? ✅
+- Or: `[bc Checkout for [Sales as Core by Team1]]`? ❌
 
 **Langium resolution**: Parser enforces correct structure via grammar precedence.
 
@@ -337,10 +337,10 @@ BC Checkout for Sales as Core by Team1
 **Recommendation L2.1**: Add optional punctuation for visual grouping
 ```dlang
 // Enhanced readability with commas (optional)
-BC Checkout for Sales, as Core, by Team1
+bc Checkout for Sales, as Core, by Team1
 
 // Or line breaks (already supported)
-BC Checkout 
+bc Checkout 
     for Sales 
     as Core 
     by Team1
@@ -434,7 +434,7 @@ Domain Sales {          // Container of domain metadata
     description: "..."
 }
 
-BC Checkout { }         // Empty container (valid!)
+bc Checkout { }         // Empty container (valid!)
 
 ContextMap {            // Container of relationships
     contains BC1, BC2
@@ -641,7 +641,7 @@ Domain CustomerExperience {
     classifier: CoreDomain
 }
 
-BC Checkout for CustomerExperience {
+bc Checkout for CustomerExperience {
     description: "Handles payment processing and order confirmation"
     team: PaymentsTeam
 }
@@ -680,7 +680,7 @@ ContextMap IntegrationPatterns {
 ```dlang
 // ✅ Good - familiar programming patterns
 package com.acme.sales {
-    BC OrderService for Sales {
+    bc OrderService for Sales {
         implementation {
             language: "TypeScript"
             framework: "NestJS"
@@ -689,7 +689,7 @@ package com.acme.sales {
 }
 
 // ⚠️ Verbose - would prefer more concise syntax
-BC Checkout for Sales as Core by Team1 {
+bc Checkout for Sales as Core by Team1 {
     description: "..."
     team: Team1  // Redundant with 'by Team1' above
 }
@@ -889,11 +889,11 @@ as CoreDomain                   // Keyword = classification
 
 // Unified approach 1: All tags use brackets
 [OHS] Catalog -> [ACL] Orders
-BC Sales [CoreDomain] [Strategic]
+bc Sales [CoreDomain] [Strategic]
 
 // Unified approach 2: All tags use 'as' keyword
 Catalog as OpenHost -> Orders as AntiCorruptionLayer
-BC Sales as CoreDomain as Strategic
+bc Sales as CoreDomain as Strategic
 ```
 
 ---
@@ -988,8 +988,8 @@ show me all relationships for Checkout
 
 **Current inconsistency**:
 ```dlang
-BC Sales for Domain1     // 'for' is inline
-BC Sales {
+bc Sales for Domain1     // 'for' is inline
+bc Sales {
     domain: Domain1      // 'domain:' is in block (not currently supported!)
 }
 ```
@@ -997,17 +997,17 @@ BC Sales {
 **Recommendation**: Allow **all inline properties** to also appear in **blocks**:
 ```dlang
 // Inline
-BC Sales for Domain1 as Core by Team1
+bc Sales for Domain1 as Core by Team1
 
 // Block equivalent (fully explicit)
-BC Sales {
+bc Sales {
     domain: Domain1
     role: Core
     team: Team1
 }
 
 // Hybrid (currently allowed, should validate for conflicts)
-BC Sales for Domain1 {
+bc Sales for Domain1 {
     role: Core
     team: Team1
 }
@@ -1025,17 +1025,17 @@ team=[Team:QualifiedName]
 
 **User-facing syntax**:
 ```dlang
-BC Sales for SalesDomain  // Implicit: [Domain:SalesDomain]
+bc Sales for SalesDomain  // Implicit: [Domain:SalesDomain]
 ```
 
 **Enhancement**: Allow **explicit type annotations** for clarity:
 ```dlang
 // Current (implicit type)
-BC Sales for SalesDomain
+bc Sales for SalesDomain
 
 // Enhanced (explicit type)
-BC Sales for Domain::SalesDomain
-BC Sales for <Domain>SalesDomain
+bc Sales for Domain::SalesDomain
+bc Sales for <Domain>SalesDomain
 ```
 
 **Benefit**: Helps when same name exists in multiple namespaces.
@@ -1048,7 +1048,7 @@ BC Sales for <Domain>SalesDomain
 
 **Current**: Cardinality is implicit in grammar
 ```dlang
-BC Sales for SalesDomain      // Exactly one domain (grammar enforced)
+bc Sales for SalesDomain      // Exactly one domain (grammar enforced)
 ContextGroup {
     contains BC1, BC2, BC3    // Multiple BCs (grammar allows)
 }
@@ -1057,11 +1057,11 @@ ContextGroup {
 **Enhancement**: Make cardinality **linguistically explicit**:
 ```dlang
 // Optional vs. required
-BC Sales for SalesDomain           // Required (no '?')
-BC Prototype for SalesDomain?      // Optional
+bc Sales for SalesDomain           // Required (no '?')
+bc Prototype for SalesDomain?      // Optional
 
 // One vs. many
-BC Sales {
+bc Sales {
     owned-by Team1                 // Singular = exactly one
     depends-on Inventory, Billing  // Plural = many
 }
@@ -1073,17 +1073,17 @@ BC Sales {
 
 **Current**: No lifecycle information
 ```dlang
-BC LegacyOrders { ... }  // Is this active? Deprecated?
+bc LegacyOrders { ... }  // Is this active? Deprecated?
 ```
 
 **Enhancement**: Add lifecycle markers:
 ```dlang
-@deprecated BC LegacyOrders { ... }
-@experimental BC NewCheckout { ... }
-@stable BC Orders { ... }
+@deprecated bc LegacyOrders { ... }
+@experimental bc NewCheckout { ... }
+@stable bc Orders { ... }
 
 // Or inline
-BC LegacyOrders (deprecated) { ... }
+bc LegacyOrders (deprecated) { ... }
 ```
 
 ---

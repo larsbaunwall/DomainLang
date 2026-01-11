@@ -31,7 +31,7 @@ describe('Advanced Syntax Features', () => {
             Team ProductTeam
             Classification Core
             
-            BC OrderContext for Sales as Core by ProductTeam
+            bc OrderContext for Sales as Core by ProductTeam
         `;
         
         // Act
@@ -54,8 +54,8 @@ describe('Advanced Syntax Features', () => {
             Classification Core
             Classification Supporting
             
-            BC OrderContext for Sales as Core by ProductTeam
-            BC PaymentContext for Sales as Supporting by ProductTeam
+            bc OrderContext for Sales as Core by ProductTeam
+            bc PaymentContext for Sales as Supporting by ProductTeam
         `;
         
         // Act
@@ -70,10 +70,10 @@ describe('Advanced Syntax Features', () => {
         expect(contexts[1].name).toBe('PaymentContext');
     });
 
-    test('should parse namespace declarations', async () => {
+    test('should parse Namespace declarations', async () => {
         // Arrange
         const input = s`
-            namespace com.example.sales {
+            Namespace com.example.sales {
                 Domain Sales {}
                 Team SalesTeam
             }
@@ -95,8 +95,8 @@ describe('Advanced Syntax Features', () => {
         const input = s`
             Domain Sales {}
             
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
         `;
         
         // Act
@@ -140,8 +140,8 @@ describe('Advanced Syntax Features', () => {
             Domain Sales {}
             Domain Payment {}
             
-            BC OrderContext for Sales
-            BC PaymentContext for Payment
+            bc OrderContext for Sales
+            bc PaymentContext for Payment
             
             ContextMap ECommerceMap {
                 contains OrderContext, PaymentContext
@@ -176,10 +176,10 @@ describe('Advanced Syntax Features', () => {
         expect(document.parseResult.value).toBeDefined();
     });
 
-    test('should parse complex nested namespace structure', async () => {
+    test('should parse complex nested Namespace structure', async () => {
         // Arrange
         const input = s`
-            namespace com.company.ecommerce {
+            Namespace com.company.ecommerce {
                 Team SalesTeam
                 Classification Core
                 Classification Architectural
@@ -190,7 +190,7 @@ describe('Advanced Syntax Features', () => {
                     vision: "Complete e-commerce platform"
                 }
                 
-                BC OrderManagement for Commerce as Core by SalesTeam {
+                bc OrderManagement for Commerce as Core by SalesTeam {
                     description: "Order processing and management"
                     
                     terminology {

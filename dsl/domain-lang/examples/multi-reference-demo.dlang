@@ -112,7 +112,7 @@ ContextMap CustomerServices {// Sales team's perspective of customer management}
 
     terminology {    contains CustomerManagement  // <- Resolves to BOTH instances above!
 
-namespace Ecommerce {
+Namespace Ecommerce {
 
     Classification CoreDomain        term Lead: "Potential customer prospect"}
 
@@ -188,7 +188,7 @@ namespace Ecommerce {
 
 // When you reference "CustomerManagement", it resolves to both instances
 
-namespace Payments {
+Namespace Payments {
 
     Classification GenericDomainContextGroup CustomerServices {BC OrderValidation for Ordering as Supporting {
 

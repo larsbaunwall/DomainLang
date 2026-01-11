@@ -26,11 +26,11 @@ describe('MultiReference Practical Examples', () => {
             
             // Two different BCs with the same name "CustomerManagement"
             // Each serves a different domain with different responsibilities
-            BC CustomerManagement for Sales {
+            bc CustomerManagement for Sales {
                 description: "Manages sales leads and opportunities"
             }
             
-            BC CustomerManagement for Support {
+            bc CustomerManagement for Support {
                 description: "Manages support tickets and SLAs"
             }
             
@@ -77,11 +77,11 @@ describe('MultiReference Practical Examples', () => {
             Domain Marketing {}
             Domain Sales {}
             
-            BC Campaigns for Marketing {
+            bc Campaigns for Marketing {
                 description: "Marketing campaigns"
             }
             
-            BC Campaigns for Sales {
+            bc Campaigns for Sales {
                 description: "Sales campaigns"  
             }
             
@@ -120,7 +120,7 @@ describe('MultiReference Practical Examples', () => {
         const input = s`
             Domain Sales {}
             
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 description: "Order management"
             }
             

@@ -111,7 +111,7 @@ BoundedContext:
 ```
 
 **Strengths**:
-- ✅ Multiple keyword aliases improve ergonomics (BC is concise, BoundedContext is explicit)
+- ✅ Multiple keyword aliases improve ergonomics (bc is concise, BoundedContext is explicit)
 - ✅ Inline role and team assignments provide convenient shorthand
 - ✅ Single domain reference properly enforces boundary integrity (fixed in audit)
 - ✅ Optional body allows lightweight declarations
@@ -120,23 +120,23 @@ BoundedContext:
 **Issues Identified**:
 
 **I1.1 - Inconsistent Keyword: "implements"** [FIXED ✅]
-- Previously allowed `BC Sales implements SalesDomain` 
+- Previously allowed `bc Sales implements SalesDomain` 
 - Fixed in DDD audit: removed "implements" keyword
-- Proper syntax now: `BC Sales for SalesDomain`
+- Proper syntax now: `bc Sales for SalesDomain`
 
 **I1.2 - Confusing Inline vs. Block Syntax**
 ```langium
 // Option 1: Inline
-BC Sales for Domain1 as CoreRole by Team1
+bc Sales for Domain1 as CoreRole by Team1
 
 // Option 2: Block  
-BC Sales for Domain1 {
+bc Sales for Domain1 {
     role: CoreRole
     team: Team1
 }
 
 // Option 3: Mixed (currently allowed!)
-BC Sales for Domain1 as CoreRole {
+bc Sales for Domain1 as CoreRole {
     team: Team1  // Redundant/conflicting?
 }
 ```
@@ -485,7 +485,7 @@ PropertyDeclaration:
 
 Example usage:
 ```dlang
-BC OrderManagement for Sales {
+bc OrderManagement for Sales {
     description: "..."
     
     Aggregate Order {
@@ -633,7 +633,7 @@ Currently, all symbols are implicitly exported. Add explicit export control:
 ```langium
 // Option 1: Export statements
 export Domain Sales
-export BC OrderManagement
+export bc OrderManagement
 
 // Option 2: Private keyword
 private Classification InternalOnly  // Not exported
@@ -641,7 +641,7 @@ private Classification InternalOnly  // Not exported
 // Option 3: Explicit export block
 exports {
     Domain Sales
-    BC OrderManagement
+    bc OrderManagement
 }
 ```
 
@@ -821,7 +821,7 @@ Alternative:
 
 Example:
 ```dlang
-BC OrderManagement {
+bc OrderManagement {
     ADR 001: "Use Event Sourcing for Order Aggregate" {
         status accepted
         context: "Orders require full audit trail for compliance and customer support"
@@ -959,7 +959,7 @@ function validateBoundedContextComplexity(
     if (aggregateCount > 7) {
         accept('info',
             `Bounded Context '${bc.name}' has ${aggregateCount} aggregates. ` +
-            `Consider splitting into smaller contexts (DDD: "A BC should be as small as possible").`,
+            `Consider splitting into smaller contexts (DDD: "A bc should be as small as possible").`,
             { node: bc }
         );
     }
@@ -1079,13 +1079,13 @@ Document when to use which alias:
 Examples:
 ```dlang
 // Block style: use colon
-BC Sales for Domain1 {
+bc Sales for Domain1 {
     description: "Handles sales"
     role: CoreDomain
 }
 
 // Inline style: use 'as'/'by'
-BC Sales for Domain1 as CoreDomain by Team1
+bc Sales for Domain1 as CoreDomain by Team1
 
 // Natural language: use 'is'
 term Order: "A customer purchase"
@@ -1133,7 +1133,7 @@ Improve parser error recovery for common mistakes:
 
 ```langium
 // Current: Hard error on missing colon
-BC Sales for Domain1 {
+bc Sales for Domain1 {
     description "Missing colon"  // Parser error, no recovery
 }
 
@@ -1215,7 +1215,7 @@ BoundedContext:
 
 Example:
 ```dlang
-BC OrderManagement for Sales {
+bc OrderManagement for Sales {
     description: "..."
     
     implementation {
@@ -1243,7 +1243,7 @@ TechnologyEntry:
 
 Example:
 ```dlang
-BC OrderManagement {
+bc OrderManagement {
     technology mapping {
         database: "PostgreSQL"
         messagebus: "RabbitMQ"
@@ -1303,9 +1303,9 @@ Context: BoundedContext | ExecutionContext | SecurityContext
 
 ### ❌ Don't: Break DDD Semantics
 ```langium
-// Bad: Allow BC to implement multiple domains
+// Bad: Allow bc to implement multiple domains
 BoundedContext:
-    'BC' name=ID ('implements' domains=[+Domain])?  // ❌ Violates BC principle
+    'BC' name=ID ('implements' domains=[+Domain])?  // ❌ Violates bc principle
 ```
 **(Already fixed in audit)**
 
@@ -1328,7 +1328,7 @@ Domain Sales {
 ```langium
 // Good: Strategic in Domain, tactical in BC, implementation in metadata
 Domain Sales { ... }
-BC OrderManagement for Sales { 
+bc OrderManagement for Sales { 
     technology mapping { database: "PostgreSQL" }
 }
 ```
@@ -1389,7 +1389,7 @@ DomainLang has achieved **production readiness** for strategic DDD modeling with
 ### Recommended Roadmap
 
 **Phase 1: Validation Hardening** (1-2 weeks)
-- R1.3, R1.4: BC metadata validation
+- R1.3, R1.4: bc metadata validation
 - R2.1, R2.2: Relationship pattern validation
 - R4.4: Circular import detection
 - R7.1: Configurable severity

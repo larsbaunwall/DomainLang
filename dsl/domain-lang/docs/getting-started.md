@@ -321,12 +321,12 @@ BoundedContext OrderManagement for Bookstore as CoreDomain by OrderTeam {
 As your model grows, namespaces help keep things organized:
 
 ```dlang
-namespace Bookstore.Core {
+Namespace Bookstore.Core {
     BoundedContext Catalog for Bookstore as CoreDomain by CatalogTeam { }
     BoundedContext OrderManagement for Bookstore as CoreDomain by OrderTeam { }
 }
 
-namespace Bookstore.Supporting {
+Namespace Bookstore.Supporting {
     BoundedContext Shipping for Bookstore as SupportingDomain by ShippingTeam { }
 }
 ```
@@ -366,7 +366,7 @@ Team CatalogTeam
 Team OrderTeam
 Team ShippingTeam
 
-namespace Bookstore.Core {
+Namespace Bookstore.Core {
     BoundedContext Catalog for Bookstore as CoreDomain by CatalogTeam {
         description: "Manages the book catalog and inventory"
 
@@ -401,7 +401,7 @@ namespace Bookstore.Core {
     }
 }
 
-namespace Bookstore.Supporting {
+Namespace Bookstore.Supporting {
     BoundedContext Shipping for Bookstore as SupportingDomain by ShippingTeam {
         description: "Manages shipping and delivery"
 

@@ -71,7 +71,7 @@ describe('Decision Classification', () => {
     test('should support qualified names for decision Classification', async () => {
         // Arrange
         const input = s`
-            namespace governance {
+            Namespace governance {
                 Classification Architectural
                 Classification Business
             }

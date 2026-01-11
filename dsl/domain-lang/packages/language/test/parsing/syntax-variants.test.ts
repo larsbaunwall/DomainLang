@@ -36,10 +36,10 @@ describe('Domain Keyword Variants', () => {
         expect(getFirstDomain(document).name).toBe('Sales');
     });
 
-    test('should parse domain with lowercase d', async () => {
+    test('should parse dom shorthand', async () => {
         // Arrange
         const input = s`
-            domain Sales {
+            dom Sales {
                 vision: "Sales vision"
             }
         `;
@@ -75,11 +75,11 @@ describe('BoundedContext Keyword Variants', () => {
 
     // NOTE: boundedcontext (lowercase, concatenated) alias removed - use BoundedContext or BC
 
-    test('should parse BC shorthand', async () => {
+    test('should parse bc shorthand', async () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
+            bc OrderContext for Sales
         `;
 
         // Act
@@ -95,24 +95,11 @@ describe('BoundedContext Keyword Variants', () => {
 // TEAM KEYWORD VARIANTS
 // ============================================================================
 
-describe('Team Keyword Variants', () => {
-    test('should parse Team with capital T', async () => {
+describe('Team Keyword', () => {
+    test('should parse Team keyword', async () => {
         // Arrange
         const input = s`
             Team SalesTeam
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
-
-    test('should parse team with lowercase t', async () => {
-        // Arrange
-        const input = s`
-            team SalesTeam
         `;
 
         // Act
@@ -127,24 +114,11 @@ describe('Team Keyword Variants', () => {
 // CLASSIFICATION KEYWORD VARIANTS
 // ============================================================================
 
-describe('Classification Keyword Variants', () => {
-    test('should parse Classification with capital C', async () => {
+describe('Classification Keyword', () => {
+    test('should parse Classification keyword', async () => {
         // Arrange
         const input = s`
             Classification Core
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
-
-    test('should parse classification with lowercase c', async () => {
-        // Arrange
-        const input = s`
-            classification Core
         `;
 
         // Act
@@ -164,7 +138,7 @@ describe('ContextMap Keyword Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
+            bc OrderContext for Sales
             
             ContextMap SalesMap {
                 contains OrderContext
@@ -205,7 +179,24 @@ describe('DomainMap Keyword Variants', () => {
         expectValidDocument(document);
     });
 
-    // NOTE: domainmap (lowercase, concatenated) alias removed - use DomainMap
+    test('should parse dm shorthand', async () => {
+        // Arrange
+        const input = s`
+            Domain Sales {
+                vision: "Sales domain"
+            }
+            
+            dm BusinessMap {
+                contains Sales
+            }
+        `;
+
+        // Act
+        const document = await testServices.parse(input);
+
+        // Assert
+        expectValidDocument(document);
+    });
 });
 
 // ============================================================================
@@ -213,10 +204,10 @@ describe('DomainMap Keyword Variants', () => {
 // ============================================================================
 
 describe('Namespace Keyword Variants', () => {
-    test('should parse namespace with lowercase', async () => {
+    test('should parse ns shorthand', async () => {
         // Arrange
         const input = s`
-            namespace sales {
+            ns sales {
                 Domain Sales {
                     vision: "Sales domain"
                 }
@@ -252,13 +243,13 @@ describe('Namespace Keyword Variants', () => {
 // INLINE BC ASSIGNMENT VARIANTS
 // ============================================================================
 
-describe('BC Inline Assignment Variants', () => {
+describe('bc Inline Assignment Variants', () => {
     test('should parse as keyword for role', async () => {
         // Arrange
         const input = s`
             Domain Sales {}
             Classification Core
-            BC OrderContext for Sales as Core
+            bc OrderContext for Sales as Core
         `;
 
         // Act
@@ -275,7 +266,7 @@ describe('BC Inline Assignment Variants', () => {
         const input = s`
             Domain Sales {}
             Team SalesTeam
-            BC OrderContext for Sales by SalesTeam
+            bc OrderContext for Sales by SalesTeam
         `;
 
         // Act
@@ -292,13 +283,13 @@ describe('BC Inline Assignment Variants', () => {
 // BC DOCUMENTATION BLOCK VARIANTS
 // ============================================================================
 
-describe('BC Documentation Block Variants', () => {
+describe('bc Documentation Block Variants', () => {
     test('should parse team: keyword', async () => {
         // Arrange
         const input = s`
             Team SalesTeam
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 team: SalesTeam
             }
         `;
@@ -315,7 +306,7 @@ describe('BC Documentation Block Variants', () => {
         const input = s`
             Classification Core
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 role: Core
             }
         `;
@@ -332,7 +323,7 @@ describe('BC Documentation Block Variants', () => {
         const input = s`
             Classification SaaS
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 businessModel: SaaS
             }
         `;
@@ -349,7 +340,7 @@ describe('BC Documentation Block Variants', () => {
         const input = s`
             Classification SaaS
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 business model: SaaS
             }
         `;
@@ -366,7 +357,7 @@ describe('BC Documentation Block Variants', () => {
         const input = s`
             Classification Mature
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 lifecycle: Mature
             }
         `;
@@ -383,7 +374,7 @@ describe('BC Documentation Block Variants', () => {
         const input = s`
             Classification Mature
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 lifecycle: Mature
             }
         `;
@@ -405,9 +396,9 @@ describe('Relationships Block Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            BC InventoryContext for Sales {
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
+            bc InventoryContext for Sales {
                 relationships {
                     this -> OrderContext
                 }
@@ -425,9 +416,9 @@ describe('Relationships Block Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            BC InventoryContext for Sales {
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
+            bc InventoryContext for Sales {
                 integrations {
                     this -> OrderContext
                 }
@@ -445,9 +436,9 @@ describe('Relationships Block Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            BC InventoryContext for Sales {
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
+            bc InventoryContext for Sales {
                 connections {
                     this -> OrderContext
                 }
@@ -471,7 +462,7 @@ describe('Decisions Block Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 decisions {
                     decision EventSourcing: "Use event sourcing"
                 }
@@ -489,7 +480,7 @@ describe('Decisions Block Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 constraints {
                     decision EventSourcing: "Use event sourcing"
                 }
@@ -507,7 +498,7 @@ describe('Decisions Block Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 rules {
                     decision EventSourcing: "Use event sourcing"
                 }
@@ -525,7 +516,7 @@ describe('Decisions Block Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 policies {
                     decision EventSourcing: "Use event sourcing"
                 }
@@ -549,7 +540,7 @@ describe('Decision Type Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 decisions {
                     decision EventSourcing: "Use event sourcing"
                 }
@@ -567,7 +558,7 @@ describe('Decision Type Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 decisions {
                     Decision EventSourcing: "Use event sourcing"
                 }
@@ -585,7 +576,7 @@ describe('Decision Type Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 decisions {
                     policy RefundPolicy: "30-day refunds"
                 }
@@ -603,7 +594,7 @@ describe('Decision Type Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 decisions {
                     Policy RefundPolicy: "30-day refunds"
                 }
@@ -621,7 +612,7 @@ describe('Decision Type Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 decisions {
                     rule UniqueIds: "All IDs must be unique"
                 }
@@ -639,7 +630,7 @@ describe('Decision Type Variants', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 decisions {
                     Rule UniqueIds: "All IDs must be unique"
                 }

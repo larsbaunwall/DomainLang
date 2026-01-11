@@ -60,12 +60,12 @@ describe('Grammar Completeness Tests', () => {
                     Classification TestClass
                     ContextMap TestMap { contains TestBC }
                     DomainMap TestDomainMap { contains TestDomain }
-                    namespace grouped {
-                        namespace nested {
+                    Namespace grouped {
+                        Namespace nested {
                             Domain NestedDomain {}
                         }
                     }
-                    namespace test.pkg { Domain PkgDomain {} }
+                    Namespace test.pkg { Domain PkgDomain {} }
                 `,
                 'StructureElement'
             );
@@ -100,7 +100,7 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    namespace com.example {
+                    Namespace com.example {
                         Domain Parent {}
                     }
                     Domain Child in com.example.Parent {}
@@ -141,7 +141,7 @@ describe('Grammar Completeness Tests', () => {
                 testServices.parse,
                 s`
                     Domain Test {}
-                    BC TestBC for Test
+                    bc TestBC for Test
                 `,
                 'BoundedContext shorthand'
             );
@@ -494,11 +494,11 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    namespace com.example.sales {
+                    Namespace com.example.sales {
                         Domain Sales {}
                         Team SalesTeam
                         
-                        namespace orders {
+                        Namespace orders {
                             BoundedContext OrderContext for Sales
                         }
                     }
@@ -511,10 +511,10 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    namespace TopLevel {
+                    Namespace TopLevel {
                         Domain ParentDomain {}
                         
-                        namespace Nested {
+                        Namespace Nested {
                             Domain ChildDomain in ParentDomain {}
                         }
                     }
@@ -527,7 +527,7 @@ describe('Grammar Completeness Tests', () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
-                    namespace com.example.deep.pkg.name {
+                    Namespace com.example.deep.pkg.name {
                         Domain Test {}
                     }
                     

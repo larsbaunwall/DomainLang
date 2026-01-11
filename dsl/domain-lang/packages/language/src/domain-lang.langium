@@ -64,7 +64,7 @@ Type:
  * Use `classifier` to indicate Core, Supporting, or Generic.
  */
 Domain:
-    (/** A Domain represents a sphere of knowledge, influence, or activity. In DDD, it is the subject area to which the user applies a program. Example: Sales, Shipping, Accounting. */ 'Domain' | 'domain') name=ID ('in' parent=[Domain:QualifiedName])?
+    (/** A Domain represents a sphere of knowledge, influence, or activity. In DDD, it is the subject area to which the user applies a program. Example: Sales, Shipping, Accounting. */ 'Domain' | 'dom') name=ID ('in' parent=[Domain:QualifiedName])?
     '{'
         documentation+=DomainDocumentationBlock*
     '}'
@@ -82,7 +82,7 @@ DomainDocumentationBlock:
  * Belongs to exactly ONE domain (fundamental DDD principle).
  */
 BoundedContext:
-    (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'BC') name=ID 
+    (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'bc') name=ID 
     ('for' domain=[Domain:QualifiedName])?
     (
         ('as' role=[Classification:QualifiedName])?
@@ -116,7 +116,7 @@ BoundedContextDocumentationBlock:
  * Represents organizational boundaries in DDD.
  */
 Team:
-    (/** A Team represents the people responsible for a Bounded Context or Domain. */ 'Team' | 'team') name=ID
+    (/** A Team represents the people responsible for a Bounded Context or Domain. */ 'Team') name=ID
 ;
 
 /**
@@ -124,7 +124,7 @@ Team:
  * Examples: Core, Supporting, Generic, Strategic, Commodity, Architectural, Business, Technical.
  */
 Classification:
-    (/** A Classification is a reusable label for categorizing domains, contexts, patterns, and decisions (e.g., Core, Supporting, Generic, Architectural, Business, Technical). */ 'Classification' | 'classification') name=ID
+    (/** A Classification is a reusable label for categorizing domains, contexts, patterns, and decisions (e.g., Core, Supporting, Generic, Architectural, Business, Technical). */ 'Classification') name=ID
 ;
 
 // ============================================================================
@@ -144,7 +144,7 @@ ObjectMap:
  * Shows integration patterns and team interactions.
  */
 ContextMap:
-    (/** A Context Map visualizes and documents the relationships between Bounded Contexts, including their integration patterns. */ 'ContextMap') name=ID
+    (/** A Context Map visualizes and documents the relationships between Bounded Contexts, including their integration patterns. */ 'ContextMap' | 'cm') name=ID
     '{'
         ('contains' boundedContexts += [+BoundedContext:QualifiedName] ((",")? boundedContexts += [+BoundedContext:QualifiedName])*)*
         (relationships += Relationship ((",")? relationships += Relationship)*)*
@@ -156,7 +156,7 @@ ContextMap:
  * Shows high-level domain organization and subdomain structure.
  */
 DomainMap:
-    (/** A Domain Map visualizes and documents the relationships between Domains. */ 'DomainMap') name=ID
+    (/** A Domain Map visualizes and documents the relationships between Domains. */ 'DomainMap' | 'dm') name=ID
     '{'
         ('contains' domains += [+Domain:QualifiedName] ((",")? domains += [+Domain:QualifiedName])*)*
     '}'
@@ -281,7 +281,7 @@ BusinessRule:
  *   - Named imports: import { OrderContext } from "./contexts.dlang"
  */
 ImportStatement:
-    /** Imports types or namespaces from another file or module, enabling reuse and modularity. */ 'import' (
+    /** Imports types or namespaces from another file or module, enabling reuse and modularity. */ ('Import' | 'import') (
         '{' symbols+=ID (',' symbols+=ID)* '}' 'from' uri=STRING
         | uri=STRING
         ('integrity' integrity=STRING)?
@@ -294,7 +294,7 @@ ImportStatement:
  * Combines package modularity with group-style nesting.
  */
 NamespaceDeclaration:
-    (/** Namespaces organize large models into hierarchical qualified names for symbol resolution. */ 'namespace' | 'Namespace') name=QualifiedName '{'
+    (/** Namespaces organize large models into hierarchical qualified names for symbol resolution. */ 'Namespace' | 'ns') name=QualifiedName '{'
         (children+=StructureElement)*
     '}'
 ;

@@ -360,7 +360,7 @@ describe('Import Position', () => {
             Classification Core
             Team SalesTeam
             Domain Sales {}
-            BC OrderContext for Sales
+            bc OrderContext for Sales
         `;
 
         // Act
@@ -381,7 +381,7 @@ describe('Import Position', () => {
                 vision: "Sales domain"
             }
             
-            BC OrderContext for Sales {
+            bc OrderContext for Sales {
                 description: "Order management"
             }
         `;

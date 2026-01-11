@@ -17,7 +17,7 @@ graph TB
     end
     subgraph Organization
         CM[ContextMap] --> BC
-        NS[namespace] --> D
+        NS[Namespace] --> D
         NS --> BC
     end
     subgraph Metadata
@@ -36,22 +36,23 @@ Domain DomainName {
     description: "What this domain does"
 }
 
-BC ContextName for DomainName {
+bc ContextName for DomainName {
     description: "What this context does"
 }
 ```
 
 ## Keywords
 
-| Concept | Keywords | Shorthand |
-| ------- | -------- | --------- |
-| Domain | `Domain` | — |
-| Bounded Context | `BoundedContext` | `BC` |
+| Concept | Primary | Shorthand |
+| ------- | ------- | --------- |
+| Domain | `Domain` | `dom` |
+| Bounded Context | `BoundedContext` | `bc` |
 | Team | `Team` | — |
 | Classification | `Classification` | — |
-| Context Map | `ContextMap` | — |
-| Domain Map | `DomainMap` | — |
-| Namespace | `namespace` | — |
+| Context Map | `ContextMap` | `cm` |
+| Domain Map | `DomainMap` | `dm` |
+| Namespace | `Namespace` | `ns` |
+| Import | `Import` | `import` |
 
 ---
 
@@ -60,12 +61,12 @@ BC ContextName for DomainName {
 Write concise declarations with inline syntax:
 
 ```dlang
-BC Orders for Sales as CoreDomain by SalesTeam {
+bc Orders for Sales as CoreDomain by SalesTeam {
     description: "Order processing"
 }
 
 // Equivalent to:
-BC Orders for Sales {
+bc Orders for Sales {
     role: CoreDomain
     team: SalesTeam
     description: "Order processing"
@@ -79,7 +80,7 @@ BC Orders for Sales {
 Add metadata to your types:
 
 ```dlang
-BC Orders for Sales {
+bc Orders for Sales {
     description: "Short description"
 
     terminology { term Order: "..." }
@@ -220,7 +221,7 @@ import "ddd-patterns" as Patterns
 
 ```dlang
 // Namespace (hierarchical container)
-namespace Shared {
+Namespace Shared {
     Classification CoreDomain
     Team ProductTeam
 }
@@ -231,7 +232,7 @@ namespace Shared {
 ## Assignment Operators
 
 ```dlang
-BC Orders {
+bc Orders {
     description: "..."      // colon (recommended)
     team = SalesTeam         // equals
     role is CoreDomain       // is (natural language)
@@ -277,7 +278,7 @@ These keywords are interchangeable:
 Use `this` to refer to the containing context:
 
 ```dlang
-BC Orders {
+bc Orders {
     relationships {
         this -> ExternalSystem      // self-reference
     }
@@ -310,7 +311,7 @@ Domain ECommerce {
     description: "Online shopping"
 }
 
-BC Catalog for ECommerce as CoreDomain by ProductTeam {
+bc Catalog for ECommerce as CoreDomain by ProductTeam {
     description: "Product catalog"
 
     terminology {
@@ -318,7 +319,7 @@ BC Catalog for ECommerce as CoreDomain by ProductTeam {
     }
 }
 
-BC Orders for ECommerce as CoreDomain by ProductTeam {
+bc Orders for ECommerce as CoreDomain by ProductTeam {
     description: "Order management"
 }
 
@@ -344,7 +345,7 @@ Domain Sales {
 }
 
 // Apply to contexts
-BC Orders for Sales {
+bc Orders for Sales {
     role: CoreDomain
 }
 ```
@@ -358,7 +359,7 @@ Classification Architectural
 Classification Business
 Classification Compliance
 
-BC OrderManagement for Sales as CoreDomain by SalesTeam {
+bc OrderManagement for Sales as CoreDomain by SalesTeam {
     description: "Process customer orders"
 
     terminology {
@@ -400,7 +401,7 @@ ContextMap Integration {
 
 ## 💡 Tips for Success
 
-1. ✏️ **Use `BC` shorthand** — Saves typing over `BoundedContext`
+1. ✏️ **Use `bc` shorthand** — Saves typing over `BoundedContext`
 2. 📝 **Use `:` for assignments** — Most readable and common style
 3. 🔗 **Always associate contexts with domains** — Use `for DomainName`
 4. 📖 **Define terminology** — Documents your ubiquitous language

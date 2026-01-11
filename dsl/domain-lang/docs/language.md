@@ -10,17 +10,37 @@ This is the complete reference for DomainLang syntax and semantics. If you're ne
 
 ## Table of Contents
 
-- [Model Structure](#model-structure)
-- [Imports](#imports)
-- [Namespaces](#namespaces)
-- [Type Declarations](#type-declarations)
-- [Documentation Blocks](#documentation-blocks)
-- [Terminology and Decisions](#terminology-and-decisions)
-- [Context Maps and Relationships](#context-maps-and-relationships)
-- [Qualified Names and References](#qualified-names-and-references)
-- [Assignment Helpers](#assignment-helpers)
-- [Comments](#hidden-tokens-and-comments)
-- [Examples](#reference-examples)
+- [DomainLang Language Reference](#domainlang-language-reference)
+  - [Table of Contents](#table-of-contents)
+  - [Model Structure](#model-structure)
+  - [Imports](#imports)
+    - [How Imports Work](#how-imports-work)
+  - [Namespaces](#namespaces)
+  - [Type Declarations](#type-declarations)
+    - [Domain](#domain)
+    - [BoundedContext](#boundedcontext)
+    - [Classification and Team](#classification-and-team)
+  - [Documentation Blocks](#documentation-blocks)
+    - [Available Blocks](#available-blocks)
+    - [Block Examples](#block-examples)
+    - [Usage Example](#usage-example)
+  - [Terminology and Decisions](#terminology-and-decisions)
+    - [Terms](#terms)
+    - [Decisions, Policies, and Rules](#decisions-policies-and-rules)
+  - [Context Maps and Relationships](#context-maps-and-relationships)
+    - [ContextMap](#contextmap)
+    - [DomainMap](#domainmap)
+    - [Relationship Patterns](#relationship-patterns)
+    - [Relationship Syntax Examples](#relationship-syntax-examples)
+  - [Qualified Names and References](#qualified-names-and-references)
+    - [Naming Rules](#naming-rules)
+    - [Special References](#special-references)
+  - [Assignment Helpers](#assignment-helpers)
+  - [Hidden Tokens and Comments](#hidden-tokens-and-comments)
+  - [Reference Examples](#reference-examples)
+    - [Minimal Workspace Example](#minimal-workspace-example)
+    - [Advanced Portfolio Model](#advanced-portfolio-model)
+  - [See Also](#see-also)
 
 ---
 
@@ -52,12 +72,12 @@ graph TD
 import "./shared/classifications.dlang"
 import "acme/ddd-patterns@v2.1.0" as Patterns
 
-namespace Shared {
+Namespace Shared {
     Classification CoreDomain
     Classification SupportingDomain
 }
 
-namespace acme.sales {
+Namespace acme.sales {
     Domain Sales { description: "Handles all sales operations" }
 }
 ```
@@ -115,7 +135,7 @@ import "acme/ddd-patterns@v2.1.0" as Patterns
 import { CoreDomain, SupportingDomain } from "./classifications.dlang"
 
 // Use imported symbols
-BC Checkout for Sales as Patterns.CoreDomain { }
+bc Checkout for Sales as Patterns.CoreDomain { }
 ```
 
 ---
@@ -125,7 +145,7 @@ BC Checkout for Sales as Patterns.CoreDomain { }
 Namespaces organize large models into logical hierarchies:
 
 ```dlang
-namespace Qualified.Name {
+Namespace Qualified.Name {
     // Structure elements go here
 }
 ```
@@ -139,8 +159,8 @@ namespace Qualified.Name {
 | **Resolution** | Cross-references resolve using shortest valid FQN; inner scopes shadow outer |
 
 ```dlang
-namespace acme.platform {
-    namespace Shared {
+Namespace acme.platform {
+    Namespace Shared {
         Classification CoreDomain
         Team PlatformGuild
     }
@@ -148,6 +168,7 @@ namespace acme.platform {
     Domain Sales {
         classification: Shared.CoreDomain  // Resolves to acme.platform.Shared.CoreDomain
     }
+}
 }
 ```
 
@@ -181,7 +202,7 @@ Domain Sales in Enterprise {
 A **BoundedContext** defines a model boundary with clear ownership and terminology.
 
 ```dlang
-BC Checkout for Sales as Core by PaymentsTeam {
+bc Checkout for Sales as Core by PaymentsTeam {
     description: "Checkout orchestration"
     role: Strategic.CoreDomain
     team: PaymentsTeam
@@ -193,7 +214,7 @@ BC Checkout for Sales as Core by PaymentsTeam {
 
 | Element | Required | Description |
 | ------- | -------- | ----------- |
-| `BoundedContext` or `BC` | ✅ | Keywords are equivalent |
+| `BoundedContext` or `bc` | ✅ | Keywords are equivalent |
 | `Name` | ✅ | Context identifier |
 | `for Domain` | ❌ | Domain association for strategic alignment |
 | `as Classification` | ❌ | Inline role assignment |
@@ -232,7 +253,7 @@ Documentation blocks enrich types with metadata. They're optional and can contai
 ### Usage Example
 
 ```dlang
-BC OrderManagement for Sales {
+bc OrderManagement for Sales {
     description: "Handles order lifecycle"
     team: SalesTeam
     
@@ -383,7 +404,7 @@ ContextMap Integration {
 **Self-reference with `this`:**
 
 ```dlang
-BC Orders for Sales {
+bc Orders for Sales {
     relationships {
         [OHS] this -> ExternalPaymentSystem
     }
@@ -408,7 +429,7 @@ BC Orders for Sales {
 - `this` resolves to the containing bounded context when used in relationship blocks
 
 ```dlang
-BC Checkout for Sales {
+bc Checkout for Sales {
     relationships {
         this -> PaymentGateway    // "this" = Checkout
     }

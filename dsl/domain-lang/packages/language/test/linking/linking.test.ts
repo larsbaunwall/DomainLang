@@ -67,13 +67,13 @@ describe('ContextMap Relationship Linking', () => {
     test('should resolve references in ContextMap when present', async () => {
         // Arrange
         const input = s`
-            namespace TestNamespace {
+            Namespace TestNamespace {
                 ContextMap CorrectMap {
                     OtherNamespace.PaymentBC <- OrdersBC
                 }
                 BoundedContext OrdersBC {}
             }
-            namespace OtherNamespace {
+            Namespace OtherNamespace {
                 BoundedContext PaymentBC {}
             }
         `;
@@ -100,8 +100,8 @@ describe('ContextMap Relationship Linking', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap PatternMap {
                 contains OrderContext, PaymentContext
@@ -129,8 +129,8 @@ describe('ContextMap Relationship Linking', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TypedMap {
                 contains OrderContext, PaymentContext
@@ -257,7 +257,7 @@ describe('Team Reference Linking', () => {
             Domain Sales {}
             Team SalesTeam
             
-            BC OrderContext for Sales by SalesTeam
+            bc OrderContext for Sales by SalesTeam
         `;
 
         // Act
@@ -297,7 +297,7 @@ describe('Team Reference Linking', () => {
     test('should resolve qualified team reference', async () => {
         // Arrange
         const input = s`
-            namespace company.teams {
+            Namespace company.teams {
                 Team EngineeringTeam
             }
             
@@ -333,7 +333,7 @@ describe('Classification Reference Linking', () => {
             Domain Sales {}
             Classification Core
             
-            BC OrderContext for Sales as Core
+            bc OrderContext for Sales as Core
         `;
 
         // Act
@@ -394,7 +394,7 @@ describe('Classification Reference Linking', () => {
     test('should resolve qualified classification reference', async () => {
         // Arrange
         const input = s`
-            namespace governance {
+            Namespace governance {
                 Classification Technical
             }
             
@@ -454,7 +454,7 @@ describe('DomainMap Linking', () => {
     test('should resolve qualified domain references in DomainMap', async () => {
         // Arrange
         const input = s`
-            namespace company {
+            Namespace company {
                 Domain Sales {
                     vision: "Company sales"
                 }
@@ -538,17 +538,17 @@ describe('This Reference Linking', () => {
 // ============================================================================
 
 describe('Complex Linking Scenarios', () => {
-    test('should resolve cross-namespace references', async () => {
+    test('should resolve cross-Namespace references', async () => {
         // Arrange
         const input = s`
-            namespace sales {
+            Namespace sales {
                 Domain Sales {
                     vision: "Sales domain"
                 }
                 Team SalesTeam
             }
             
-            namespace billing {
+            Namespace billing {
                 Domain Billing {
                     vision: "Billing domain"
                 }
@@ -564,7 +564,7 @@ describe('Complex Linking Scenarios', () => {
 
         // Assert
         expectValidDocument(document);
-        // Verify cross-namespace team reference resolved
+        // Verify cross-Namespace team reference resolved
         const billingNs = document.parseResult.value.children.find(
             c => isNamespaceDeclaration(c) && c.name === 'billing'
         ) as any;
@@ -573,11 +573,11 @@ describe('Complex Linking Scenarios', () => {
         expect(teamBlock?.team?.ref?.name).toBe('SalesTeam');
     });
 
-    test('should resolve nested namespace qualified names', async () => {
+    test('should resolve nested Namespace qualified names', async () => {
         // Arrange
         const input = s`
-            namespace com.company {
-                namespace sales {
+            Namespace com.company {
+                Namespace sales {
                     Domain Sales {
                         vision: "Nested sales domain"
                     }

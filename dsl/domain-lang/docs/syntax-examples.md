@@ -132,7 +132,7 @@ BoundedContext OrderProcessing for Sales {
 ### Using Shorthand `BC`
 
 ```dlang
-BC OrderProcessing for Sales {
+bc OrderProcessing for Sales {
     description: "Process customer orders"
 }
 ```
@@ -143,11 +143,11 @@ BC OrderProcessing for Sales {
 Classification CoreDomain
 Classification SupportingDomain
 
-BC OrderProcessing for Sales as CoreDomain {
+bc OrderProcessing for Sales as CoreDomain {
     description: "Core order processing logic"
 }
 
-BC Notifications for Sales as SupportingDomain {
+bc Notifications for Sales as SupportingDomain {
     description: "Send order notifications"
 }
 ```
@@ -157,7 +157,7 @@ BC Notifications for Sales as SupportingDomain {
 ```dlang
 Team SalesTeam
 
-BC OrderProcessing for Sales by SalesTeam {
+bc OrderProcessing for Sales by SalesTeam {
     description: "Process customer orders"
 }
 ```
@@ -168,7 +168,7 @@ BC OrderProcessing for Sales by SalesTeam {
 Classification CoreDomain
 Team SalesTeam
 
-BC OrderProcessing for Sales as CoreDomain by SalesTeam {
+bc OrderProcessing for Sales as CoreDomain by SalesTeam {
     description: "Process customer orders"
 }
 ```
@@ -180,7 +180,7 @@ Classification CoreDomain
 Classification EventSourced
 Classification HighTraffic
 
-BC OrderProcessing for Sales {
+bc OrderProcessing for Sales {
     description: "Process customer orders"
 
     classifications {
@@ -206,7 +206,7 @@ Classification GenericDomain
 ### Classification in Namespaces
 
 ```dlang
-namespace StrategicPatterns {
+Namespace StrategicPatterns {
     Classification CoreDomain
     Classification SupportingDomain
     Classification GenericDomain
@@ -224,7 +224,7 @@ Team InfrastructureTeam
 ### Teams in Namespaces
 
 ```dlang
-namespace Engineering {
+Namespace Engineering {
     Team BackendTeam
     Team FrontendTeam
     Team DataTeam
@@ -240,7 +240,7 @@ Document the ubiquitous language within bounded contexts.
 ### Basic Terms
 
 ```dlang
-BC OrderProcessing for Sales {
+bc OrderProcessing for Sales {
     terminology {
         term Order: "Customer purchase request"
         term Invoice: "Bill sent to customer"
@@ -287,15 +287,15 @@ terminology {
 
 ```dlang
 // All of these are equivalent for terminology
-BC Sales for Domain1 {
+bc Sales for Domain1 {
     terminology { ... }
 }
 
-BC Sales for Domain1 {
+bc Sales for Domain1 {
     language { ... }
 }
 
-BC Sales for Domain1 {
+bc Sales for Domain1 {
     glossary { ... }
 }
 ```
@@ -318,11 +318,11 @@ graph LR
 ### Basic Context Map
 
 ```dlang
-BC Catalog for Sales {
+bc Catalog for Sales {
     description: "Product catalog"
 }
 
-BC Orders for Sales {
+bc Orders for Sales {
     description: "Order management"
 }
 
@@ -449,7 +449,7 @@ ContextMap Independent {
 ### Self-Referential with `this`
 
 ```dlang
-BC Sales for Domain1 {
+bc Sales for Domain1 {
     relationships {
         [OHS] this -> ExternalSystem : PublicAPI
     }
@@ -501,7 +501,7 @@ Document governance, architectural decisions, and business rules.
 ### Decisions
 
 ```dlang
-BC Orders for Sales {
+bc Orders for Sales {
     decisions {
         decision EventSourcing: "Use event sourcing for order history"
         decision MicroserviceArchitecture: "Deploy as independent microservices"
@@ -536,7 +536,7 @@ decisions {
 ```dlang
 Classification Business
 
-BC Orders for Sales {
+bc Orders for Sales {
     decisions {
         policy [Business] FreeShipping: "Free shipping over $50"
         policy [Business] ReturnWindow: "30-day return window"
@@ -550,7 +550,7 @@ BC Orders for Sales {
 Classification Compliance
 Classification Business
 
-BC Orders for Sales {
+bc Orders for Sales {
     decisions {
         rule [Compliance] DataRetention: "Store data for 7 years"
         rule [Business] MinimumOrder: "Minimum order value is $10"
@@ -597,7 +597,7 @@ import "./shared/types.dlang" as SharedTypes
 import "~/domains/sales.dlang" as SalesDomain
 
 // Use with qualified names
-BC Orders for SalesDomain.Sales {
+bc Orders for SalesDomain.Sales {
     classification: SharedTypes.CoreDomain
 }
 ```
@@ -615,7 +615,7 @@ import "ddd-patterns/core@abc123def456"
 import "ddd-patterns/core"
 
 // Use patterns
-BC Orders for Sales {
+bc Orders for Sales {
     classifications {
         role: DDDPatterns.AggregateRoot
     }
@@ -650,14 +650,14 @@ Organize large models with namespaces.
 ### Basic Namespace
 
 ```dlang
-namespace Shared {
+Namespace Shared {
     Classification CoreDomain
     Classification SupportingDomain
     Team PlatformTeam
 }
 
 // Reference with qualified names
-BC Orders for Sales as Shared.CoreDomain by Shared.PlatformTeam {
+bc Orders for Sales as Shared.CoreDomain by Shared.PlatformTeam {
     description: "Order processing"
 }
 ```
@@ -665,19 +665,19 @@ BC Orders for Sales as Shared.CoreDomain by Shared.PlatformTeam {
 ### Nested Namespaces
 
 ```dlang
-namespace Company {
-    namespace Engineering {
+Namespace Company {
+    Namespace Engineering {
         Team BackendTeam
         Team FrontendTeam
     }
 
-    namespace BusinessDevelopment {
+    Namespace BusinessDevelopment {
         Team SalesTeam
         Team MarketingTeam
     }
 }
 
-BC Orders for Sales by Company.Engineering.BackendTeam {
+bc Orders for Sales by Company.Engineering.BackendTeam {
     description: "Owned by backend team"
 }
 ```
@@ -685,12 +685,12 @@ BC Orders for Sales by Company.Engineering.BackendTeam {
 ### Namespace with Qualified Name
 
 ```dlang
-namespace acme.sales {
+Namespace acme.sales {
     Domain Sales {
         description: "Sales domain"
     }
 
-    BC Orders for Sales {
+    bc Orders for Sales {
         description: "Order processing"
     }
 }
@@ -701,8 +701,8 @@ namespace acme.sales {
 ### Namespace with Shared Resources
 
 ```dlang
-namespace acme.platform {
-    namespace Shared {
+Namespace acme.platform {
+    Namespace Shared {
         Classification CoreDomain
         Team PlatformGuild
     }
@@ -712,7 +712,7 @@ namespace acme.platform {
         classification: Shared.CoreDomain
     }
 
-    BC Orders for Sales by Shared.PlatformGuild {
+    bc Orders for Sales by Shared.PlatformGuild {
         description: "Order processing"
     }
 }
@@ -737,7 +737,7 @@ import "~/shared/compliance.dlang" as Compliance
 // Strategic Classifications
 // ============================================================================
 
-namespace StrategicClassifications {
+Namespace StrategicClassifications {
     Classification CoreDomain
     Classification SupportingDomain
     Classification GenericDomain
@@ -747,7 +747,7 @@ namespace StrategicClassifications {
 // Teams
 // ============================================================================
 
-namespace OrganizationStructure {
+Namespace OrganizationStructure {
     Team ProductTeam
     Team CheckoutTeam
     Team FulfillmentTeam
@@ -778,7 +778,7 @@ Domain BackOffice in EcommercePlatform {
 // Core Bounded Contexts
 // ============================================================================
 
-BC ProductCatalog for CustomerExperience
+bc ProductCatalog for CustomerExperience
     as StrategicClassifications.CoreDomain
     by OrganizationStructure.ProductTeam {
 
@@ -817,7 +817,7 @@ BC ProductCatalog for CustomerExperience
     }
 }
 
-BC ShoppingCart for CustomerExperience
+bc ShoppingCart for CustomerExperience
     as StrategicClassifications.CoreDomain
     by OrganizationStructure.CheckoutTeam {
 
@@ -841,7 +841,7 @@ BC ShoppingCart for CustomerExperience
     }
 }
 
-BC Checkout for CustomerExperience
+bc Checkout for CustomerExperience
     as StrategicClassifications.CoreDomain
     by OrganizationStructure.CheckoutTeam {
 
@@ -882,7 +882,7 @@ BC Checkout for CustomerExperience
     }
 }
 
-BC OrderManagement for BackOffice
+bc OrderManagement for BackOffice
     as StrategicClassifications.CoreDomain
     by OrganizationStructure.FulfillmentTeam {
 
@@ -904,7 +904,7 @@ BC OrderManagement for BackOffice
     }
 }
 
-BC PaymentGateway for CustomerExperience
+bc PaymentGateway for CustomerExperience
     as StrategicClassifications.SupportingDomain
     by OrganizationStructure.CheckoutTeam {
 
@@ -917,7 +917,7 @@ BC PaymentGateway for CustomerExperience
     }
 }
 
-BC Analytics for BackOffice
+bc Analytics for BackOffice
     as StrategicClassifications.GenericDomain
     by OrganizationStructure.DataTeam {
 
@@ -983,7 +983,7 @@ DomainLang supports three assignment operators interchangeably.
 ### Colon `:` (JSON/YAML Style)
 
 ```dlang
-BC Orders for Sales {
+bc Orders for Sales {
     description: "Order processing"
     role: CoreDomain
 }
@@ -992,7 +992,7 @@ BC Orders for Sales {
 ### Equals `=` (Traditional Programming)
 
 ```dlang
-BC Orders for Sales {
+bc Orders for Sales {
     description = "Order processing"
     role = CoreDomain
 }
@@ -1001,7 +1001,7 @@ BC Orders for Sales {
 ### Is (Natural Language)
 
 ```dlang
-BC Orders for Sales {
+bc Orders for Sales {
     description is "Order processing"
     role is CoreDomain
 }

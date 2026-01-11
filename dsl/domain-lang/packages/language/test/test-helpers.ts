@@ -270,7 +270,7 @@ export const TestFixtures = {
      * Namespace declaration with nested elements.
      */
     namespaceDeclaration: () => s`
-        namespace com.example.sales {
+        Namespace com.example.sales {
             Domain Sales {
                 description: "Sales domain in namespace"
             }
@@ -296,7 +296,7 @@ export const TestFixtures = {
     complexExample: () => s`
         import "./shared.dlang" as Shared
         
-        namespace com.company.ecommerce {
+        Namespace com.company.ecommerce {
             Team SalesTeam
             Team PaymentTeam
             Classification Core
@@ -333,7 +333,7 @@ export const TestFixtures = {
                 }
             }
             
-            BC PaymentProcessing for Commerce as Supporting by PaymentTeam {
+            bc PaymentProcessing for Commerce as Supporting by PaymentTeam {
                 description: "Payment processing"
             }
             

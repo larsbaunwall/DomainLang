@@ -38,8 +38,8 @@ describe('Relationship Arrow Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -60,8 +60,8 @@ describe('Relationship Arrow Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -82,8 +82,8 @@ describe('Relationship Arrow Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -104,8 +104,8 @@ describe('Relationship Arrow Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -134,8 +134,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -156,8 +156,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -178,8 +178,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -200,8 +200,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -222,8 +222,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -244,8 +244,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -266,8 +266,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -288,8 +288,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -311,8 +311,8 @@ describe('DDD Pattern Annotations', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -341,8 +341,8 @@ describe('DDD Pattern Annotations - Long-form Aliases', () => {
     test('should parse [PublishedLanguage] (long-form of PL)', async () => {
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -358,8 +358,8 @@ describe('DDD Pattern Annotations - Long-form Aliases', () => {
     test('should parse [OpenHostService] (long-form of OHS)', async () => {
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -375,8 +375,8 @@ describe('DDD Pattern Annotations - Long-form Aliases', () => {
     test('should parse [Conformist] (long-form of CF)', async () => {
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -392,8 +392,8 @@ describe('DDD Pattern Annotations - Long-form Aliases', () => {
     test('should parse [AntiCorruptionLayer] (long-form of ACL)', async () => {
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -409,8 +409,8 @@ describe('DDD Pattern Annotations - Long-form Aliases', () => {
     test('should parse [Partnership] (long-form of P)', async () => {
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -426,8 +426,8 @@ describe('DDD Pattern Annotations - Long-form Aliases', () => {
     test('should parse [SharedKernel] (long-form of SK)', async () => {
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -443,8 +443,8 @@ describe('DDD Pattern Annotations - Long-form Aliases', () => {
     test('should parse [BigBallOfMud] (long-form of BBoM)', async () => {
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -460,8 +460,8 @@ describe('DDD Pattern Annotations - Long-form Aliases', () => {
     test('should parse mixed short and long-form patterns', async () => {
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -487,8 +487,8 @@ describe('Relationship Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -509,8 +509,8 @@ describe('Relationship Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -531,8 +531,8 @@ describe('Relationship Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -553,8 +553,8 @@ describe('Relationship Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -575,8 +575,8 @@ describe('Relationship Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -603,8 +603,8 @@ describe('Combined Patterns and Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext
@@ -627,9 +627,9 @@ describe('Combined Patterns and Types', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
-            BC InventoryContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
+            bc InventoryContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext, InventoryContext
@@ -650,16 +650,16 @@ describe('Combined Patterns and Types', () => {
 });
 
 // ============================================================================
-// BC INTERNAL RELATIONSHIPS
+// bc INTERNAL RELATIONSHIPS
 // ============================================================================
 
-describe('BC Internal Relationships', () => {
+describe('bc Internal Relationships', () => {
     test('should parse this reference on left side', async () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales {
+            bc OrderContext for Sales
+            bc PaymentContext for Sales {
                 relationships {
                     this -> OrderContext
                 }
@@ -677,8 +677,8 @@ describe('BC Internal Relationships', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales {
+            bc OrderContext for Sales
+            bc PaymentContext for Sales {
                 relationships {
                     [OHS] this -> [CF] OrderContext : CustomerSupplier
                 }
@@ -696,9 +696,9 @@ describe('BC Internal Relationships', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC InventoryContext for Sales
-            BC PaymentContext for Sales {
+            bc OrderContext for Sales
+            bc InventoryContext for Sales
+            bc PaymentContext for Sales {
                 relationships {
                     this -> OrderContext
                     this <-> InventoryContext
@@ -717,8 +717,8 @@ describe('BC Internal Relationships', () => {
         // Arrange
         const input = s`
             Domain Sales {}
-            BC OrderContext for Sales
-            BC PaymentContext for Sales
+            bc OrderContext for Sales
+            bc PaymentContext for Sales
             
             ContextMap TestMap {
                 contains OrderContext, PaymentContext

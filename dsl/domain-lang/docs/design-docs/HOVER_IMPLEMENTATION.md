@@ -109,7 +109,7 @@ JSDoc comments on grammar rules appear when hovering instances:
 ```langium
 /**
  * A bounded context represents an explicit boundary within which a domain model exists.
- * Teams, codebase, database schemas, and unified language should align with BC boundaries.
+ * Teams, codebase, database schemas, and unified language should align with bc boundaries.
  */
 BoundedContext:
     'boundedcontext' name=ID

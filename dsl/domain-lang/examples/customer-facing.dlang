@@ -3,7 +3,7 @@ Domain Enterprise {
     vision: "Create a cohesive experience from discovery to fulfillment"
 }
 
-namespace CustomerFacing {
+Namespace CustomerFacing {
     Classification CoreDomain
     Classification SupportingDomain
     Team PlatformGuild

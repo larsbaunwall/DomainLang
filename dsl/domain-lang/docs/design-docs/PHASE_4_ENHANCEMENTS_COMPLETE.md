@@ -114,12 +114,12 @@ n.domains.flatMap(d => d.items.map(item => `- ${this.refLink(item.ref)}`))
 Fixed two existing tests to access `MultiReference.items[0].ref` instead of direct `.ref`:
 
 - `test/parsing/domains-parsing.test.ts` - DomainMap parsing test
-- `test/parsing/new-syntax.test.ts` - BC shorthand test
+- `test/parsing/new-syntax.test.ts` - bc shorthand test
 
 ### Use Cases Enabled
 
 1. **Same-name references across scopes** - Multiple BCs named "Orders" from different packages/imports
-2. **Partial definitions** - BC implementations split across multiple files/modules
+2. **Partial definitions** - bc implementations split across multiple files/modules
 3. **Multi-domain contexts** - BCs that span multiple domain boundaries
 4. **Aggregation views** - ContextMaps and DomainMaps collecting references from various sources
 
@@ -140,7 +140,7 @@ interface MultiReferenceItem<T extends AstNode> {
 }
 ```
 
-**Key Discovery**: Multi-target references work best for **ambiguous name resolution** (e.g., `Orders` resolving to multiple BC definitions from different scopes) rather than inline multiple specifications. The syntax `for Sales for Marketing` creates ONE multi-reference with text "Sales", not two separate references.
+**Key Discovery**: Multi-target references work best for **ambiguous name resolution** (e.g., `Orders` resolving to multiple bc definitions from different scopes) rather than inline multiple specifications. The syntax `for Sales for Marketing` creates ONE multi-reference with text "Sales", not two separate references.
 
 ---
 
@@ -239,7 +239,7 @@ The grammar file already contains **40+ JSDoc comment blocks** documenting:
  *   - Supports inline team and role assignment for brevity.
  *
  * Examples:
- *   BC SalesContext for Sales as Core by SalesTeam
+ *   bc SalesContext for Sales as Core by SalesTeam
  *   BoundedContext SalesContext implements Sales {
  *     description: "Handles sales workflows."
  *   }
@@ -357,7 +357,7 @@ Created `test/multireference/multi-target-refs.test.ts` with 7 comprehensive tes
    - Works in real VS Code environment
 
 7. **✅ Partial definitions across contexts**
-   - Tests same BC name in different domain contexts
+   - Tests same bc name in different domain contexts
    - Validates multi-target resolution with duplicate names
 
 ### Test Helper Implementation
@@ -376,8 +376,8 @@ test('ContextMap can reference multiple BoundedContexts with same name', async (
         Domain Sales {}
         Domain Billing {}
         
-        BC Orders for Sales { description: "Sales orders" }
-        BC Orders for Billing { description: "Billing orders" }
+        bc Orders for Sales { description: "Sales orders" }
+        bc Orders for Billing { description: "Billing orders" }
         
         ContextMap AllOrders {
             contains Orders
@@ -445,7 +445,7 @@ Duration    1.72s
 
 ### Tests
 - `test/parsing/domains-parsing.test.ts` - Fixed DomainMap test for MultiReference
-- `test/parsing/new-syntax.test.ts` - Fixed BC shorthand test for MultiReference
+- `test/parsing/new-syntax.test.ts` - Fixed bc shorthand test for MultiReference
 - `test/multireference/multi-target-refs.test.ts` - **NEW** comprehensive test suite
 
 ### Documentation

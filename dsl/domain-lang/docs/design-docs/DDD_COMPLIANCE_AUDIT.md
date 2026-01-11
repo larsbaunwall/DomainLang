@@ -30,7 +30,7 @@ A comprehensive audit of the DomainLang grammar was conducted to ensure strict c
 
 ### 1. BoundedContext.domain Reference Type
 
-**Issue**: BoundedContext used `domain=[+Domain]` (MultiReference) allowing a BC to belong to multiple domains.
+**Issue**: BoundedContext used `domain=[+Domain]` (MultiReference) allowing a bc to belong to multiple domains.
 
 **DDD Violation**: A Bounded Context defines a boundary—it cannot span multiple domains without losing its core characteristic of establishing clear boundaries.
 
@@ -50,7 +50,7 @@ BoundedContext:
 ```
 
 **Rationale**: 
-- A BC must have clear, singular domain context
+- A bc must have clear, singular domain context
 - Multiple domains = unclear boundaries = context boundary violation
 - If same concept needed in different domains → create separate BCs
 
@@ -63,9 +63,9 @@ BoundedContext:
 
 ### 2. Removal of 'implements' Keyword
 
-**Issue**: BoundedContext syntax allowed `BC SalesContext implements Sales`
+**Issue**: BoundedContext syntax allowed `bc SalesContext implements Sales`
 
-**DDD Issue**: 'implements' suggests interface implementation from OOP, not a DDD concept. A BC doesn't "implement" a domain—it belongs to or operates within a domain.
+**DDD Issue**: 'implements' suggests interface implementation from OOP, not a DDD concept. A bc doesn't "implement" a domain—it belongs to or operates within a domain.
 
 **Fix Applied**:
 ```langium
@@ -79,10 +79,10 @@ BoundedContext:
 **Preferred Syntax**:
 ```dlang
 // ✅ Correct - expresses domain membership
-BC OrderManagement for Sales { ... }
+bc OrderManagement for Sales { ... }
 
 // ❌ Removed - misleading OOP terminology  
-BC OrderManagement implements Sales { ... }
+bc OrderManagement implements Sales { ... }
 ```
 
 **Impact**:
@@ -196,8 +196,8 @@ function validateContextGroupDomainCohesion(
 Domain Sales {}
 Domain Support {}
 
-BC OrderManagement for Sales {}
-BC TicketManagement for Support {}
+bc OrderManagement for Sales {}
+bc TicketManagement for Support {}
 
 ContextGroup CustomerServices {
     contains OrderManagement, TicketManagement  // ⚠️ WARNING!
@@ -280,7 +280,7 @@ MultiReference (`[+Type]` syntax) is used **only** where it makes semantic DDD s
 
 ### Explicitly NOT Used
 
-❌ **BoundedContext.domain** - A BC can only belong to ONE domain (fundamental DDD principle)
+❌ **BoundedContext.domain** - A bc can only belong to ONE domain (fundamental DDD principle)
 
 ### Documentation Updated
 
@@ -322,10 +322,10 @@ MultiReference (`[+Type]` syntax) is used **only** where it makes semantic DDD s
 **Migration**:
 ```dlang
 # BEFORE (no longer valid):
-BC OrderContext implements Sales { ... }
+bc OrderContext implements Sales { ... }
 
 # AFTER (correct):
-BC OrderContext for Sales { ... }
+bc OrderContext for Sales { ... }
 ```
 
 ### For Generated Code
@@ -370,7 +370,7 @@ const domainName = bc.domain?.ref?.name;
 
 ### Strategic Design ✅
 
-1. **Bounded Context Boundaries** - A BC belongs to exactly one domain
+1. **Bounded Context Boundaries** - A bc belongs to exactly one domain
 2. **Subdomain Classification** - Core/Supporting/Generic via classifiers
 3. **Context Mapping Patterns** - All canonical patterns supported
 4. **Ubiquitous Language** - Terminology blocks with synonyms and examples

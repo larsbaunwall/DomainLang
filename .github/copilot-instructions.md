@@ -41,6 +41,8 @@ npm test                  # Run tests
 
 1. **NEVER** commit to git without my explicit approval
 2. **ALWAYS** use conventional commit messages
+3. **ALWAYS** divide large changes into smaller commits
+4. **ALWAYS** run tests before committing
 
 ### 🔴 Grammar Changes
 
