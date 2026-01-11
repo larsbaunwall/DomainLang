@@ -44,6 +44,7 @@
     "devDependencies": {
         "@types/node": "~20.17.48",
         "@types/vscode": "~1.67.0",
+        "@vscode/vsce": "~2.32.0",
         "concurrently": "~8.2.1",
         "esbuild": "~0.25.5",
         "shx": "~0.4.0",

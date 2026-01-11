@@ -56,7 +56,7 @@ jobs:
       - name: Build VSIX
         run: |
           mkdir -p ./dist
-          cd packages/extension && npx vsce package --allow-missing-repository --no-update-package-json
+          cd packages/extension && npx @vscode/vsce package --allow-missing-repository --no-update-package-json
           mv vscode-domain-lang-*.vsix ../../dist/domain-lang-${{ steps.get_version.outputs.version }}.vsix
         working-directory: ./dsl/domain-lang
         shell: bash
