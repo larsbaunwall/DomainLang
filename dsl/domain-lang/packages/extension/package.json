@@ -3,6 +3,7 @@
     "description": "The extension specific package",
     "version": "0.0.1",
     "displayName": "domain-lang",
+    "publisher": "thinkability",
     "type": "module",
     "license": "Apache-2.0",
     "engines": {
