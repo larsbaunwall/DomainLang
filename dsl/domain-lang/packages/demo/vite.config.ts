@@ -11,12 +11,7 @@ export default defineConfig((): UserConfig => {
             rollupOptions: {
                 input: path.resolve(__dirname, 'index.html'),
                 output: {
-                    format: 'es',
-                    manualChunks: {
-                        'monaco-editor': ['monaco-editor-wrapper', 'monaco-editor'],
-                        'langium': ['langium', 'vscode-languageclient'],
-                        'vendor': ['vue']
-                    }
+                    format: 'es'
                 }
             }
         },
