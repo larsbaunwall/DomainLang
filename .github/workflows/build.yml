@@ -59,18 +59,23 @@ jobs:
 
       - name: Build VSIX
         run: |
+          mkdir -p ./dist
           cd packages/extension && npx vsce package --allow-missing-repository --no-update-package-json
           mv vscode-domain-lang-*.vsix ../../dist/domain-lang-${{ steps.get_version.outputs.version }}.vsix
         working-directory: ./dsl/domain-lang
         shell: bash
 
-      - name: Create manifest
+      - name: Prepare artifacts
         run: |
           mkdir -p ./dsl/domain-lang/dist
+          cp -r ./dsl/domain-lang/packages/demo/dist ./dsl/domain-lang/dist/demo
           cat > ./dsl/domain-lang/dist/manifest.yaml << EOF
           version: ${{ steps.get_version.outputs.version }}
           commit_sha: ${{ steps.get_commit.outputs.sha }}
           build_date: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          artifacts:
+            vsix: domain-lang-${{ steps.get_version.outputs.version }}.vsix
+            demo: demo/
           EOF
 
       - name: Upload artifacts
@@ -78,4 +83,3 @@ jobs:
         with:
           name: build-artifacts
           path: ./dsl/domain-lang/dist
-            ./dsl/domain-lang/domain-lang-${{steps.get_version.outputs.version}}.vsix 

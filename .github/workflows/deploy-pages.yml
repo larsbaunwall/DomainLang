@@ -7,6 +7,7 @@ on:
       - completed
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   pages: write
@@ -26,7 +27,7 @@ jobs:
         with:
           name: build-artifacts
           path: ./dist
-          run_id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -34,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: './dist/demo'
 
       - name: Deploy to GitHub Pages
         id: deployment
