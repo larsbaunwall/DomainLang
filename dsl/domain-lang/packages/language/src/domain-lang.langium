@@ -51,7 +51,8 @@ Type:
     Domain | 
     BoundedContext | 
     Team |
-    Classification
+    Classification |
+    Metadata
 ;
 
 // ============================================================================
@@ -97,6 +98,7 @@ BoundedContextDocumentationBlock:
     | {RoleBlock} 'role' Assignment role=[Classification:QualifiedName]
     | {BusinessModelBlock} ('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName]
     | {LifecycleBlock} ('lifecycle') Assignment lifecycle=[Classification:QualifiedName]
+    | {MetadataBlock} ('metadata' | 'meta') '{' (entries+=MetadataEntry)* '}'
     | {BoundedContextClassificationBlock} 'classifications' '{'
         (RoleAssignment Assignment role=[Classification:QualifiedName])?
         (BusinessModelAssignment Assignment businessModel=[Classification:QualifiedName])?
@@ -106,6 +108,11 @@ BoundedContextDocumentationBlock:
     | {TerminologyBlock} ('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' (terms += DomainTerm (",")?)* '}'
     | {DecisionsBlock} ('decisions' | 'constraints' | 'rules' | 'policies') '{' (decisions += AbstractDecision (',')?)* '}'
 ;
+
+MetadataEntry:
+    key=[Metadata:QualifiedName] ':' value=STRING
+;
+
 
 // ============================================================================
 // SECTION 3: DDD TACTICAL DESIGN - TEAMS & CLASSIFICATIONS
@@ -126,6 +133,16 @@ Team:
 Classification:
     (/** A Classification is a reusable label for categorizing domains, contexts, patterns, and decisions (e.g., Core, Supporting, Generic, Architectural, Business, Technical). */ 'Classification') name=ID
 ;
+
+/**
+ * Metadata - Defines a key that can be used in metadata blocks.
+ * Examples: Language, Framework, Database, Repository.
+ * Can be defined locally or imported from stdlib.
+ */
+Metadata:
+    (/** A Metadata defines a key that can be used in metadata blocks. Examples: Language, Framework, Database, Repository. Can be defined locally or imported from stdlib. */ 'Metadata') name=ID
+;
+
 
 // ============================================================================
 // SECTION 4: ARCHITECTURE MAPPING - CONTEXT MAPS & DOMAIN MAPS
@@ -334,6 +351,10 @@ interface BusinessModelBlock {
 
 interface LifecycleBlock {
     lifecycle?: @Classification
+}
+
+interface MetadataBlock {
+    entries: MetadataEntry[]
 }
 
 interface BoundedContextClassificationBlock {
