@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 21
           cache: 'npm'
-          cache-dependency-path: ./dsl/domain-lang/package-lock.json
+          cache-dependency-path: '**/package-lock.json'
           
       - name: Install dependencies
         run: npm ci
@@ -59,9 +59,7 @@ jobs:
 
       - name: Build VSIX
         run: |
-          npm install -g @vscode/vsce
-          npm run vscode:prepublish
-          cd packages/extension && vsce package --allow-missing-repository --no-update-package-json
+          cd packages/extension && npx vsce package --allow-missing-repository --no-update-package-json
           mv vscode-domain-lang-*.vsix ../../domain-lang-${{ steps.get_version.outputs.version }}.vsix
         working-directory: ./dsl/domain-lang
         shell: bash
@@ -81,4 +79,5 @@ jobs:
           name: build-artifacts
           path: |
             ./dsl/domain-lang/dist
+            ./dsl/domain-lang/domain-lang-*.vsix
             ./dsl/domain-lang/domain-lang-${{steps.get_version.outputs.version}}.vsix 
