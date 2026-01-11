@@ -68,6 +68,7 @@ jobs:
 
       - name: Create manifest
         run: |
+          mkdir -p ./dsl/domain-lang/dist
           cat > ./dsl/domain-lang/dist/manifest.yaml << EOF
           version: ${{ steps.get_version.outputs.version }}
           commit_sha: ${{ steps.get_commit.outputs.sha }}
