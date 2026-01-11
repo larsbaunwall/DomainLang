@@ -5,8 +5,8 @@ Priority: Medium
 Target Version: 2.1.0
 Parent: PRS-001
 Created: January 11, 2026
-Effort Estimate: 3-4 weeks
-Dependencies: PRS-003 (Tactical DDD Patterns)
+Effort Estimate: 2 weeks
+Dependencies: None
 
 ## Overview
 
@@ -17,9 +17,7 @@ This PRS adds implementation metadata and operational concerns to DomainLang mod
 | Requirement | Status | Notes |
 |------------|--------|-------|
 | FR-4.1: Implementation Metadata | ❌ Not Implemented | Technology stack mapping |
-| FR-4.2: API Specification Support | ❌ Not Implemented | Contract definitions |
-| FR-4.3: Service Level Objectives | ❌ Not Implemented | Operational requirements |
-| FR-4.4: Lifecycle Markers | ❌ Not Implemented | Architectural evolution tracking |
+| FR-4.2: Lifecycle Markers | ❌ Not Implemented | Architectural evolution tracking |
 
 **Overall Status**: NOT implemented. These features represent future enhancements for connecting models to deployed systems.
 
@@ -30,17 +28,7 @@ As a DevOps engineer,
 I want to specify infrastructure requirements in DomainLang models,
 So that I can generate deployment configurations automatically.
 
-### US-2: API Designer
-As an API designer,
-I want to document API contracts within Bounded Contexts,
-So that integration teams understand available endpoints.
-
-### US-3: Site Reliability Engineer
-As an SRE,
-I want to define SLOs for each Bounded Context,
-So that monitoring and alerting can be configured automatically.
-
-### US-4: Software Architect
+### US-2: Software Architect
 As a software architect managing evolution,
 I want to mark deprecated or experimental contexts,
 So that teams understand which systems are stable.
@@ -128,237 +116,131 @@ BC LegacyOrders for Sales {
 - Documents technology decisions in model
 - Supports polyglot architectures
 
-### ❌ FR-4.2: API Specification Support [NOT IMPLEMENTED]
+### ❌ FR-4.2: Lifecycle Markers [NOT IMPLEMENTED]
 
-**Status**: **NOT IMPLEMENTED** - No API contract definitions exist.
-
-**Current Gap**: 
-Relationships show connections but not the interfaces/contracts.
-
-**Requirement**:
-
-Add API contract definitions to BoundedContexts:
-
-```langium
-BoundedContextDocumentationBlock:
-    // ... existing blocks ...
-    | {APIBlock} ('API' | 'api') name=ID '{' 
-        ('protocol' Assignment protocol=APIProtocol)?
-        ('version' Assignment version=STRING)?
-        (endpoints+=APIEndpoint)*
-        (events+=PublishedEvent)*
-      '}'
-;
-
-APIProtocol returns string:
-    'REST' | 'GraphQL' | 'gRPC' | 'SOAP'
-;
-
-APIEndpoint:
-    method=HTTPMethod path=STRING 
-    ('returns' returnType=ID)?
-    ('requires' authType=ID)?
-;
-
-HTTPMethod returns string:
-    'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-;
-
-PublishedEvent:
-    'publishes' eventType=[DomainEvent:QualifiedName] 
-    'to' topic=STRING
-;
-```
-
-**Example Usage**:
-```dlang
-BC OrderManagement for Sales {
-    description: "Manages customer orders"
-    
-    API OrderAPI {
-        protocol: REST
-        version: "v1"
-        
-        POST /orders returns OrderId
-        GET /orders/:id returns Order
-        GET /orders returns OrderList
-        PUT /orders/:id returns Order
-        DELETE /orders/:id
-        
-        publishes OrderPlaced to "orders.placed"
-        publishes OrderCancelled to "orders.cancelled"
-        publishes OrderShipped to "orders.shipped"
-    }
-    
-    API OrderQuery {
-        protocol: GraphQL
-        version: "v1"
-        
-        // GraphQL schema reference
-    }
-}
-```
-
-**Code Generation Use Cases**:
-- Generate OpenAPI/Swagger specifications
-- Generate API gateway configurations
-- Generate contract tests
-- Generate API client libraries
-- Generate event schemas (AsyncAPI)
-
-**IDE Features**:
-- Hover over endpoint shows documentation
-- Click endpoint navigates to implementation (future)
-- Validation warns on duplicate paths
-- Completion suggests HTTP methods
-
-**Rationale**: 
-- Documents integration contracts
-- Enables API gateway configuration
-- Supports contract testing
-- Improves team coordination
-
-### ❌ FR-4.3: Service Level Objectives [NOT IMPLEMENTED]
-
-**Status**: **NOT IMPLEMENTED** - No SLO definitions exist.
-
-**Current Gap**: 
-Models describe functionality but not operational requirements.
-
-**Requirement**:
-
-Add SLO definitions to BoundedContexts:
-
-```langium
-BoundedContextDocumentationBlock:
-    // ... existing blocks ...
-    | {SLOBlock} ('slo' | 'SLO') name=ID '{' 
-        ('target' Assignment target=STRING)?
-        ('measurement' Assignment measurement=STRING)?
-        ('p99' Assignment p99=STRING)?
-        ('p95' Assignment p95=STRING)?
-        ('p50' Assignment p50=STRING)?
-        (customMetrics+=KeyValuePair)*
-      '}'
-;
-```
-
-**Example Usage**:
-```dlang
-BC OrderManagement for Sales {
-    description: "Manages customer orders"
-    
-    slo Availability {
-        target: "99.9%"
-        measurement: "uptime per month"
-    }
-    
-    slo Latency {
-        p99: "200ms"
-        p95: "100ms"
-        p50: "50ms"
-        measurement: "API response time"
-    }
-    
-    slo ErrorRate {
-        target: "< 0.1%"
-        measurement: "5xx errors per request"
-    }
-    
-    slo DataConsistency {
-        target: "eventual consistency < 5s"
-        measurement: "replication lag"
-    }
-}
-```
-
-**Code Generation Use Cases**:
-- Generate monitoring dashboards (Grafana)
-- Generate alerting rules (Prometheus AlertManager)
-- Generate SLA documentation
-- Generate capacity planning reports
-- Configure load testing scenarios
-
-**Validation**:
-- Warn if critical context has no SLOs
-- Info hint for standard SLO templates
-- Future: Validate metric format
-
-**Rationale**: 
-- Documents operational requirements
-- Enables DevOps automation
-- Supports SRE practices
-- Improves reliability engineering
-
-### ❌ FR-4.4: Lifecycle Markers [NOT IMPLEMENTED]
-
-**Status**: **NOT IMPLEMENTED** - No status annotations exist.
+**Status**: **NOT IMPLEMENTED** - No lifecycle tracking exists.
 
 **Current Gap**: 
 Models don't indicate which contexts are stable, deprecated, or experimental.
 
+**Design Decision**: 
+This feature will **use the existing `Classification` system** rather than introducing generic annotations. This preserves DomainLang's DDD-first philosophy where all concepts are explicit domain terms, not programming language metaphors.
+
+**Rationale for Classifications over Annotations**:
+- ✅ Maintains ubiquitous language principle - Classifications are named domain concepts
+- ✅ Consistent with existing patterns - avoids "two ways to do the same thing"
+- ✅ Better discoverability - Classifications are first-class, referenceable elements
+- ✅ Type-safe - IDE knows valid values through cross-references
+- ✅ LSP-friendly - Works with Langium's built-in cross-referencing
+- ❌ Avoids programming language metaphors (`@annotation`) in domain modeling
+
 **Requirement**:
 
-Add annotation-style lifecycle markers:
+Add dedicated `lifecycle` field to BoundedContext for lifecycle state tracking:
 
 ```langium
-// Add to grammar entry point
-Type:
-    annotations+=Annotation*
-    (Domain | BoundedContext | Team | Classification)
-;
-
-Annotation:
-    '@' name=ID ('(' value=STRING ')')?
+BoundedContext:
+    ('BoundedContext' | 'bc') name=ID 
+    ('for' domain=[Domain:QualifiedName])?
+    (
+        ('as' role=[Classification:QualifiedName])?
+        ('by' team=[Team:QualifiedName])?
+        ('lifecycle' lifecycle=[Classification:QualifiedName])?  // NEW
+    )?
+    ('{' documentation+=BoundedContextDocumentationBlock* '}')?
 ;
 ```
 
-**Predefined Annotations**:
-- `@deprecated(reason)` - Context is being phased out
-- `@experimental` - Context is under development
-- `@stable` - Context is production-ready
-- `@internal` - Context is not for external use
-- `@beta` - Context is in beta testing
+**Standard Lifecycle Classifications**:
+
+These can be defined locally in each project, or imported from a shared standard library:
+
+```dlang
+// Option 1: Define locally
+Classification Deprecated
+Classification Experimental
+Classification Stable
+Classification Internal
+Classification Beta
+
+// Option 2: Import from standard library (recommended)
+import "domainlang/stdlib@v1.0.0" as Std
+
+// Use: Std.Deprecated, Std.Experimental, etc.
+```
+
+**Future: DomainLang Standard Library (BCL-equivalent)**:
+- `domainlang/stdlib` - Core classifications and common patterns
+- `domainlang/ddd-patterns` - DDD strategic/tactical patterns
+- `domainlang/examples` - Example models and templates
+- Community packages via git imports (already supported)
+
+This leverages DomainLang's existing git-native import system, making standard definitions available without adding language keywords.
+
+**See**: [PRS-006: Standard Library](./006-standard-library.md) for full stdlib implementation details, including LSP recognition and semantic validation of standard types.
 
 **Example Usage**:
+
 ```dlang
-@deprecated("Use NewOrderService instead. Migration guide: https://wiki/orders-v2")
-BC LegacyOrders for Sales {
+// Define lifecycle classifications once
+Classification Deprecated
+Classification Experimental
+Classification Stable
+Classification Internal
+Classification Beta
+
+// Or import from standard library
+import "domainlang/stdlib@v1.0.0" as Std
+
+// Use inline lifecycle assignment
+BC LegacyOrders for Sales
+    lifecycle Deprecated
+    by SalesTeam {
     description: "Legacy order management system"
 }
 
-@experimental
-BC AIRecommendations for Marketing {
+BC AIRecommendations for Marketing
+    lifecycle Experimental {
     description: "AI-powered product recommendations"
 }
 
-@stable
-BC Checkout for Sales {
+BC Checkout for Sales
+    lifecycle Stable {
     description: "Checkout and payment processing"
 }
 
-@internal
-BC AdminTools for Operations {
+BC AdminTools for Operations
+    lifecycle Internal {
     description: "Internal administration tools"
 }
 
-@beta
-BC MobileAPI for Sales {
+BC MobileAPI for Sales
+    lifecycle Beta {
     description: "Mobile-optimized API endpoints"
+}
+
+// Using imported standard library
+BC PaymentGateway for Sales
+    lifecycle Std.Stable {
+    description: "Third-party payment processing"
 }
 ```
 
 **Validation**:
-- Warning: Deprecated context referenced by stable context
-- Info: Experimental context used in production
-- Error: Internal context referenced by external system (future)
+- Warning: Context with `lifecycle: Deprecated` referenced by stable context
+- Info: Context with `lifecycle: Experimental` has relationships
+- Error: Context with `lifecycle: Internal` referenced by external system (future)
+- Suggest: If BC has no lifecycle, suggest adding one
+
+**Note**: Enhanced validation with stdlib type recognition is covered in [PRS-006: Standard Library](./006-standard-library.md).
 
 **IDE Features**:
-- Strikethrough text for @deprecated
-- Warning icon for @experimental
-- Lock icon for @internal
-- Beta badge for @beta
-- Hover shows full annotation message
+- Strikethrough text for contexts with `lifecycle: Deprecated`
+- Warning icon for `lifecycle: Experimental`
+- Lock icon for `lifecycle: Internal`
+- Beta badge for `lifecycle: Beta`
+- Hover shows lifecycle Classification with its description
+- Completion suggests standard lifecycle Classifications
 
 **Code Generation Use Cases**:
 - Generate architectural decision records
@@ -371,6 +253,36 @@ BC MobileAPI for Sales {
 - Supports migration planning
 - Improves team communication
 - Prevents accidental usage of deprecated systems
+
+**Alternative Approaches Considered**:
+
+*Generic Annotation System* (Rejected):
+```dlang
+@deprecated("reason")
+@experimental
+BC OrderManagement { ... }
+```
+
+**Why Rejected**:
+- Breaks DDD ubiquitous language principle - `@annotation` is programming metaphor
+- Creates two ways to do same thing (Classifications already exist)
+- Less discoverable - annotations are "magic strings" vs. first-class Classifications
+- Weaker type safety - no cross-reference validation
+- Harder to query - can't ask "show all Deprecated contexts"
+- Poor fit for LSP - would need custom validation, hover, completion
+
+*Inline Classification Assignment* (Current Approach):
+```dlang
+BC OrderManagement lifecycle Deprecated { ... }
+```
+
+**Why Chosen**:
+- Leverages existing `Classification` construct (zero new syntax)
+- Type-safe cross-references with IDE support
+- First-class domain concepts, not metadata
+- Consistent with `as role` and `by team` patterns
+- Easy to query and validate
+- Future: Can add metadata to Classifications themselves
 
 ## Non-Functional Requirements
 
@@ -401,13 +313,20 @@ BC MobileAPI for Sales {
 
 **Grammar Evolution**:
 - Add new documentation blocks to BoundedContext
-- Add annotation support to Type definitions
-- Keep metadata optional to avoid breaking changes
+- Add inline `lifecycle` keyword (parallel to `as` and `by`)
+- Keep lifecycle optional to avoid breaking changes
+- Leverage existing Classification cross-reference infrastructure
 
 **Validation Strategy**:
 - No strict validation initially (freeform)
 - Future: Catalogs of known technologies
 - Future: Compatibility checking
+
+**Lifecycle Classification Strategy**:
+- Standard lifecycle names are conventions, not enforced
+- Users can define custom lifecycle Classifications
+- Future: Classification metadata (type, severity, description)
+- Future: Validation recognizes common lifecycle patterns
 
 **Code Generation Impact**:
 - Metadata directly supports infrastructure generation
@@ -419,9 +338,11 @@ BC MobileAPI for Sales {
 **Proposed**:
 - ADR-006: Implementation Metadata Design (to be created)
 - ADR-007: Code Generation Architecture (to be created)
+- ADR-008: Standard Library Architecture (see PRS-006)
 
 **References**:
 - [ADR-002: Architectural Review 2025](../adr/002-architectural-review-2025.md)
+- [PRS-006: Standard Library](./006-standard-library.md)
 
 ## Acceptance Testing
 
@@ -432,25 +353,13 @@ BC MobileAPI for Sales {
 **And** hover shows technology stack
 **And** code generator can access metadata
 
-### TS-4.2: API Endpoint Validation
-**Given** two API endpoints with same path and method
-**When** file is validated
-**Then** warning appears about duplicate endpoint
-**And** suggestion provided to use different paths
-
-### TS-4.3: SLO Documentation
-**Given** a BoundedContext with SLO definitions
-**When** documentation is generated
-**Then** SLOs appear in system documentation
-**And** monitoring configuration is created
-
-### TS-4.4: Deprecated Context Warning
+### TS-4.2: Deprecated Context Warning
 **Given** a stable context referencing a deprecated context
 **When** file is validated
 **Then** warning appears about deprecated dependency
 **And** migration message from @deprecated is shown
 
-### TS-4.5: Lifecycle Visualization
+### TS-4.3: Lifecycle Visualization
 **Given** a model with various lifecycle annotations
 **When** rendered in diagram
 **Then** deprecated contexts are shown as strikethrough
@@ -460,16 +369,15 @@ BC MobileAPI for Sales {
 ## Dependencies
 
 **Requires**:
-- PRS-003: Tactical DDD Patterns (for API event publishing)
 - Langium 4.x (existing)
 - TypeScript 5.8+ (existing)
 
 **Blocks**:
 - Infrastructure code generation
 - Deployment automation
-- Monitoring configuration generation
 
 **Related**:
+- PRS-006: Standard Library (lifecycle Classifications from stdlib)
 - Code generation framework design
 - DevOps tooling integration
 
@@ -482,36 +390,21 @@ BC MobileAPI for Sales {
 - [ ] Add hover provider support
 - [ ] Create examples
 
-### Phase 2: API Specifications (1 week)
-- [ ] Add API block to grammar
-- [ ] Implement endpoint parsing
-- [ ] Add validation for duplicate endpoints
-- [ ] Add event publishing syntax
-- [ ] Create API examples
+### Phase 2: Lifecycle Markers (1 week)
 
-### Phase 3: SLOs (1 week)
-- [ ] Add SLO block to grammar
-- [ ] Implement SLO parsing
-- [ ] Add standard SLO templates
-- [ ] Create SLO examples
-- [ ] Document SLO best practices
-
-### Phase 4: Lifecycle Markers (1 week)
-- [ ] Add annotation support to grammar
-- [ ] Implement lifecycle annotations
+- [ ] Add inline `lifecycle` keyword to grammar
+- [ ] Implement lifecycle Classification references
 - [ ] Add validation for deprecated references
-- [ ] Add IDE visual indicators
+- [ ] Add IDE visual indicators (strikethrough, icons)
 - [ ] Update diagrams to show lifecycle
 
-**Total Effort**: 4 weeks
+**Total Effort**: 2 weeks
 
 ## Success Metrics
 
 | Metric | Current | Target |
 |--------|---------|--------|
 | Implementation metadata support | 0% | 100% |
-| API contract definitions | 0% | Full REST/GraphQL |
-| SLO definitions | 0% | Common metrics |
 | Lifecycle markers | 0% | 5 standard annotations |
 | Infrastructure generation | 0% | Basic Docker/K8s |
 
@@ -526,31 +419,10 @@ BC MobileAPI for Sales {
 
 **Recommendation**: Option A initially, Option B in future with extensible catalog.
 
-### Q2: API Specification Depth
-**Question**: How detailed should API specifications be?
-**Options**:
-- A) Paths and methods only
-- B) Add request/response schemas
-- C) Full OpenAPI compatibility
-
-**Recommendation**: Option A initially, Option B in future phases.
-
-### Q3: SLO Format
-**Question**: Should SLOs use structured format or freeform text?
-**Options**:
-- A) Freeform text (flexible but not machine-readable)
-- B) Structured format (strict but code-generable)
-- C) Hybrid (templates with overrides)
-
-**Recommendation**: Option A initially, Option C in future for automation.
-
 ## References
 
 - [Original PRS-001](./001-language-design-improvements.md)
-- [PRS-003: Tactical DDD Patterns](./003-tactical-ddd-patterns.md)
-- [OpenAPI Specification](https://swagger.io/specification/)
-- [AsyncAPI Specification](https://www.asyncapi.com/)
-- [Google SRE Book - SLOs](https://sre.google/sre-book/service-level-objectives/)
+- [PRS-006: Standard Library](./006-standard-library.md)
 
 ---
 
