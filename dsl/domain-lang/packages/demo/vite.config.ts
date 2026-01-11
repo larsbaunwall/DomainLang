@@ -7,10 +7,16 @@ export default defineConfig((): UserConfig => {
         plugins: [vue()],
         build: {
             target: 'esnext',
+            chunkSizeWarningLimit: 1000,
             rollupOptions: {
                 input: path.resolve(__dirname, 'index.html'),
                 output: {
-                    format: 'es'
+                    format: 'es',
+                    manualChunks: {
+                        'monaco-editor': ['monaco-editor-wrapper', 'monaco-editor'],
+                        'langium': ['langium', 'vscode-languageclient'],
+                        'vendor': ['vue']
+                    }
                 }
             }
         },
