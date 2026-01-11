@@ -11,7 +11,7 @@ Domain Sales {
     description: "Revenue generation and customer acquisition"
 }
 
-BC OrderProcessing for Sales as CoreDomain by SalesTeam {
+BoundedContext OrderProcessing for Sales as CoreDomain by SalesTeam {
     description: "Handles customer order lifecycle"
     
     terminology {
@@ -57,11 +57,11 @@ Domain ECommerce {
     description: "Online shopping platform"
 }
 
-BC Catalog for ECommerce as CoreDomain by ProductTeam {
+BoundedContext Catalog for ECommerce as CoreDomain by ProductTeam {
     description: "Product catalog management"
 }
 
-BC Orders for ECommerce as CoreDomain by ProductTeam {
+BoundedContext Orders for ECommerce as CoreDomain by ProductTeam {
     description: "Order processing"
 }
 
