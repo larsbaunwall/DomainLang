@@ -30,7 +30,7 @@ Reviewers: Language Designer Agent, Software Architect Agent
 - Multi-target references
 - Basic validation (missing descriptions)
 - Test coverage measurement (Vitest with v8)
-- Canonical keywords (`BC`, `BoundedContext`, `Domain`)
+- Canonical keywords (`bc`, `BoundedContext`, `Domain`)
 
 ⚠️ **Partially Implemented:**
 - Assignment operators exist but no semantic conventions
@@ -99,10 +99,10 @@ So that I can understand integration patterns without cryptic abbreviations.
 ### Must Have (Phase 1: Foundation - 2-3 weeks)
 
 #### FR-1.1: Reduce Keyword Synonym Overload
-**Current Issue:** 4 keywords for BoundedContext (`BoundedContext`, `boundedcontext`, `BC`, `Context`)
+**Current Issue:** 4 keywords for BoundedContext (`BoundedContext`, `boundedcontext`, `bc`, `Context`)
 
 **Requirement:**
-- Establish canonical forms: `BoundedContext` (primary), `BC` (shorthand)
+- Establish canonical forms: `BoundedContext` (primary), `bc` (shorthand)
 - Deprecate `Context` keyword (too ambiguous)
 - Document canonical vs secondary forms in language guide
 - Add deprecation warnings for discouraged forms
@@ -127,7 +127,7 @@ So that I can understand integration patterns without cryptic abbreviations.
 **Current Issue:** Can specify same property inline AND in block with no warning
 
 ```dlang
-BC Sales for Domain1 as CoreRole by Team1 {
+bc Sales for Domain1 as CoreRole by Team1 {
     role: SupportingRole   // Conflicts with inline 'as CoreRole'
     team: Team2            // Conflicts with inline 'by Team1'
 }
@@ -184,7 +184,7 @@ Add grammar support for:
 
 **Example:**
 ```dlang
-BC OrderManagement for Sales {
+bc OrderManagement for Sales {
     Aggregate Order {
         root: Order
 
@@ -268,7 +268,7 @@ ValueObject OrderItem {
 
 Add implementation metadata for code generation:
 ```dlang
-BC OrderManagement {
+bc OrderManagement {
     implementation {
         language: "TypeScript"
         framework: "NestJS"
@@ -289,7 +289,7 @@ BC OrderManagement {
 
 Add API contract definitions:
 ```dlang
-BC OrderManagement {
+bc OrderManagement {
     API OrderAPI {
         protocol: REST
         version: "v1"
@@ -312,7 +312,7 @@ BC OrderManagement {
 
 Add SLO definitions:
 ```dlang
-BC OrderManagement {
+bc OrderManagement {
     slo Availability {
         target: 99.9%
         measurement: "uptime per month"
@@ -335,13 +335,13 @@ BC OrderManagement {
 Add status annotations:
 ```dlang
 @deprecated("Use NewOrderService instead")
-BC LegacyOrders { }
+bc LegacyOrders { }
 
 @experimental
-BC AIRecommendations { }
+bc AIRecommendations { }
 
 @stable
-BC Checkout { }
+bc Checkout { }
 ```
 
 **Rationale:** Documents architectural evolution and migration paths.
@@ -354,7 +354,7 @@ BC Checkout { }
 **Requirement:**
 
 Create three-level learning path:
-- **Level 1: Essentials (30 minutes)** - Domain, BC, Team, Classification, basic properties
+- **Level 1: Essentials (30 minutes)** - Domain, bc, Team, Classification, basic properties
 - **Level 2: Strategic (4 hours)** - Context Maps, Relationships, Integration patterns
 - **Level 3: Advanced (8+ hours)** - Package management, Git dependencies, Governance
 
@@ -381,7 +381,7 @@ Expecting 'for' after BoundedContext name
 Bounded Context 'Sales' needs a domain assignment. Use 'for <DomainName>'
 to specify which domain this context belongs to.
 
-Example: BC Sales for CustomerExperience
+Example: bc Sales for CustomerExperience
 ```
 
 **Rationale:** Teaches DDD principles while guiding syntax correction.
@@ -567,7 +567,7 @@ Add layout hints (position, color, grouping) for auto-generated diagrams.
 #### TS-1: Keyword Consistency (Phase 1)
 **Given** a DomainLang file using deprecated `Context` keyword
 **When** file is validated
-**Then** warning appears suggesting `BoundedContext` or `BC`
+**Then** warning appears suggesting `BoundedContext` or `bc`
 **And** hover documentation shows deprecation notice
 
 #### TS-2: Assignment Operator Usage (Phase 1)

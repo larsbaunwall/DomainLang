@@ -105,12 +105,12 @@ keywords = ["ddd", "patterns", "classifications", "standard-library"]
 import "domainlang/stdlib@v1.0.0" as Std
 
 // Use standard Classifications
-BC Orders lifecycle Std.Deprecated { ... }
+bc Orders lifecycle Std.Deprecated { ... }
 
 // Or import specific modules
 import "domainlang/stdlib/lifecycle@v1.0.0" as Lifecycle
 
-BC Orders lifecycle Lifecycle.Deprecated { ... }
+bc Orders lifecycle Lifecycle.Deprecated { ... }
 ```
 
 **Versioning Strategy**:
@@ -285,19 +285,19 @@ Enable community-contributed pattern libraries following stdlib conventions.
 // E-commerce patterns
 import "ddd-community/ecommerce-patterns@v2.1.0" as ECommerce
 
-BC Checkout lifecycle ECommerce.CheckoutProcess { ... }
+bc Checkout lifecycle ECommerce.CheckoutProcess { ... }
 
 // Healthcare patterns (HIPAA compliance)
 import "healthcare/hipaa-patterns@v1.0.0" as HIPAA
 
-BC PatientRecords 
+bc PatientRecords 
     for HealthcareDomain
     as HIPAA.HIPAACompliant { ... }
 
 // Microservices patterns
 import "microservices/cloud-patterns@v3.0.0" as Cloud
 
-BC OrderService 
+bc OrderService 
     as Cloud.StatelessService
     lifecycle Cloud.ContainerReady { ... }
 ```
@@ -570,7 +570,7 @@ export class StdlibValidator {
 import "domainlang/stdlib@v1.0.0" as Std
 
 // ⚠️ WARNING: Stable context references deprecated context
-BC NewOrders for Sales
+bc NewOrders for Sales
     lifecycle Std.Stable {
     
     relationships {
@@ -578,18 +578,18 @@ BC NewOrders for Sales
     }
 }
 
-BC LegacyOrders for Sales
+bc LegacyOrders for Sales
     lifecycle Std.Deprecated {
     description: "Being replaced by NewOrders"
 }
 
 // ❌ ERROR: Internal context referenced by external context
-BC AdminTools for Operations
+bc AdminTools for Operations
     lifecycle Std.Internal {
     description: "Internal admin tooling"
 }
 
-BC PublicAPI for Sales
+bc PublicAPI for Sales
     lifecycle Std.External {
     
     relationships {
@@ -598,12 +598,12 @@ BC PublicAPI for Sales
 }
 
 // ℹ️ INFO: Experimental context is used
-BC AIRecommendations for Marketing
+bc AIRecommendations for Marketing
     lifecycle Std.Experimental {
     description: "Machine learning recommendations"
 }
 
-BC ProductCatalog for Sales {
+bc ProductCatalog for Sales {
     relationships {
         this -> AIRecommendations  // INFO: Experimental API may change
     }

@@ -151,7 +151,7 @@ Parameter:
 
 **Example Usage**:
 ```dlang
-BC OrderManagement for Sales {
+bc OrderManagement for Sales {
     description: "Manages customer orders from placement to fulfillment"
     
     Aggregate Order {

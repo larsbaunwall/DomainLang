@@ -93,7 +93,7 @@ Metadata Deployment
 Metadata ApiVersion
 Metadata HealthCheckPath
 
-BC OrderManagement for Sales {
+bc OrderManagement for Sales {
     description: "Manages customer orders"
     
     meta {
@@ -108,7 +108,7 @@ BC OrderManagement for Sales {
     }
 }
 
-BC LegacyOrders for Sales {
+bc LegacyOrders for Sales {
     description: "Legacy order system"
     
     meta {
@@ -127,7 +127,7 @@ BC LegacyOrders for Sales {
 import "domainlang/stdlib@v1.0.0" as Std
 
 // Stdlib provides standard metadata keys - no local definition needed
-BC PaymentGateway for Sales {
+bc PaymentGateway for Sales {
     description: "Third-party payment processing"
     
     meta {
@@ -147,7 +147,7 @@ import "domainlang/stdlib@v1.0.0" as Std
 Metadata CustomMetricPath
 Metadata CustomAlertGroup
 
-BC Analytics for Business {
+bc Analytics for Business {
     description: "Analytics and reporting"
     
     meta {
@@ -213,11 +213,11 @@ Classification Deprecated
 Classification Experimental
 Classification Stable
 
-BC LegacyOrders for Sales as Deprecated {
+bc LegacyOrders for Sales as Deprecated {
     description: "Legacy order system"
 }
 
-BC NewFeature for Sales as Experimental {
+bc NewFeature for Sales as Experimental {
     description: "Experimental feature"
 }
 ```
@@ -236,7 +236,7 @@ BC NewFeature for Sales as Experimental {
 ```dlang
 import "domainlang/stdlib@v1.0.0" as Std
 
-BC PaymentGateway for Sales as Std.Stable {
+bc PaymentGateway for Sales as Std.Stable {
     description: "Core payment processing"
 }
 ```

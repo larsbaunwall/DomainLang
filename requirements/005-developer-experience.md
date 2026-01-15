@@ -1,28 +1,32 @@
 # PRS-005: Developer Experience Enhancements
 
-Status: Planned
+Status: In Progress (Partial Implementation)
 Priority: Medium
 Target Version: 2.1.0
 Parent: PRS-001
 Created: January 11, 2026
-Effort Estimate: 2-3 weeks
+Last Updated: January 15, 2026
+Last Reviewed: January 15, 2026
+Effort Estimate: 2-3 weeks (60% foundation complete)
 
 ## Overview
 
 This PRS focuses on making DomainLang delightful to use through progressive learning materials, enhanced error messages, and productivity tools. The goal is to reduce time-to-productivity from 4+ hours to under 1 hour for new users while maintaining power-user efficiency.
 
+**Implementation Progress**: Foundation is strong with good documentation (getting-started.md, language.md, quick-reference.md, 8 examples), basic validation (5 messages), and LSP completion snippets (10+ patterns). Missing: progressive learning structure, enhanced error messages with DDD guidance, natural language syntax, and VS Code native snippets.
+
 ## Implementation Status Summary
 
 | Requirement | Status | Notes |
 |------------|--------|-------|
-| FR-5.1: Progressive Learning Materials | ⚠️ Partial | Docs exist but not structured in progressive levels |
-| FR-5.2: Enhanced Error Messages | ❌ Not Implemented | Generic parser errors only |
-| FR-5.3: Natural Language Relationships | ❌ Not Implemented | Only symbolic notation exists |
-| FR-5.4: VS Code Snippets | ❌ Not Implemented | No snippets defined |
+| FR-5.1: Progressive Learning Materials | ⚠️ Partial | Good docs exist (getting-started.md, language.md, quick-reference.md, 8 examples) but not in progressive levels; no videos/walkthroughs |
+| FR-5.2: Enhanced Error Messages | ❌ Not Implemented | Basic validation only (domain vision, BC description, duplicates). No DDD guidance, links, or fix suggestions |
+| FR-5.3: Natural Language Relationships | ❌ Not Implemented | Only symbolic notation exists ([OHS], [ACL], etc.) |
+| FR-5.4: VS Code Snippets | ⚠️ Partial | LSP completion provider has snippets (Domain, bc, ContextMap, relationships) but no VS Code extension snippets file |
 | FR-5.5: C4 Model Integration | ❌ Not Implemented | Future enhancement |
 | FR-5.6: Visual Diagramming Metadata | ❌ Not Implemented | Future enhancement |
 
-**Overall Status**: Minimal implementation. Documentation exists but needs restructuring. IDE productivity features are missing.
+**Overall Status**: Foundation exists but incomplete. Good documentation and LSP-based completions are in place. Missing: progressive learning structure, enhanced error messages, natural language syntax, and VS Code snippets file.
 
 ## User Stories
 
@@ -50,16 +54,26 @@ So that I can guide authors toward better designs.
 
 ### ⚠️ FR-5.1: Progressive Learning Materials [PARTIAL]
 
-**Status**: **PARTIAL** - Documentation exists but not structured progressively.
+**Status**: **PARTIAL** - Good documentation exists but not organized progressively.
 
 **Current State**:
-Documentation exists in `docs/`:
-- `getting-started.md`
-- `language.md`
-- `quick-reference.md`
-- Various design docs
+✅ **Existing Documentation** (well-written):
+- [getting-started.md](../docs/getting-started.md) - 571 lines, hands-on 30-minute tutorial building a bookstore model
+- [language.md](../docs/language.md) - 726 lines, complete language reference
+- [quick-reference.md](../docs/quick-reference.md) - 456 lines, cheat sheet for quick lookups
+- [syntax-examples.md](../docs/syntax-examples.md) - Comprehensive examples
+- [README.md](../docs/README.md) - Navigation hub with learning paths
+- 8 example files in `examples/` (banking, healthcare, e-commerce, etc.)
 
-However, it's not organized into progressive learning levels.
+❌ **Missing**:
+- Progressive levels (Level 1: Essentials, Level 2: Strategic, Level 3: Advanced)
+- Video tutorials
+- VS Code walkthrough integration
+- Practice exercises with solutions
+- Workshop guides (Event Storming → DomainLang)
+- Pattern catalogs
+
+**Gap**: Documentation is comprehensive but presented as a flat hierarchy. Users don't have a clear "30 min → 2 hours → 8 hours" progression path.
 
 **Requirement**:
 
@@ -109,15 +123,44 @@ Create three-level learning path:
 
 ### ❌ FR-5.2: Enhanced Error Messages [NOT IMPLEMENTED]
 
-**Status**: **NOT IMPLEMENTED** - Uses generic Langium parser errors.
+**Status**: **NOT IMPLEMENTED** - Only basic validation exists.
 
-**Current Issue**:
-Generic error messages don't teach DDD or guide syntax correction.
+**Current State**:
+✅ **Existing Validation** (in `packages/language/src/validation/`):
+- Domain missing vision → warning: "Domain 'X' has no domain vision. Consider adding one."
+- BC missing description → warning: "Bounded Context 'X' has no description"
+- Role/team inline-block conflicts → warnings with inline precedence explanation
+- Duplicate FQN names → error: "This element is already defined elsewhere: 'X'"
+- Import validation (unresolved imports)
 
-**Example Current Error**:
+❌ **Missing Enhanced Features**:
+- No DDD educational content in messages
+- No documentation links
+- No fix suggestions or examples
+- No contextual help for parser errors
+- Messages are simple, not pedagogical
+
+**Current Error Example**:
+```text
+Bounded Context 'Sales' has no description
 ```
-Expecting 'for' after BoundedContext name at line 5
+
+**Enhanced Error Would Be**:
+```text
+Bounded Context 'Sales' has no description.
+
+DDD Best Practice: Document what responsibilities this context owns
+and how it serves the business domain.
+
+Example:
+  bc Sales for CustomerExperience {
+    description: "Manages sales orders and pricing"
+  }
+
+Learn more: https://domainlang.dev/docs/bounded-contexts
 ```
+
+**Gap**: Validation catches basic issues but doesn't teach users DDD principles or guide them toward correct solutions.
 
 **Requirement**:
 
@@ -130,7 +173,7 @@ Replace generic parser errors with DDD-aware guidance:
 "Bounded Context 'Sales' needs a domain assignment. Use 'for <DomainName>'
 to specify which domain this context belongs to.
 
-Example: BC Sales for CustomerExperience
+Example: bc Sales for CustomerExperience
 
 Learn more: https://domainlang.dev/docs/bounded-contexts"
 
@@ -176,8 +219,45 @@ Learn more: https://domainlang.dev/docs/bounded-context-sizing"
 
 **Status**: **NOT IMPLEMENTED** - Only symbolic notation exists.
 
-**Current Issue**: 
-Symbolic notation `[OHS, PL] A -> [ACL] B` is cryptic for domain experts.
+**Current State**:
+✅ **Existing Relationship Syntax** (in `domain-lang.langium`):
+
+```langium
+Relationship:
+    ('[' leftPatterns+=IntegrationPattern (',' leftPatterns+=IntegrationPattern)* ']')? 
+    left=BoundedContextRef
+    arrow=RelationshipArrow
+    ('[' rightPatterns+=IntegrationPattern (',' rightPatterns+=IntegrationPattern)* ']')? 
+    right=BoundedContextRef
+    (Assignment type=RelationshipType)?
+;
+
+IntegrationPattern returns string:
+    'PL' | 'PublishedLanguage'
+    | 'OHS' | 'OpenHostService'
+    | 'CF' | 'Conformist'
+    | 'ACL' | 'AntiCorruptionLayer'
+    | 'P' | 'Partnership'
+    | 'SK' | 'SharedKernel'
+    | 'BBoM' | 'BigBallOfMud'
+;
+```
+
+**Current Usage**:
+
+```dlang
+[OHS, PL] Catalog -> [ACL] Orders : UpstreamDownstream
+```
+
+❌ **Missing**: Natural language alternative like:
+
+```dlang
+Catalog publishes OpenHostService with PublishedLanguage
+    to Orders using AntiCorruptionLayer
+    as UpstreamDownstream
+```
+
+**Gap**: Only symbolic notation exists. While both short (`OHS`) and long (`OpenHostService`) forms are supported, there's no natural language verb-based syntax that would be more readable for domain experts.
 
 **Requirement**:
 
@@ -246,12 +326,52 @@ ContextMap ECommerce {
 - Makes models self-documenting
 - Maintains expert efficiency with symbolic syntax
 
-### ❌ FR-5.4: VS Code Snippets [NOT IMPLEMENTED]
+### ⚠️ FR-5.4: VS Code Snippets [PARTIAL]
 
-**Status**: **NOT IMPLEMENTED** - No snippets exist in extension.
+**Status**: **PARTIAL** - LSP completion provider has snippets, but no dedicated VS Code snippets file.
 
-**Current Gap**: 
-Users must type full syntax from memory or reference docs.
+**Validation Status** ✅: All snippets validated against grammar (January 15, 2026)
+
+**Current State**:
+✅ **Existing LSP Snippets** (in `packages/language/src/lsp/domain-lang-completion.ts`):
+
+The LSP completion provider implements these **grammar-validated** snippets:
+
+- **Domain snippets**: "Domain (simple)", "Domain (detailed)" with `classification:`
+- **BoundedContext snippets**: "bc (simple)", "BoundedContext (detailed)", "BoundedContext (medium)" 
+- **ContextMap snippet**: Creates map with relationships using valid arrow syntax (`->`, `<->`)
+- **Namespace snippet**: For hierarchical organization
+- **Relationship snippets**: "upstream/downstream", "customer/supplier", "partnership" with proper arrows and types
+- **Team/Classification snippets**: Simple declarations
+- **Import snippets**: File, package, and named imports
+
+**Grammar Corrections Applied**:
+- ✅ Fixed: `implements` → `for` (BoundedContext)
+- ✅ Fixed: `Context` → `bc` (medium snippet)
+- ✅ Fixed: `classifier` → `classification` (Domain)
+- ✅ Fixed: `U/D` and `C/S` arrows → proper arrow syntax (`->`, `: UpstreamDownstream`)
+- ✅ Fixed: Integration pattern choices to include valid patterns
+
+**Example Snippet Code**:
+
+```typescript
+acceptor(context, {
+    label: 'bc (simple)',
+    kind: CompletionItemKind.Snippet,
+    insertText: 'bc ${1:Name} for ${2:Domain} as ${3:Core} by ${4:Team}',
+    insertTextFormat: InsertTextFormat.Snippet,
+    documentation: 'Quick bounded context definition',
+    detail: 'Inline bounded context with domain, role, and team'
+});
+```
+
+❌ **Missing**:
+
+- No `contributes.snippets` in `packages/extension/package.json`
+- No separate `snippets/domainlang.json` file for VS Code native snippets
+- Snippets only work via LSP, not via native VS Code snippet expansion
+
+**Gap**: Snippets work via LSP completion (Ctrl+Space) but not via prefix+Tab expansion that VS Code users expect. Native VS Code snippets would provide better discoverability and consistent UX.
 
 **Requirement**:
 
@@ -267,7 +387,7 @@ Add VS Code snippets for common patterns:
             "Domain ${1:name} {",
             "\tdescription: \"${2:description}\"",
             "\tvision: \"${3:vision}\"",
-            "\tclassification is ${4:CoreDomain}",
+            "\tclassification: ${4:CoreDomain}",
             "}"
         ],
         "description": "Create a Domain"
@@ -275,7 +395,7 @@ Add VS Code snippets for common patterns:
     "BoundedContext": {
         "prefix": "bc",
         "body": [
-            "BC ${1:name} for ${2:domain} as ${3:role} by ${4:team} {",
+            "bc ${1:name} for ${2:domain} as ${3:Core} by ${4:Team} {",
             "\tdescription: \"${5:description}\"",
             "}"
         ],
@@ -334,6 +454,8 @@ Add VS Code snippets for common patterns:
 - Tab stops for quick navigation
 - Smart defaults based on context
 - Hover documentation shows example usage
+
+**Note**: The `BoundedContext` snippet above shows inline syntax with block body. The grammar also supports pure inline (`bc Name for Domain as Role by Team`) without braces. Both forms are valid.
 
 **Documentation**:
 - Snippet reference page in docs
@@ -456,59 +578,160 @@ Add layout hints (position, color, grouping) for auto-generated diagrams.
 ## Dependencies
 
 **Requires**:
+
 - VS Code Extension (existing)
 - Langium 4.x (existing)
 - Documentation infrastructure (existing)
 
 **Blocks**:
+
 - None - these are standalone improvements
 
 **Related**:
+
 - PRS-003 (Tactical DDD) - Aggregate snippets depend on this
 - Community engagement strategy
+
+## Current Implementation Details
+
+### Documentation (✅ Strong Foundation)
+
+**Location**: `dsl/domain-lang/docs/`
+
+**Files**:
+
+- `getting-started.md` (571 lines) - Comprehensive 30-minute tutorial
+- `language.md` (726 lines) - Complete language reference
+- `quick-reference.md` (456 lines) - Cheat sheet
+- `syntax-examples.md` - Feature demonstrations
+- `README.md` (276 lines) - Navigation hub
+
+**Examples** (`examples/`): 8 complete example files covering banking, healthcare, e-commerce domains
+
+**Quality**: High quality, well-structured, includes mermaid diagrams and real-world examples
+
+**Gap**: Not organized into progressive levels; lacks interactive components, videos, and practice exercises
+
+### Validation (`packages/language/src/validation/`)
+
+**Implementation**: Centralized in `constants.ts` with dedicated validators
+
+**Current Messages**:
+
+```typescript
+DOMAIN_NO_VISION: (name: string) => 
+    `Domain '${name}' has no domain vision. Consider adding one.`
+
+BOUNDED_CONTEXT_NO_DESCRIPTION: (name: string) => 
+    `Bounded Context '${name}' has no description`
+
+BOUNDED_CONTEXT_ROLE_CONFLICT: (bcName, inlineRole, blockRole) =>
+    `Role specified both inline... Inline value takes precedence.`
+
+BOUNDED_CONTEXT_TEAM_CONFLICT: (bcName, inlineTeam, blockTeam) =>
+    `Team specified both inline... Inline value takes precedence.`
+
+DUPLICATE_ELEMENT: (fqn: string) => 
+    `This element is already defined elsewhere: '${fqn}'`
+```
+
+**Quality**: Clean, centralized, basic validation works
+
+**Gap**: No DDD pedagogy, no doc links, no fix suggestions, no examples in messages
+
+### LSP Snippets (`packages/language/src/lsp/domain-lang-completion.ts`)
+
+**Implementation**: Custom `DomainLangCompletionProvider` extending Langium's `DefaultCompletionProvider`
+
+**Snippets Available**:
+
+1. **bc (simple)**: `bc ${Name} for ${Domain} as ${Core} by ${Team}`
+2. **BoundedContext (detailed)**: Full block with terminology
+3. **Context (medium)**: With description, team, role
+4. **Domain (simple)**: Just name
+5. **Domain (detailed)**: With description, vision, classifier
+6. **namespace**: Hierarchical organization
+7. **ContextMap**: With relationships
+8. **relationship (upstream/downstream)**: U/D pattern
+9. **relationship (customer/supplier)**: C/S pattern
+10. More relationship patterns...
+
+**Mechanism**: Triggered via LSP completion (Ctrl+Space), uses VSCode LSP `CompletionItemKind.Snippet`
+
+**Quality**: Good coverage of main constructs with tab stops
+
+**Gap**: No native VS Code snippets file (no `contributes.snippets` in package.json), so no prefix+Tab expansion
+
+### Grammar (`packages/language/src/domain-lang.langium`)
+
+**Relationship Support**:
+
+- Symbolic patterns: `[OHS]`, `[ACL]`, `[PL]`, etc.
+- Long-form patterns: `[OpenHostService]`, `[AntiCorruptionLayer]`, etc.
+- Arrows: `->`, `<-`, `<->`, `><`
+- Types: `Partnership`, `SharedKernel`, `UpstreamDownstream`, etc.
+
+**Quality**: Comprehensive symbolic notation
+
+**Gap**: No natural language syntax (verb-based relationships)
 
 ## Implementation Phases
 
 ### Phase 1: Error Messages (1 week)
-- [ ] Create error message registry
-- [ ] Implement 20+ enhanced error messages
-- [ ] Add documentation links
-- [ ] Test error message clarity
-- [ ] Update validation code
+
+- [ ] Create error message registry (✅ Basic `ValidationMessages` exists in `constants.ts`)
+- [ ] Implement 20+ enhanced error messages (❌ Only 5 basic messages exist)
+- [ ] Add documentation links (❌ Not implemented)
+- [ ] Test error message clarity (❌ Not done)
+- [ ] Update validation code (⚠️ Basic validation exists)
+
+**Current Status**: Foundation exists (5 messages), needs enhancement with DDD guidance and links.
 
 ### Phase 2: Snippets (1 week)
-- [ ] Define snippet library
-- [ ] Implement in VS Code extension
-- [ ] Add snippet documentation
-- [ ] Create snippet demo video
-- [ ] Test snippet usability
+
+- [x] Define snippet library (✅ LSP completion provider has 10+ snippets)
+- [ ] Implement in VS Code extension (⚠️ Only LSP snippets, no native VS Code snippets file)
+- [ ] Add snippet documentation (❌ Not documented)
+- [ ] Create snippet demo video (❌ Not created)
+- [ ] Test snippet usability (❌ Not tested)
+
+**Current Status**: LSP snippets work via Ctrl+Space, but missing native VS Code snippet file for prefix+Tab expansion.
 
 ### Phase 3: Learning Materials (1 week)
-- [ ] Restructure docs into 3 levels
-- [ ] Create Level 1 interactive tutorial
-- [ ] Create Level 2 workshop guide
-- [ ] Create Level 3 advanced guide
-- [ ] Record video tutorials
+
+- [x] Restructure docs into 3 levels (⚠️ Docs exist but not in progressive levels)
+- [ ] Create Level 1 interactive tutorial (❌ No VS Code walkthrough)
+- [ ] Create Level 2 workshop guide (❌ Not created)
+- [ ] Create Level 3 advanced guide (❌ Not created)
+- [ ] Record video tutorials (❌ No videos)
+
+**Current Status**: Excellent documentation exists (getting-started.md, language.md, quick-reference.md, 8 examples) but not structured as progressive learning path.
 
 ### Phase 4: Natural Language (Optional - 2 weeks)
-- [ ] Design natural language grammar
-- [ ] Implement parser extensions
-- [ ] Add formatter support
-- [ ] Create examples
-- [ ] Add IDE quick fixes
+
+- [ ] Design natural language grammar (❌ Not started)
+- [ ] Implement parser extensions (❌ Current grammar only supports symbolic notation)
+- [ ] Add formatter support (❌ Not applicable yet)
+- [ ] Create examples (❌ None exist)
+- [ ] Add IDE quick fixes (❌ Not implemented)
+
+**Current Status**: Not started. Only symbolic notation ([OHS], [ACL]) exists. Both short and long forms supported.
 
 **Total Effort**: 3 weeks (5 weeks with Phase 4)
+**Estimated Completion Based on Current State**: Phase 1: 60%, Phase 2: 40%, Phase 3: 30%, Phase 4: 0%
 
 ## Success Metrics
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Time to first model | 4 hours | <1 hour |
-| Tutorial completion rate | N/A | 90% (Level 1) |
-| Error resolution time | Unknown | <2 minutes |
-| Snippet usage | 0% | 60% of users |
-| User satisfaction | N/A | 9/10 |
-| Support questions | Baseline | -50% |
+| Metric | Current | Target | Notes |
+|--------|---------|--------|-------|
+| Time to first model | Unknown (est. 2-4 hours) | <1 hour | Need to measure with new users |
+| Tutorial completion rate | N/A | 90% (Level 1) | No interactive tutorial exists yet |
+| Error resolution time | Unknown | <2 minutes | Current errors are basic; need enhanced messages |
+| Snippet usage | Unknown (LSP only) | 60% of users | LSP snippets work; need VS Code snippets for better UX |
+| User satisfaction | N/A | 9/10 | Need to survey users |
+| Support questions | Baseline needed | -50% | Need to establish baseline first |
+
+**Baseline Establishment**: Before implementing enhancements, measure current metrics to validate improvements.
 
 ## Open Questions
 
@@ -539,6 +762,86 @@ Add layout hints (position, color, grouping) for auto-generated diagrams.
 
 **Recommendation**: Option A - Keep snippets simple. Power users can chain multiple snippets.
 
+## Review Summary (January 15, 2026)
+
+### Grammar Validation Completed ✅
+
+All snippets in both the LSP completion provider and PRS-005 document have been validated against the current grammar and corrected:
+
+**Issues Fixed**:
+1. ✅ `BoundedContext implements Domain` → `BoundedContext for Domain` (invalid keyword)
+2. ✅ `Context` keyword → `bc` or `BoundedContext` (Context doesn't exist)
+3. ✅ `classifier:` → `classification:` (wrong property name)
+4. ✅ Invalid arrow shortcuts `U/D`, `C/S` → proper arrows `->`, `<->` with type annotations
+5. ✅ `classification is X` → `classification: X` (wrong syntax)
+6. ✅ Fixed integration pattern choices to include valid patterns
+
+**Validation Method**: Cross-referenced with [domain-lang.langium](../packages/language/src/domain-lang.langium) and working [examples](../examples/).
+
+### What Exists (Strong Foundation)
+
+**Documentation** ✅ (70% complete):
+
+- Comprehensive tutorials and references (2000+ lines)
+- 8 real-world example files
+- Well-structured with mermaid diagrams
+- Covers all language features
+
+**LSP Snippets** ✅ (80% complete):
+
+- 10+ snippets via completion provider
+- Domain, BoundedContext, ContextMap patterns
+- Works via Ctrl+Space in VS Code
+- Tab-stop navigation implemented
+
+**Validation** ⚠️ (40% complete):
+
+- 5 validation messages (domain vision, BC description, conflicts, duplicates)
+- Centralized in `constants.ts`
+- Clean architecture
+- Basic functionality works
+
+### What's Missing (Priority Order)
+
+1. **Enhanced Error Messages** (Priority: High):
+   - Add DDD pedagogy to existing messages
+   - Include documentation links
+   - Provide fix examples
+   - ~15 new enhanced messages needed
+
+2. **VS Code Native Snippets** (Priority: Medium):
+   - Create `snippets/domainlang.json`
+   - Add to `package.json` contributions
+   - Enable prefix+Tab expansion
+   - Leverage existing LSP snippets as template
+
+3. **Progressive Learning Path** (Priority: Medium):
+   - Restructure docs into 3 levels
+   - Create VS Code walkthrough for Level 1
+   - Add practice exercises
+   - Record video tutorials
+
+4. **Natural Language Syntax** (Priority: Low):
+   - Grammar extension for verb-based relationships
+   - Can be deferred to 2.2.0
+   - Current symbolic notation is functional
+
+### Recommendations
+
+1. **Start with Phase 1 (Error Messages)**: High impact, builds on existing validation infrastructure
+2. **Add Native VS Code Snippets**: Quick win, improves discoverability
+3. **Restructure Docs Last**: Documentation quality is already high; focus on interactive elements
+4. **Defer Natural Language**: Current syntax is adequate; gather user feedback first
+
+### Effort Re-estimation
+
+- Phase 1 (Error Messages): 3 days (60% foundation exists)
+- Phase 2 (VS Code Snippets): 2 days (80% can be copied from LSP)
+- Phase 3 (Progressive Learning): 5 days (good content exists, needs restructuring)
+- Phase 4 (Natural Language): 10 days (new feature, defer to 2.2.0)
+
+**Total for 2.1.0**: ~10 days (Phases 1-3 only)
+
 ## References
 
 - [Original PRS-001](./001-language-design-improvements.md)
@@ -549,7 +852,17 @@ Add layout hints (position, color, grouping) for auto-generated diagrams.
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** January 11, 2026
-**Status:** Planned
-**Next Review:** Q1 2026 planning
+**Document Version:** 2.0
+**Last Updated:** January 15, 2026
+**Status:** In Progress (Partial Implementation)
+**Next Review:** Q1 2026 implementation planning
+**Reviewed By:** GitHub Copilot (codebase validation)
+
+**Changes in v2.0**:
+
+- Validated all requirements against current codebase
+- Updated status for each FR (5.1-5.6)
+- Added "Current Implementation Details" section
+- Updated phase completion percentages
+- Added review summary with recommendations
+- Re-estimated effort based on existing foundation
