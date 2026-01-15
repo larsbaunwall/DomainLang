@@ -2,7 +2,7 @@
  * Advanced Syntax Features Tests
  * 
  * This test suite validates modern syntax features:
- * - BC shorthand syntax
+ * - bc shorthand syntax
  * - Inline role/team/domain assignments
  * - Flattened classifiers
  * - Categorized decisions
@@ -25,7 +25,7 @@ describe('Advanced Syntax Features', () => {
         testServices = setupTestSuite();
     });
 
-    test('should parse BC shorthand with inline assignments', async () => {
+    test('should parse bc shorthand with inline assignments', async () => {
         // Arrange
         const input = s`
             Domain Sales {}

@@ -13,17 +13,17 @@ By the end of this tutorial, you'll have created a complete domain model for an 
 ```mermaid
 graph TB
     subgraph Domain["📦 Bookstore Domain"]
-        BC1["📋 Catalog Context"]
-        BC2["📋 OrderManagement Context"]
-        BC3["📋 Shipping Context"]
+        bc1["📋 Catalog Context"]
+        bc2["📋 OrderManagement Context"]
+        bc3["📋 Shipping Context"]
     end
     
-    BC1 -->|"provides books"| BC2
-    BC2 -->|"triggers fulfillment"| BC3
+    bc1 -->|"provides books"| bc2
+    bc2 -->|"triggers fulfillment"| bc3
     
-    T1["👥 CatalogTeam"] -.->|owns| BC1
-    T2["👥 OrderTeam"] -.->|owns| BC2
-    T3["👥 ShippingTeam"] -.->|owns| BC3
+    T1["👥 CatalogTeam"] -.->|owns| bc1
+    T2["👥 OrderTeam"] -.->|owns| bc2
+    T3["👥 ShippingTeam"] -.->|owns| bc3
 ```
 
 ---
@@ -140,7 +140,7 @@ BoundedContext Catalog for Bookstore {
 
 | Element | Purpose |
 | ------- | ------- |
-| `BoundedContext` | Declares a bounded context (shorthand: `BC`) |
+| `BoundedContext` | Declares a bounded context (shorthand: `bc`) |
 | `Catalog` | The context name |
 | `for Bookstore` | Links this context to the Bookstore domain |
 

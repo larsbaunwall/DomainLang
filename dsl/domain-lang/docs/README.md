@@ -162,7 +162,7 @@ Domain Sales {
 ### How do I create a bounded context?
 
 ```dlang
-BC Orders for Sales {
+bc Orders for Sales {
     description: "Order processing"
 }
 ```
@@ -202,7 +202,7 @@ import "owner/repo@v1.0.0" as External
 ### How do I document ubiquitous language?
 
 ```dlang
-BC Orders {
+bc Orders {
     terminology {
         term Order: "Customer purchase request"
             aka: PurchaseOrder

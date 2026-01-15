@@ -53,7 +53,7 @@ graph TD
     M[Model] --> I[Imports]
     M --> S[Structure Elements]
     S --> D[Domain]
-    S --> BC[BoundedContext]
+    S --> bc[BoundedContext]
     S --> CMAP[ContextMap / DomainMap]
     S --> NS[Namespace]
     NS --> S
@@ -240,14 +240,14 @@ Documentation blocks enrich types with metadata. They're optional and can contai
 
 | Block | Purpose | Used In |
 | ----- | ------- | ------- |
-| `description` | Short human-readable summary | Domain, BC |
+| `description` | Short human-readable summary | Domain, bc |
 | `vision` | Long-term intent statement | Domain only |
 | `classification` / `role` / `businessModel` / `lifecycle` | Reference to a Classification | Both |
-| `team` | Reference to a Team | BC |
-| `metadata` / `meta` | Key-value metadata for operational metadata | BC |
-| `relationships` / `integrations` / `connections` | Inline relationship definitions | BC |
-| `terminology` / `language` / `glossary` | Collection of term declarations | BC |
-| `decisions` / `constraints` / `rules` / `policies` | Governance documentation | BC |
+| `team` | Reference to a Team | bc |
+| `metadata` / `meta` | Key-value metadata for operational metadata | bc |
+| `relationships` / `integrations` / `connections` | Inline relationship definitions | bc |
+| `terminology` / `language` / `glossary` | Collection of term declarations | bc |
+| `decisions` / `constraints` / `rules` / `policies` | Governance documentation | bc |
 
 ### Block Examples
 
@@ -636,7 +636,7 @@ Domain CustomerExperience {
     classification: Strategic.CoreDomain
 }
 
-BC Onboarding for CustomerExperience as Core {
+bc Onboarding for CustomerExperience as Core {
     description: "Handles account sign-up and activation"
     role: Strategic.CoreDomain
     terminology {
@@ -652,7 +652,7 @@ ContextMap CustomerJourney {
 This example shows:
 
 - Importing shared classifications via a namespace prefix
-- Using `BC` shorthand with inline `as Core` assignment
+- Using `bc` shorthand with inline `as Core` assignment
 - A minimal context map for a single-context topology
 
 ### Advanced Portfolio Model
@@ -675,7 +675,7 @@ namespace acme.platform.customer {
         classification: SharedKnowledge.CoreDomain
     }
 
-    BC Checkout for Sales as Patterns.CoreDomain by SharedKnowledge.PlatformGuild {
+    bc Checkout for Sales as Patterns.CoreDomain by SharedKnowledge.PlatformGuild {
         description: "Order capture and payment orchestration"
         
         relationships {
@@ -693,7 +693,7 @@ namespace acme.platform.customer {
         }
     }
 
-    BC PricingContext for Sales as Supporting {
+    bc PricingContext for Sales as Supporting {
         classifications {
             role: Patterns.SupportingSubdomain
             lifecycle: SharedKnowledge.SupportingDomain

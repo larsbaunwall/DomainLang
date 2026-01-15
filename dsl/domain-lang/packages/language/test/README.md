@@ -34,7 +34,7 @@ This document describes the test organization for the DomainLang language packag
 
 **`test/parsing/new-syntax.test.ts`** (9 tests)  
 - **Purpose**: Advanced syntax combinations and shorthand features
-- **Covers**: BC shorthand, inline assignments, categorized decisions, relationship arrows
+- **Covers**: bc shorthand, inline assignments, categorized decisions, relationship arrows
 - **Status**: Active - tests working features not covered by grammar completeness
 
 #### 2. Validation Tests
