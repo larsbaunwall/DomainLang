@@ -147,7 +147,7 @@ npm test                  # Must pass
 |-----------|---------|
 | Domain | `Domain Sales { vision: "..." }` |
 | Subdomain | `Domain Orders in Sales {}` |
-| BoundedContext | `BC OrderContext for Sales as Core by SalesTeam` |
+| BoundedContext | `bc OrderContext for Sales as Core by SalesTeam` |
 | ContextMap | `ContextMap Sales { contains OrderContext, BillingContext }` |
 | Relationships | `[OHS] this -> [CF] PaymentContext` |
 | Namespace | `namespace acme.sales { ... }` |

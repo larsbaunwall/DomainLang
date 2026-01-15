@@ -156,7 +156,7 @@ Follow Google Technical Writing Style Guide:
 
 ### Terminology
 - Define terms on first use
-- Use consistent terminology (pick one: "bounded context" or "BC", not both)
+- Use consistent terminology (pick one: "bounded context" or "bc", not both)
 - Match DDD vocabulary from `copilot-instructions.md`
 
 ### Code Examples

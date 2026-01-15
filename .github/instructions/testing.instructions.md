@@ -7,6 +7,25 @@ applyTo: "**/*.test.ts"
 
 > Guidelines for writing tests in DomainLang using Vitest and Langium test utilities.
 
+## 🔴 CRITICAL: Test Structure Requirements
+
+**EVERY TEST MUST follow the Arrange-Act-Assert (AAA) pattern with explicit comments:**
+
+```typescript
+test('description of behavior', async () => {
+    // Arrange - Set up test data and state
+    const input = `...`;
+    
+    // Act - Execute the code under test
+    const result = await testServices.parse(input);
+    
+    // Assert - Verify expected behavior
+    expect(result).toBeDefined();
+});
+```
+
+**NO EXCEPTIONS.** If you write a test without clear AAA structure, it WILL be rejected.
+
 ## Core Intent
 
 - Every new feature or bug fix requires tests
@@ -16,6 +35,7 @@ applyTo: "**/*.test.ts"
 
 ## Essential Rules
 
+- **🔴 MANDATORY: AAA Pattern** - Every test must have `// Arrange`, `// Act`, `// Assert` comments
 - **Always add tests** for new behavior (happy path + edge cases + errors)
 - **Use `setupTestSuite()`** from `test-helpers.ts` for automatic cleanup
 - **Use validation helpers** instead of manual error checks
@@ -23,9 +43,9 @@ applyTo: "**/*.test.ts"
 - **Never change original code** just to make it easier to test
 - **Document the feature** - If adding feature tests, also update docs (see Documentation Checklist below)
 
-## Test Setup
+## Test Setup Template
 
-Tests should follow the Arrange-Act-Assert pattern. Here's a basic example:
+**USE THIS EXACT TEMPLATE for every test file:**
 
 ```typescript
 import { describe, test, beforeAll, expect } from 'vitest';
@@ -35,21 +55,33 @@ import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
 let testServices: TestServices;
 
 beforeAll(() => {
-    testServices = setupTestSuite();  // Handles cleanup automatically
+    testServices = setupTestSuite();  // REQUIRED: Handles cleanup automatically
 });
 
-test('parse domain', async () => {
-    // Arrange
-    const document = await testServices.parse(s`
+test('description of BEHAVIOR not implementation', async () => {
+    // Arrange - REQUIRED COMMENT: Set up test data
+    const input = s`
         Domain Sales {
             vision: "Handle sales operations"
         }
-    `);
+    `;
 
-    // Act & Assert
+    // Act - REQUIRED COMMENT: Execute code under test
+    const document = await testServices.parse(input);
+
+    // Assert - REQUIRED COMMENT: Verify expected behavior
     expectValidDocument(document);
+    const domain = getFirstDomain(document);
+    expect(domain.name).toBe('Sales');
 });
 ```
+
+**MANDATORY RULES:**
+1. Use `setupTestSuite()` in `beforeAll()` - no exceptions
+2. Every test MUST have `// Arrange`, `// Act`, `// Assert` comments
+3. Separate Arrange from Act with a blank line
+4. Separate Act from Assert with a blank line
+5. Test names describe BEHAVIOR, not implementation
 
 ## Key Utilities from `test-helpers.ts`
 
@@ -67,46 +99,57 @@ test('parse domain', async () => {
 
 ### Parsing Tests
 
+**Template: Test grammar produces expected AST**
+
 ```typescript
 test('parse domain with vision', async () => {
-    // Arrange
-    const document = await testServices.parse(s`
+    // Arrange - Input with domain and vision
+    const input = s`
         Domain Sales { vision: "Handle sales" }
-    `);
+    `;
 
+    // Act - Parse the input
+    const document = await testServices.parse(input);
     expectValidDocument(document);
-    
-    // Act
     const domain = getFirstDomain(document);
     
-    // Assert
+    // Assert - Verify AST structure
     expect(domain.name).toBe('Sales');
+    expect(domain.documentation).toHaveLength(1);
 });
 ```
 
 ### Validation Tests
 
+**Template: Test validation rules catch invalid states**
+
 ```typescript
 test('warns when domain lacks vision', async () => {
-    // Arrange
-    const document = await testServices.parse(s`
+    // Arrange - Domain without vision
+    const input = s`
         Domain Sales { description: "Sales operations" }
-    `);
+    `;
 
-    // Act & Assert
+    // Act - Parse and validate
+    const document = await testServices.parse(input);
+
+    // Assert - Expect specific warning
     expectValidationWarnings(document, [
         "Domain 'Sales' has no domain vision"
     ]);
 });
 
 test('detects duplicate names', async () => {
-    // Arrange
-    const document = await testServices.parse(s`
+    // Arrange - Two classifications with same name
+    const input = s`
         Classification Core
         Classification Core
-    `);
+    `;
 
-    // Act & Assert
+    // Act - Parse and validate
+    const document = await testServices.parse(input);
+
+    // Assert - Expect duplicate error
     expectValidationErrors(document, [
         "This element is already defined elsewhere"
     ]);
@@ -162,8 +205,8 @@ test('ContextMap references multiple same-named BCs', async () => {
     const document = await testServices.parse(s`
         Domain Sales {}
         Domain Billing {}
-        BC Orders for Sales {}
-        BC Orders for Billing {}
+        bc Orders for Sales {}
+        bc Orders for Billing {}
         
         ContextMap AllOrders { contains Orders }
     `);
@@ -293,7 +336,7 @@ Use `test.each` for parameterized tests with multiple inputs:
 ```typescript
 test.each([
     ['Domain', 'Domain Sales {}'],
-    ['BoundedContext', 'Domain Sales {} BC Orders for Sales {}'],
+    ['BoundedContext', 'Domain Sales {} bc Orders for Sales {}'],
     ['Team', 'Team Backend {}'],
 ])('should parse %s construct', async (name, input) => {
     const document = await testServices.parse(input);
@@ -303,7 +346,7 @@ test.each([
 // With expected outcomes
 test.each([
     { input: 'Domain {}', error: 'expecting ID' },
-    { input: 'BC Orders for {}', error: 'expecting QualifiedName' },
+    { input: 'bc Orders for {}', error: 'expecting QualifiedName' },
 ])('should reject invalid: $input', async ({ input, error }) => {
     const document = await testServices.parse(input);
     expect(getDocumentErrors(document).some(e => e.includes(error))).toBe(true);

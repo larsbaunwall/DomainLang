@@ -49,7 +49,7 @@ You are working with Langium 4.x, a framework for building DSLs with full LSP su
 | Construct | Purpose | Key Features |
 |-----------|---------|--------------|
 | `Domain` | Sphere of knowledge/activity | `in` hierarchy, `vision`, `description`, `classifier` |
-| `BoundedContext` / `BC` | Context boundary | `for` domain, `as` classifier, `by` team |
+| `BoundedContext` / `bc` | Context boundary | `for` domain, `as` classifier, `by` team |
 | `ContextMap` / `DomainMap` | Architecture mapping | MultiReference support |
 | `Team`, `Classification` | Organizational elements | Cross-referenced |
 | `NamespaceDeclaration` | Hierarchical organization | FQN support |
@@ -57,7 +57,7 @@ You are working with Langium 4.x, a framework for building DSLs with full LSP su
 ### BoundedContext Features
 
 ```dlang
-BC OrderContext for Sales as Core by SalesTeam {
+bc OrderContext for Sales as Core by SalesTeam {
     description: "Order management"
     team: SalesTeam
     role: Core
@@ -157,8 +157,8 @@ ContextMap:
 ```
 
 ```dlang
-BC Orders for Sales {}
-BC Orders for Billing {}
+bc Orders for Sales {}
+bc Orders for Billing {}
 
 ContextMap AllOrders {
     contains Orders  // Resolves to BOTH BCs!
