@@ -33,7 +33,7 @@ Domain Finance {
 
 // Bounded Contexts with Implementation Metadata
 
-BC OrderManagement for Sales {
+bc OrderManagement for Sales {
     description: "Manages customer orders and order lifecycle"
     
     metadata {
@@ -50,7 +50,7 @@ BC OrderManagement for Sales {
     }
 }
 
-BC Pricing for Sales {
+bc Pricing for Sales {
     description: "Product pricing engine and calculations"
     
     metadata {
@@ -64,7 +64,7 @@ BC Pricing for Sales {
     }
 }
 
-BC Fulfillment for Operations {
+bc Fulfillment for Operations {
     description: "Manages order fulfillment and warehouse operations"
     
     metadata {
@@ -79,7 +79,7 @@ BC Fulfillment for Operations {
     }
 }
 
-BC Shipping for Operations {
+bc Shipping for Operations {
     description: "Integrates with shipping providers"
     
     metadata {
@@ -93,7 +93,7 @@ BC Shipping for Operations {
     }
 }
 
-BC BillingEngine for Finance {
+bc BillingEngine for Finance {
     description: "Generates invoices and manages billing"
     
     metadata {
@@ -107,7 +107,7 @@ BC BillingEngine for Finance {
     }
 }
 
-BC PaymentGateway for Finance {
+bc PaymentGateway for Finance {
     description: "Third-party payment processing integration"
     
     metadata {
@@ -121,7 +121,7 @@ BC PaymentGateway for Finance {
     }
 }
 
-BC LegacyReporting for Finance {
+bc LegacyReporting for Finance {
     description: "Legacy reporting system"
     
     metadata {

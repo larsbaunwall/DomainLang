@@ -11,7 +11,7 @@ BoundedContext SupportPortal for Marketplace as StrategicLandscape.SupportingDom
         term SLA: "Service level agreement applied to a ticket"
     }
     decisions {
-        policy [operational] FollowTheSun: "Route tickets to available regional teams"
+        policy FollowTheSun: "Route tickets to available regional teams"
     }
     relationships {
         [CF] this -> CustomerFacing.ApplicationFramework

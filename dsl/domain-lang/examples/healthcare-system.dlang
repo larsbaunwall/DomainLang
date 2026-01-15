@@ -55,7 +55,7 @@ Domain Pharmacy in Healthcare {
 // Clinical Bounded Contexts
 // ============================================================================
 
-BC ElectronicHealthRecords for PatientCare
+bc ElectronicHealthRecords for PatientCare
     as CoreDomain
     by ClinicalTeam {
 
@@ -119,7 +119,7 @@ BC ElectronicHealthRecords for PatientCare
     }
 }
 
-BC AppointmentScheduling for Administration
+bc AppointmentScheduling for Administration
     as SupportingDomain
     by AdministrativeTeam {
 
@@ -157,7 +157,7 @@ BC AppointmentScheduling for Administration
     }
 }
 
-BC MedicationManagement for Pharmacy
+bc MedicationManagement for Pharmacy
     as CoreDomain
     by PharmacyTeam {
 
@@ -208,7 +208,7 @@ BC MedicationManagement for Pharmacy
     }
 }
 
-BC LaboratoryInformationSystem for PatientCare
+bc LaboratoryInformationSystem for PatientCare
     as CoreDomain
     by ClinicalTeam {
 
@@ -243,7 +243,7 @@ BC LaboratoryInformationSystem for PatientCare
     }
 }
 
-BC RadiologyInformationSystem for PatientCare
+bc RadiologyInformationSystem for PatientCare
     as CoreDomain
     by ClinicalTeam {
 
@@ -274,7 +274,7 @@ BC RadiologyInformationSystem for PatientCare
     }
 }
 
-BC PatientBilling for Administration
+bc PatientBilling for Administration
     as SupportingDomain
     by BillingTeam {
 
@@ -308,7 +308,7 @@ BC PatientBilling for Administration
     }
 }
 
-BC PatientPortal for PatientCare
+bc PatientPortal for PatientCare
     as SupportingDomain
     by AdministrativeTeam {
 

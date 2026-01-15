@@ -48,7 +48,7 @@ Domain Support {    description: "Sales operations and customer acquisition"
 
 // Sales team's perspective of customer management// Example 1: Same BC name in different domains
 
-BC CustomerManagement for Sales {
+bc CustomerManagement for Sales {
 
     description: "Sales team's view: leads, opportunities, deals"// ============================================================================Domain Support {
 
@@ -70,7 +70,7 @@ BC CustomerManagement for Sales {
 
 // Support team's perspective of customer management
 
-BC CustomerManagement for Support {}BC CustomerManagement for Sales {
+bc CustomerManagement for Support {}BC CustomerManagement for Sales {
 
     description: "Support team's view: tickets, SLAs, escalations"
 
@@ -86,7 +86,7 @@ BC CustomerManagement for Support {}BC CustomerManagement for Sales {
 
     }
 
-}}BC CustomerManagement for Support {
+}}bc CustomerManagement for Support {
 
 
 
@@ -98,7 +98,7 @@ ContextMap CustomerServices {// Sales team's perspective of customer management}
 
     contains CustomerManagement
 
-}BC CustomerManagement for Sales {
+}bc CustomerManagement for Sales {
 
 
 
@@ -136,7 +136,7 @@ Namespace Ecommerce {
 
     
 
-    BC ProductSearch for Catalog as CoreDomain {
+    bc ProductSearch for Catalog as CoreDomain {
 
         description: "Search and browse products"// Support team's perspective of customer managementClassification Core
 

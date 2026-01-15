@@ -38,7 +38,7 @@ Domain Checkout in ECommerce {
 
 // Microservices with Diverse Technology Stacks
 
-BC UserAuthentication for CustomerManagement {
+bc UserAuthentication for CustomerManagement {
     description: "OAuth2 and JWT token authentication service"
     
     metadata {
@@ -55,7 +55,7 @@ BC UserAuthentication for CustomerManagement {
     }
 }
 
-BC UserProfiles for CustomerManagement {
+bc UserProfiles for CustomerManagement {
     description: "User profile management and preferences"
     
     metadata {
@@ -73,7 +73,7 @@ BC UserProfiles for CustomerManagement {
     }
 }
 
-BC ProductSearch for ProductCatalog {
+bc ProductSearch for ProductCatalog {
     description: "Full-text search and filtering engine"
     
     metadata {
@@ -90,7 +90,7 @@ BC ProductSearch for ProductCatalog {
     }
 }
 
-BC ProductInventory for ProductCatalog {
+bc ProductInventory for ProductCatalog {
     description: "Inventory tracking and stock management"
     
     metadata {
@@ -108,7 +108,7 @@ BC ProductInventory for ProductCatalog {
     }
 }
 
-BC ShoppingCart for Checkout {
+bc ShoppingCart for Checkout {
     description: "Shopping cart state management"
     
     metadata {
@@ -125,7 +125,7 @@ BC ShoppingCart for Checkout {
     }
 }
 
-BC PaymentProcessing for Checkout {
+bc PaymentProcessing for Checkout {
     description: "Payment gateway integration and processing"
     
     metadata {
@@ -143,7 +143,7 @@ BC PaymentProcessing for Checkout {
     }
 }
 
-BC OrderFulfillment for Checkout {
+bc OrderFulfillment for Checkout {
     description: "Order creation and fulfillment orchestration"
     
     metadata {
@@ -161,7 +161,7 @@ BC OrderFulfillment for Checkout {
     }
 }
 
-BC LegacyPaymentAdapter for Checkout {
+bc LegacyPaymentAdapter for Checkout {
     description: "Legacy payment system compatibility layer"
     
     metadata {

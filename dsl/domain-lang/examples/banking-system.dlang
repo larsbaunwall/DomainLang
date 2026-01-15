@@ -54,7 +54,7 @@ Domain Compliance in Banking {
 // Core Banking Contexts
 // ============================================================================
 
-BC AccountManagement for CustomerAccounts
+bc AccountManagement for CustomerAccounts
     as CoreDomain
     by CoreBankingTeam {
 
@@ -112,7 +112,7 @@ BC AccountManagement for CustomerAccounts
     }
 }
 
-BC PaymentProcessing for Payments
+bc PaymentProcessing for Payments
     as CoreDomain
     by PaymentsTeam {
 
@@ -165,7 +165,7 @@ BC PaymentProcessing for Payments
     }
 }
 
-BC FraudDetection for Compliance
+bc FraudDetection for Compliance
     as CoreDomain
     by FraudDetectionTeam {
 
@@ -199,7 +199,7 @@ BC FraudDetection for Compliance
     }
 }
 
-BC ComplianceReporting for Compliance
+bc ComplianceReporting for Compliance
     as SupportingDomain
     by ComplianceTeam {
 
@@ -230,7 +230,7 @@ BC ComplianceReporting for Compliance
     }
 }
 
-BC CustomerService for CustomerAccounts
+bc CustomerService for CustomerAccounts
     as SupportingDomain
     by CustomerServiceTeam {
 
@@ -254,7 +254,7 @@ BC CustomerService for CustomerAccounts
     }
 }
 
-BC CardManagement for Payments
+bc CardManagement for Payments
     as CoreDomain
     by PaymentsTeam {
 
