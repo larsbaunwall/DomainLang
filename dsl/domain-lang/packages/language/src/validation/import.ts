@@ -28,7 +28,10 @@ export class ImportValidator {
         document: LangiumDocument
     ): Promise<void> {
         if (!imp.uri) {
-            accept('error', 'Import statement must have a URI', { node: imp });
+            accept('error', 'Import statement must have a URI', { 
+                node: imp,
+                keyword: 'import'
+            });
             return;
         }
 
@@ -81,7 +84,7 @@ export class ImportValidator {
             for (const symbol of imp.symbols) {
                 if (!exportedSymbols.has(symbol)) {
                     accept('error', 
-                        `Symbol '${symbol}' not found in ${imp.uri}. Available symbols: ${Array.from(exportedSymbols).join(', ')}`,
+                        `Symbol '${symbol}' not found in ${imp.uri}`,
                         {
                             node: imp,
                             property: 'symbols'
@@ -155,7 +158,10 @@ export function createImportChecks(_services: DomainLangServices): ValidationChe
             
             // For now, just do basic syntax validation
             if (!imp.uri) {
-                accept('error', 'Import statement must have a URI', { node: imp });
+                accept('error', 'Import statement must have a URI', { 
+                    node: imp,
+                    keyword: 'import'
+                });
             }
 
             // TODO: Implement async validation in a separate build phase

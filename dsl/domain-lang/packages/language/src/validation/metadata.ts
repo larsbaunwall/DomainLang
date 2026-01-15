@@ -23,6 +23,7 @@ export const metadataChecks: ValidationChecks<DomainLangAstType> = {
         if (!block.entries || block.entries.length === 0) {
             accept('warning', 'Metadata block is empty - consider removing it', {
                 node: block,
+                keyword: 'metadata'
             });
         }
 
@@ -33,6 +34,7 @@ export const metadataChecks: ValidationChecks<DomainLangAstType> = {
                 if (keys.has(entry.key.ref.name)) {
                     accept('warning', `Metadata key '${entry.key.ref.name}' is already defined in this block`, {
                         node: entry,
+                        property: 'key'
                     });
                 }
                 keys.add(entry.key.ref.name);

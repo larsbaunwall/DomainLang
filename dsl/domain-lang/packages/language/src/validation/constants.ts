@@ -20,6 +20,13 @@ export const ValidationMessages = {
         `Bounded Context '${name}' has no description`,
     
     /**
+     * Warning message when a bounded context lacks a domain reference.
+     * @param name - The name of the bounded context
+     */
+    BOUNDED_CONTEXT_NO_DOMAIN: (name: string) =>
+        `Bounded Context '${name}' does not belong to any domain. Use 'for Domain' to specify.`,
+    
+    /**
      * Warning when role is specified both inline and in a block.
      * Inline value takes precedence.
      * @param bcName - The name of the bounded context

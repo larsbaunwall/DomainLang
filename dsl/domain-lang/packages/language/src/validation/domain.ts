@@ -18,8 +18,8 @@ function validateDomainHasVision(
     );
     if (!hasVision) {
         accept('warning', ValidationMessages.DOMAIN_NO_VISION(domain.name), { 
-            node: domain, 
-            property: 'documentation' 
+            node: domain,
+            keyword: 'Domain'
         });
     }
 }

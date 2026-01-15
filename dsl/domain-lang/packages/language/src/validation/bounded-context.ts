@@ -18,8 +18,27 @@ function validateBoundedContextHasDescription(
     );
     if (!hasDescription) {
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_NO_DESCRIPTION(bc.name), { 
-            node: bc, 
-            property: 'documentation' 
+            node: bc,
+            keyword: 'BoundedContext'
+        });
+    }
+}
+
+/**
+ * Validates that a bounded context belongs to a domain.
+ * A BoundedContext must have a 'for Domain' clause.
+ * 
+ * @param bc - The bounded context to validate
+ * @param accept - The validation acceptor for reporting issues
+ */
+function validateBoundedContextHasDomain(
+    bc: BoundedContext,
+    accept: ValidationAcceptor
+): void {
+    if (!bc.domain) {
+        accept('warning', ValidationMessages.BOUNDED_CONTEXT_NO_DOMAIN(bc.name), {
+            node: bc,
+            keyword: 'for'
         });
     }
 }
@@ -51,9 +70,10 @@ function validateBoundedContextInlineBlockConflicts(
         }
     }
     if (inlineRoleName && blockRoleName) {
+        // Point to the inline role that conflicts
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_ROLE_CONFLICT(bc.name, inlineRoleName, blockRoleName), {
             node: bc,
-            property: 'documentation'
+            property: 'role'
         });
     }
 
@@ -69,14 +89,16 @@ function validateBoundedContextInlineBlockConflicts(
         }
     }
     if (inlineTeamName && blockTeamName) {
+        // Point to the inline team that conflicts
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_TEAM_CONFLICT(bc.name, inlineTeamName, blockTeamName), {
             node: bc,
-            property: 'documentation'
+            property: 'team'
         });
     }
 }
 
 export const boundedContextChecks = [
     validateBoundedContextHasDescription,
+    validateBoundedContextHasDomain,
     validateBoundedContextInlineBlockConflicts
 ]; 
