@@ -2,7 +2,7 @@ import { setInferredRelationshipTypes } from '../services/relationship-inference
 import { extractNames } from './shared.js';
 import type { ValidationAcceptor } from 'langium';
 import type { Model } from '../generated/ast.js';
-import { ValidationMessages } from './constants.js';
+import { ValidationMessages, buildCodeDescription } from './constants.js';
 
 /**
  * Validates that all elements in the model have unique fully qualified names.
@@ -24,7 +24,8 @@ function validateModelUniqueNames(
         if (uniqueNames.size === oldSize) {
             accept('error', ValidationMessages.DUPLICATE_ELEMENT(fqn), { 
                 node: node, 
-                property: 'name' 
+                property: 'name',
+                codeDescription: buildCodeDescription('language.md', 'naming')
             });
         }
     }

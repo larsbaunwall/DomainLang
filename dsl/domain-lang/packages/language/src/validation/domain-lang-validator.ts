@@ -4,6 +4,7 @@ import { boundedContextChecks } from './bounded-context.js';
 import { classificationChecks } from './classification.js';
 import { metadataChecks } from './metadata.js';
 import { contextMapChecks, domainMapChecks } from './maps.js';
+import { relationshipChecks } from './relationships.js';
 import { createImportChecks } from './import.js';
 import type { ValidationChecks } from 'langium';
 import type { DomainLangAstType } from '../generated/ast.js';
@@ -26,6 +27,7 @@ export function registerValidationChecks(services: DomainLangServices): void {
         Metadata: metadataChecks.Metadata,
         MetadataBlock: metadataChecks.MetadataBlock,
         ImportStatement: importChecks.ImportStatement,
+        Relationship: relationshipChecks,
     };
     
     registry.register(pipeline);

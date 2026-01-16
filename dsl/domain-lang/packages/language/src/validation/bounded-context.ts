@@ -1,7 +1,7 @@
 import type { ValidationAcceptor } from 'langium';
 import type { BoundedContext, BoundedContextDocumentationBlock } from '../generated/ast.js';
 import { isDescriptionBlock, isRoleBlock, isTeamBlock, isBoundedContextClassificationBlock } from '../generated/ast.js';
-import { ValidationMessages } from './constants.js';
+import { ValidationMessages, buildCodeDescription } from './constants.js';
 
 /**
  * Validates that a bounded context has a description.
@@ -19,7 +19,8 @@ function validateBoundedContextHasDescription(
     if (!hasDescription) {
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_NO_DESCRIPTION(bc.name), { 
             node: bc,
-            keyword: 'BoundedContext'
+            keyword: 'BoundedContext',
+            codeDescription: buildCodeDescription('language.md', 'bounded-contexts')
         });
     }
 }
@@ -38,7 +39,8 @@ function validateBoundedContextHasDomain(
     if (!bc.domain) {
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_NO_DOMAIN(bc.name), {
             node: bc,
-            keyword: 'for'
+            keyword: 'for',
+            codeDescription: buildCodeDescription('language.md', 'bounded-contexts')
         });
     }
 }
@@ -73,7 +75,8 @@ function validateBoundedContextInlineBlockConflicts(
         // Point to the inline role that conflicts
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_ROLE_CONFLICT(bc.name, inlineRoleName, blockRoleName), {
             node: bc,
-            property: 'role'
+            property: 'role',
+            codeDescription: buildCodeDescription('language.md', 'bounded-contexts')
         });
     }
 
@@ -92,7 +95,8 @@ function validateBoundedContextInlineBlockConflicts(
         // Point to the inline team that conflicts
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_TEAM_CONFLICT(bc.name, inlineTeamName, blockTeamName), {
             node: bc,
-            property: 'team'
+            property: 'team',
+            codeDescription: buildCodeDescription('language.md', 'bounded-contexts')
         });
     }
 }

@@ -41,7 +41,7 @@ describe('Validation Tests', () => {
 
             // Assert
             expectValidationWarnings(document, [
-                "Domain 'Sales' has no domain vision"
+                "missing a vision statement"
             ]);
         });
 
@@ -115,7 +115,7 @@ describe('Validation Tests', () => {
 
             // Assert
             expectValidationWarnings(document, [
-                "Bounded Context 'OrderContext' has no description"
+                "missing a description"
             ]);
         });
 
@@ -191,7 +191,7 @@ describe('Validation Tests', () => {
 
             // Assert
             expectValidationErrors(document, [
-                "This element is already defined elsewhere"
+                "Duplicate element"
             ]);
         });
 
@@ -232,7 +232,7 @@ describe('Validation Tests', () => {
 
             // Assert
             expectValidationErrors(document, [
-                "This element is already defined elsewhere"
+                "Duplicate element"
             ]);
         });
 

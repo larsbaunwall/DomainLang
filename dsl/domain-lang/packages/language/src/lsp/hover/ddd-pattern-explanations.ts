@@ -9,19 +9,75 @@
  * Explanations for DDD integration role patterns (e.g., PL, ACL, SK).
  */
 export const rolePatternExplanations: Record<string, string> = {
-    'PL': '**Published Language (PL)**\n\nThe upstream context provides a well-documented, stable API/model that downstream contexts consume. The upstream team commits to maintaining compatibility.\n\n*Use when:* You want to share a common language across multiple consumers.',
+    'PL': `**Published Language (PL)**
+
+The upstream context provides a well-documented, stable API/model that downstream contexts consume.
+
+\`\`\`domain-lang
+[PL] UpstreamContext -> DownstreamContext
+\`\`\`
+
+*Use when:* Multiple consumers need a shared, stable interface.`,
     
-    'ACL': '**Anti-Corruption Layer (ACL)**\n\nThe downstream context protects itself from changes in the upstream by translating between models. Creates isolation and prevents upstream changes from corrupting the downstream model.\n\n*Use when:* You don\'t trust or control the upstream context\'s stability.',
+    'ACL': `**Anti-Corruption Layer (ACL)**
+
+Protects downstream from upstream changes by translating between models.
+
+\`\`\`domain-lang
+UpstreamContext -> [ACL] DownstreamContext
+\`\`\`
+
+*Use when:* You don't trust upstream stability or want isolation.`,
     
-    'SK': '**Shared Kernel (SK)**\n\nBoth contexts share a common subset of the domain model and code. Changes to the shared kernel require coordination between teams.\n\n*Use when:* Contexts are tightly related and teams can coordinate closely.',
+    'SK': `**Shared Kernel (SK)**
+
+Both contexts share common domain model code requiring coordination.
+
+\`\`\`domain-lang
+[SK] Context1 <-> [SK] Context2 : SharedKernel
+\`\`\`
+
+*Use when:* Contexts are tightly coupled and teams can coordinate.`,
     
-    'CF': '**Conformist (CF)**\n\nThe downstream context conforms to the upstream context\'s model without translation. Accepts whatever the upstream provides.\n\n*Use when:* The upstream model is good enough and translation overhead isn\'t worth it.',
+    'CF': `**Conformist (CF)**
+
+Downstream accepts upstream model without translation.
+
+\`\`\`domain-lang
+UpstreamContext -> [CF] DownstreamContext
+\`\`\`
+
+*Use when:* Upstream model is acceptable and translation isn't worth it.`,
     
-    'OHS': '**Open Host Service (OHS)**\n\nThe upstream defines a protocol/API for integrating with it, designed to be easy for many consumers to use.\n\n*Use when:* Multiple downstream contexts need to integrate with the same upstream.',
+    'OHS': `**Open Host Service (OHS)**
+
+Upstream defines a protocol/API for easy integration.
+
+\`\`\`domain-lang
+[OHS, PL] ApiContext -> ConsumerContext
+\`\`\`
+
+*Use when:* Multiple downstream contexts need integration.`,
     
-    'P': '**Partnership (P)**\n\nBoth teams coordinate development in a cooperative way, aligning releases and evolution.\n\n*Use when:* Success of one context depends on success of the other.',
+    'P': `**Partnership (P)**
+
+Teams coordinate development and align releases.
+
+\`\`\`domain-lang
+Context1 <-> Context2 : Partnership
+\`\`\`
+
+*Use when:* Mutual success dependency exists.`,
     
-    'BBoM': '**Big Ball of Mud (BBoM)**\n\nNo clear boundaries or patterns - models are tangled. This is usually a problem to fix rather than a pattern to adopt.\n\n*Use when:* Documenting legacy systems that need refactoring.'
+    'BBoM': `**Big Ball of Mud (BBoM)**
+
+No clear boundaries - tangled models needing refactoring.
+
+\`\`\`domain-lang
+[BBoM] LegacySystem -> ModernContext
+\`\`\`
+
+*Use when:* Documenting legacy systems.`
 };
 
 /**

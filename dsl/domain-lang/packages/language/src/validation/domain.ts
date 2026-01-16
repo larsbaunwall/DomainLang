@@ -1,7 +1,7 @@
 import type { ValidationAcceptor } from 'langium';
 import type { Domain, DomainDocumentationBlock, VisionBlock } from '../generated/ast.js';
 import { isVisionBlock } from '../generated/ast.js';
-import { ValidationMessages } from './constants.js';
+import { ValidationMessages, buildCodeDescription } from './constants.js';
 
 /**
  * Validates that a domain has a vision statement.
@@ -19,7 +19,8 @@ function validateDomainHasVision(
     if (!hasVision) {
         accept('warning', ValidationMessages.DOMAIN_NO_VISION(domain.name), { 
             node: domain,
-            keyword: 'Domain'
+            keyword: 'Domain',
+            codeDescription: buildCodeDescription('language.md', 'domain-vision')
         });
     }
 }

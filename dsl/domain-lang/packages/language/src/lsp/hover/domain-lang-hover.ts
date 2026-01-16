@@ -65,7 +65,6 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                             return {
                                 contents: {
                                     kind: 'markdown',
-                                    language: this.languageId,
                                     value: content
                                 }
                             };
@@ -77,7 +76,6 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                             return {
                                 contents: {
                                     kind: 'markdown',
-                                    language: this.languageId,
                                     value: content
                                 }
                             };
@@ -136,17 +134,22 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                         classificationRef = doc.classification;
                     }
                 }
-                return this.hoverTemplate(
-                    '📁',
-                    ` **\`(domain)\` ${n.name}**`,
-                    [
-                        `${n.parent ? `*Part of ${this.refLink(n.parent)} domain*` : ''}`,
-                        description ? `---\n\n&nbsp;\n\n*${description}*\n\n&nbsp;` : undefined,
-                        classification ? `🏷️ Classification: ${this.refLink(classificationRef, classification)}` : undefined,
-                        vision ? `🎯 Vision: ${vision}` : undefined
-                    ],
-                    commentBlock
-                );
+
+                // Build signature line
+                const signatureParts = ['Domain', n.name];
+                if (n.parent?.ref?.name) signatureParts.push('in', n.parent.ref.name);
+                const signature = `\`\`\`domain-lang\n${signatureParts.join(' ')}\n\`\`\``;
+
+                const fields: string[] = [signature];
+                if (description) fields.push(description);
+                if (vision || classification || n.parent) fields.push('---');
+                if (vision) fields.push(`**Vision:** ${vision}`);
+                if (classification) fields.push(`**Classification:** ${this.refLink(classificationRef, classification)}`);
+                if (n.parent) fields.push(`**Parent:** ${this.refLink(n.parent)}`);
+
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `📁 **\`(domain)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
             }
 
             // --- ThisRef ---
@@ -193,124 +196,177 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
                 const lifecycleRef = classifiersBlock?.lifecycle ? classifiersBlock.lifecycle.ref : undefined;
                 const role = classifiersBlock?.role;
                 const roleRef = classifiersBlock?.role ? classifiersBlock.role.ref : undefined;
+                const roleName = role ? roleRef?.name : n.role?.ref?.name;
+                const teamName = team ? ownerLabel : n.team?.ref?.name;
                 const relationships = relationshipsBlock?.relationships ?? [];
                 const terminology = terminologyBlock?.terms ?? [];
                 const decisions = decisionsBlock?.decisions ?? [];
 
-                return this.hoverTemplate(
-                    '📕',
-                    ` **\`(boundedcontext)\` ${n.name}**`,
-                    [
-                        `${n.domain?.ref ? `*Part of ${this.refLink(n.domain.ref)} domain*` : ''}`,  
-                        description ? `---\n\n&nbsp;\n\n*${description}*\n\n&nbsp;` : undefined,
-                        role ? `🔖 Role: ${this.refLink(roleRef)}` : undefined,
-                        team ? `👥 Team: ${this.refLink(ownerRef, String(ownerLabel))}` : undefined,
-                        businessModel ? `💼 Business Model: ${this.refLink(businessModelRef)}` : undefined,
-                        lifecycle ? `🔄 Lifecycle: ${this.refLink(lifecycleRef)}` : undefined,
-                        relationships.length ? `---\n\n&nbsp;\n\n#### 🔗 Relationships\n${relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? '(' + r.type + ')' : ''}`).join('\n')}` : undefined,
-                        terminology.length ? `---\n\n&nbsp;\n\n#### 🗝️ Terminology\n${terminology.map(t => `- **${t.name}**: _${t.meaning}_`).join('\n')}` : undefined,
-                        decisions.length ? `---\n\n&nbsp;\n\n#### ⚖️ Decisions\n${decisions.map(d => `- **${d.name}**: _${d.value}_`).join('\n')}` : undefined
-                    ],
-                    commentBlock
-                );
+                // Build signature line (TypeScript-style)
+                const signatureParts = ['boundedcontext', n.name];
+                if (n.domain?.ref?.name) signatureParts.push('for', n.domain.ref.name);
+                if (roleName) signatureParts.push('as', roleName);
+                if (teamName) signatureParts.push('by', teamName);
+                const signature = `\`\`\`domain-lang\n${signatureParts.join(' ')}\n\`\`\``;
+
+                const fields: string[] = [signature];
+                if (description) fields.push(description);
+                if (role || team || businessModel || lifecycle) fields.push('---');
+                if (role) fields.push(`🔖 **Role:** ${this.refLink(roleRef)}`);
+                if (team) fields.push(`👥 **Team:** ${this.refLink(ownerRef, String(ownerLabel))}`);
+                if (businessModel) fields.push(`💼 **Business Model:** ${this.refLink(businessModelRef)}`);
+                if (lifecycle) fields.push(`🔄 **Lifecycle:** ${this.refLink(lifecycleRef)}`);
+                if (relationships.length) fields.push(`**Relationships:**\n${relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? ' `' + r.type + '`' : ''}`).join('\n')}`);
+                if (terminology.length) fields.push(`**Terminology:**\n${terminology.map(t => `- \`${t.name}\`: ${t.meaning}`).join('\n')}`);
+                if (decisions.length) fields.push(`**Decisions:**\n${decisions.map(d => `- \`${d.name}\`: ${d.value}`).join('\n')}`);
+
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `📕 **\`(boundedcontext)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
             }
 
             // --- NamespaceDeclaration ---
             if (ast.isNamespaceDeclaration && ast.isNamespaceDeclaration(node)) {
                 const n = node as ast.NamespaceDeclaration;
-                return this.hoverTemplate(
-                    '🧭',
-                    ` **\`(namespace)\` ${n.name}**`,
-                    [
-                        `Contains ${n.children.length} elements.`
-                    ],
-                    commentBlock
-                );
+                const fields: string[] = [
+                    `Contains ${n.children.length} elements.`
+                ];
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `🧭 **\`(namespace)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
             }
 
             // --- ContextMap ---
             if (ast.isContextMap && ast.isContextMap(node)) {
                 const n = node as ast.ContextMap;
-                return this.hoverTemplate(
-                    '🗺️',
-                    ` **\`(contextmap)\` ${n.name}**`,
-                    [
-                        n.boundedContexts.length ? `---\n\n&nbsp;\n\n#### 📕 Bounded Contexts\n${n.boundedContexts.flatMap(bc => bc.items.map(item => `- ${this.refLink(item.ref)}`)).join('\n')}` : undefined,
-                        n.relationships.length ? `---\n\n&nbsp;\n\n#### 🔗 Relationships\n${n.relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? '(' + r.type + ')' : ''}`).join('\n')}` : undefined
-                    ],
-                    commentBlock
-                );
+                const fields: string[] = [];
+                if (n.boundedContexts.length) {
+                    fields.push('---');
+                    fields.push(`**📕 Bounded Contexts**\n${n.boundedContexts.flatMap(bc => bc.items.map(item => `- ${this.refLink(item.ref)}`)).join('\n')}`);
+                }
+                if (n.relationships.length) {
+                    fields.push('---');
+                    fields.push(`**🔗 Relationships**\n${n.relationships.map(r => `- ${this.refLink(r.left?.link)} ${r.arrow} ${this.refLink(r.right?.link)}${r.type ? ' \`' + r.type + '\`' : ''}`).join('\n')}`);
+                }
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `🗺️ **\`(contextmap)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
             }
             // --- DomainMap ---
             if (ast.isDomainMap && ast.isDomainMap(node)) {
                 const n = node as ast.DomainMap;
-                return this.hoverTemplate(
-                    '🗺️',
-                    ` **\`(domainmap)\` ${n.name}**`,
-                    [
-                        n.domains.length ? `---\n\n&nbsp;\n\n#### 📁 Domains\n${n.domains.flatMap(d => d.items.map(item => `- ${this.refLink(item.ref)}`)).join('\n')}` : undefined
-                    ],
-                    commentBlock
-                );
+                const fields: string[] = [];
+                if (n.domains.length) {
+                    fields.push('---');
+                    fields.push(`**📁 Domains**\n${n.domains.flatMap(d => d.items.map(item => `- ${this.refLink(item.ref)}`)).join('\n')}`);
+                }
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `🗺️ **\`(domainmap)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
             }
             
             // --- Decision ---
             if (ast.isDecision && ast.isDecision(node)) {
                 const n = node as ast.Decision;
-                return this.hoverTemplate(
-                    '⚖️',
-                    ` **\`(decision)\` ${n.name}**`,
-                    [
-                        n.value ? `---\n\n&nbsp;\n\n*Definition:* ${n.value}` : undefined
-                    ],
-                    commentBlock
-                );
+                const fields: string[] = [];
+                if (n.value) {
+                    fields.push('---');
+                    fields.push(`*Definition:* ${n.value}`);
+                }
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `⚖️ **\`(decision)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
             }
             // --- Policy ---
             if (ast.isPolicy && ast.isPolicy(node)) {
                 const n = node as ast.Policy;
-                return this.hoverTemplate(
-                    '📜',
-                    ` **\`(policy)\` ${n.name}**`,
-                    [
-                        n.value ? `---\n\n&nbsp;\n\n*Definition:* ${n.value}` : undefined
-                    ],
-                    commentBlock
-                );
+                const fields: string[] = [];
+                if (n.value) {
+                    fields.push('---');
+                    fields.push(`*Definition:* ${n.value}`);
+                }
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `📜 **\`(policy)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
             }
             // --- BusinessRule ---
             if (ast.isBusinessRule && ast.isBusinessRule(node)) {
                 const n = node as ast.BusinessRule;
-                return this.hoverTemplate(
-                    '⚖️',
-                    ` **\`(rule)\` ${n.name}**`,
-                    [
-                        n.value ? `---\n\n&nbsp;\n\n*Definition:* ${n.value}` : undefined
-                    ],
-                    commentBlock
-                );
+                const fields: string[] = [];
+                if (n.value) {
+                    fields.push('---');
+                    fields.push(`*Definition:* ${n.value}`);
+                }
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `⚖️ **\`(rule)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
             }
             // --- DomainTerm ---
             if (ast.isDomainTerm && ast.isDomainTerm(node)) {
                 const n = node as ast.DomainTerm;
-                return this.hoverTemplate(
-                    '🗝️',
-                    ` **\`(term)\` ${n.name}**`,
-                    [
-                        n.meaning ? `---\n\n&nbsp;\n\n*${n.meaning}*` : undefined
-                    ],
-                    commentBlock
-                );
+                const fields: string[] = [];
+                if (n.meaning) {
+                    fields.push('---');
+                    fields.push(`*${n.meaning}*`);
+                }
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `🗝️ **\`(term)\` ${n.name}**\n\n` + 
+                       fields.join('\n\n');
+            }
+
+            // --- Team ---
+            if (ast.isTeam && ast.isTeam(node)) {
+                const n = node as ast.Team;
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `👥 **\`(team)\` ${n.name}**`;
+            }
+
+            // --- Classification ---
+            if (ast.isClassification && ast.isClassification(node)) {
+                const n = node as ast.Classification;
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `🏷️ **\`(classification)\` ${n.name}**`;
+            }
+
+            // --- Metadata ---
+            if (ast.isMetadata && ast.isMetadata(node)) {
+                const n = node as ast.Metadata;
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `🔖 **\`(metadata)\` ${n.name}**`;
+            }
+
+            // --- Relationship ---
+            if (ast.isRelationship && ast.isRelationship(node)) {
+                const n = node as ast.Relationship;
+                const leftPatterns = n.leftPatterns.join(', ');
+                const rightPatterns = n.rightPatterns.join(', ');
+                const fields: string[] = [];
+                fields.push(`${this.refLink(n.left.link)} ${n.arrow} ${this.refLink(n.right.link)}`);
+                if (n.type) fields.push(`**Type:** \`${n.type}\``);
+                if (leftPatterns) fields.push(`**Left patterns:** ${leftPatterns}`);
+                if (rightPatterns) fields.push(`**Right patterns:** ${rightPatterns}`);
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `🔗 **\`(relationship)\`**\n\n` + 
+                       fields.join('\n\n');
+            }
+
+            // --- ImportStatement ---
+            if (ast.isImportStatement && ast.isImportStatement(node)) {
+                const n = node as ast.ImportStatement;
+                const fields: string[] = [];
+                fields.push(`**URI:** \`${n.uri}\``);
+                if (n.symbols.length) fields.push(`**Imports:** ${n.symbols.map(s => `\`${s}\``).join(', ')}`);
+                if (n.alias) fields.push(`**Alias:** \`${n.alias}\``);
+                if (n.integrity) fields.push(`**Integrity:** \`${n.integrity}\``);
+                return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                       `📦 **\`(import)\`**\n\n` + 
+                       fields.join('\n\n');
             }
 
             // --- Fallback ---
-            return this.hoverTemplate(
-                'ℹ️',
-                ast.isType(node) ? ` **\`(${node.$type.toLowerCase()})\` ${node.name}**` : ` **\`(${node.$type.toLowerCase()})\`**`,
-                [
-                ],
-                commentBlock
-            );
+            const title = ast.isType(node) ? `${node.name}` : node.$type.toLowerCase();
+            return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') + 
+                   `ℹ️ **\`(${node.$type.toLowerCase()})\`${ast.isType(node) ? ' ' + title : ''}**`;
         } catch (error) {
             // Defensive: fallback to minimal hover info
             console.error('Error in getAstNodeHoverContent:', error);
@@ -366,26 +422,6 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
     
     /**
      * Formats hover content as markdown with consistent structure.
-     *
-     * @param icon - Emoji or icon for the node type
-     * @param title - Title for the hover block
-     * @param fields - List of markdown fields to include (undefined values filtered)
-     * @param commentBlock - Optional comment/documentation block
-     * @returns Formatted markdown string
-     */
-    private hoverTemplate(
-        icon: string,
-        title: string,
-        fields: Array<string | undefined>,
-        commentBlock?: string
-    ): string {
-        return (
-            (commentBlock ? `${commentBlock}\n\n---\n\n&nbsp;\n\n` : '') +
-            `### ${icon} ${title}\n\n` +
-            fields.filter(Boolean).join('\n\n')
-        );
-    }
-
     /**
      * Provides hover content for keywords based on grammar JSDoc comments.
      * Implementation follows Langium PR #1842 pattern.
