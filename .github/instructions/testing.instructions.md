@@ -113,9 +113,9 @@ test('parse domain with vision', async () => {
     expectValidDocument(document);
     const domain = getFirstDomain(document);
     
-    // Assert - Verify AST structure
+    // Assert - Verify AST structure (direct property access)
     expect(domain.name).toBe('Sales');
-    expect(domain.documentation).toHaveLength(1);
+    expect(domain.vision).toBe('Handle sales');  // Direct property!
 });
 ```
 

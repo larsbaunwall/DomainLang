@@ -98,10 +98,10 @@ The Model Query SDK requires special documentation attention:
  * @example
  * ```typescript
  * // Direct resolution
- * const role = resolveBcRole(bc);
+ * const role = effectiveRole(bc);
  * 
  * // Via augmented property
- * const role = bc.resolvedRole;
+ * const role = bc.effectiveRole;
  * ```
  */
 ```

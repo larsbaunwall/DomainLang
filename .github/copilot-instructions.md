@@ -152,17 +152,30 @@ npm test                  # Must pass
 The SDK provides programmatic access to DomainLang models:
 
 **Key Capabilities:**
-- Zero-copy AST augmentation with semantic properties (`description`, `resolvedRole`, `resolvedTeam`, `metadata`, `fqn`)
-- Fluent query builders with lazy evaluation (`query.boundedContexts().withRole('Core').withTeam('SalesTeam')`)
+- Direct property access for simple values: `bc.description`, `domain.vision`
+- SDK augmentation for precedence resolution: `bc.effectiveRole`, `bc.effectiveTeam`, `bc.metadataMap`
+- Fluent query builders with lazy evaluation: `query.boundedContexts().withRole('Core')`
 - O(1) indexed lookups by FQN, name, team, role, and metadata
 - Type-safe pattern matching for DDD integration patterns
-- Browser-safe loaders and Node.js file loader
 
 **Entry Points:**
 - `loadModelFromText(text)` - Browser-safe in-memory parsing
 - `loadModel(file)` - Node.js file loader (from `sdk/loader-node`)
 - `fromDocument(document)` - Zero-copy LSP integration
 - `fromModel(model)` - Direct AST wrapping
+
+**Property Access Patterns:**
+```typescript
+// Direct AST access (no SDK needed)
+const desc = bc.description;           // Direct string property
+const bm = bc.businessModel?.ref;      // Direct reference
+const lc = bc.lifecycle?.ref;          // Direct reference
+
+// SDK augmented (precedence resolution)
+const role = bc.effectiveRole;         // Header 'as' wins over body 'role:'
+const team = bc.effectiveTeam;         // Header 'by' wins over body 'team:'
+const meta = bc.metadataMap;           // Metadata as Map for O(1) lookups
+```
 
 **Usage Example:**
 ```typescript

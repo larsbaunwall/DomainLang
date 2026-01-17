@@ -147,6 +147,8 @@ Then restart the debugger (⇧⌘F5 to stop, then F5 to start).
 **Inside BoundedContext:**
 
 ```dlang
+Domain CustomerExperience { description: "Customer experience" }
+
 bc Sales for CustomerExperience {
     // Put cursor here, press Ctrl+Space
     // Should suggest: description, team, role, terminology, etc.
@@ -165,7 +167,13 @@ Domain Sales {
 **Inside ContextMap:**
 
 ```dlang
-ContextMap ECommerce {
+Domain ECommerce { description: "E-commerce domain" }
+
+bc Catalog for ECommerce { description: "Catalog" }
+bc Orders for ECommerce { description: "Orders" }
+
+ContextMap ECommerceMap {
+    contains Catalog, Orders
     // Put cursor here, press Ctrl+Space
     // Should suggest: contains, relationship patterns
 }
@@ -174,6 +182,10 @@ ContextMap ECommerce {
 ### Test Smart Detection
 
 ```dlang
+Classification Core
+Team SalesTeam
+Domain CustomerExperience { description: "Customer experience" }
+
 bc Sales for CustomerExperience as Core by SalesTeam {
     // Put cursor here, press Ctrl+Space
     // Should NOT suggest 'role' or 'team' since already defined inline

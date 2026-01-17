@@ -58,26 +58,27 @@ You are working with Langium 4.x, a framework for building DSLs with full LSP su
 
 ```dlang
 bc OrderContext for Sales as Core by SalesTeam {
-    description: "Order management"
-    team: SalesTeam
-    role: Core
+    description: \"Order management\"
+    role: Core                  // Direct property (or use header: 'as Core')
+    team: SalesTeam             // Direct property (or use header: 'by SalesTeam')
     businessModel: Revenue
-    evolution: Custom
-    
-    classifiers { role: Core }
+    lifecycle: Custom
     
     terminology {
-        term Order: "A customer purchase request"
+        term Order: \"A customer purchase request\"
     }
     
     decisions {
-        decision [Architectural] EventSourcing: "Use event sourcing for orders"
+        decision [Architectural] EventSourcing: \"Use event sourcing for orders\"
     }
     
     relationships {
         [OHS] this -> [CF] PaymentContext
     }
 }
+```
+
+> **Note:** Properties like `role` and `team` can be specified inline in the header (`as`, `by`) or as direct properties in the body. When both are used, the inline form takes precedence (grammar order determines array position).
 ```
 
 ### Relationship Arrows
@@ -126,10 +127,26 @@ entry Model:
     imports+=ImportStatement*
     (children+=StructureElement)*;
 
+// Direct properties instead of documentation block arrays
 Domain:
     'Domain' name=ID ('in' parentDomain=[Domain:QualifiedName])?
-    '{' documentation+=DomainDocumentationBlock* '}';
+    '{' 
+        ('description' Assignment description=STRING)?
+        ('vision' Assignment vision=STRING)?
+        ('classification' Assignment classification=[Classification:QualifiedName])?
+    '}';
+
+BoundedContext:
+    'bc' name=ID ('for' domain=[Domain:QualifiedName])?
+    (('as' role+=[Classification:QualifiedName])? ('by' team+=[Team:QualifiedName])?)?
+    '{'
+        ('description' Assignment description=STRING)?
+        ('role' Assignment role+=[Classification:QualifiedName])?  // Array for dual-location
+        // ... other direct properties
+    '}';
 ```
+
+> **PRS-008 Change:** Properties are now direct on AST nodes instead of nested in documentation block arrays. The `role` and `team` use `+=` (array) to allow both header and body syntax with grammar-order precedence.
 
 ### Assignments
 
