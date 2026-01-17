@@ -31,9 +31,9 @@ import {
 import { QualifiedNameProvider } from '../lsp/domain-lang-naming.js';
 import type { ModelIndexes } from './types.js';
 import {
-    resolveBcMetadata,
-    resolveBcRole,
-    resolveBcTeam,
+    metadataAsMap,
+    effectiveRole,
+    effectiveTeam,
 } from './resolution.js';
 
 /**
@@ -100,7 +100,7 @@ function indexBoundedContext(
     byMetadataKey: Map<string, BoundedContext[]>
 ): void {
     // Index by team
-    const team = resolveBcTeam(bc);
+    const team = effectiveTeam(bc);
     if (team?.name) {
         const teamList = byTeam.get(team.name) ?? [];
         teamList.push(bc);
@@ -108,7 +108,7 @@ function indexBoundedContext(
     }
 
     // Index by role
-    const role = resolveBcRole(bc);
+    const role = effectiveRole(bc);
     if (role?.name) {
         const roleList = byRole.get(role.name) ?? [];
         roleList.push(bc);
@@ -116,7 +116,7 @@ function indexBoundedContext(
     }
 
     // Index by metadata keys
-    const metadata = resolveBcMetadata(bc);
+    const metadata = metadataAsMap(bc);
     for (const key of metadata.keys()) {
         const metaList = byMetadataKey.get(key) ?? [];
         metaList.push(bc);

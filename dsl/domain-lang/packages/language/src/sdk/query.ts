@@ -25,7 +25,6 @@ import {
     isDomainMap,
     isModel,
     isNamespaceDeclaration,
-    isRelationshipsBlock,
     isTeam,
     isThisRef,
 } from '../generated/ast.js';
@@ -33,15 +32,9 @@ import { QualifiedNameProvider } from '../lsp/domain-lang-naming.js';
 import type { DomainLangServices } from '../domain-lang-module.js';
 import { buildIndexes } from './indexes.js';
 import {
-    resolveBcBusinessModel,
-    resolveBcDescription,
-    resolveBcLifecycle,
-    resolveBcMetadata,
-    resolveBcRole,
-    resolveBcTeam,
-    resolveDomainClassification,
-    resolveDomainDescription,
-    resolveDomainVision,
+    metadataAsMap,
+    effectiveRole,
+    effectiveTeam,
 } from './resolution.js';
 import { isDownstreamPattern, isUpstreamPattern, matchesPattern } from './patterns.js';
 import type {
@@ -209,17 +202,13 @@ class QueryImpl implements Query {
 
     /** @internal Generator for relationship iteration */
     private *iterateRelationships(): Generator<RelationshipView> {
-        // Collect from BoundedContext.documentation.relationships
+        // Collect relationships defined on bounded contexts
         for (const node of AstUtils.streamAllContents(this.model)) {
             if (isBoundedContext(node)) {
-                for (const block of node.documentation) {
-                    if (isRelationshipsBlock(block)) {
-                        for (const rel of block.relationships) {
-                            const view = this.createRelationshipView(rel, node, 'BoundedContext');
-                            if (view) {
-                                yield view;
-                            }
-                        }
+                for (const rel of node.relationships) {
+                    const view = this.createRelationshipView(rel, node, 'BoundedContext');
+                    if (view) {
+                        yield view;
                     }
                 }
             }
@@ -526,7 +515,7 @@ class BcQueryBuilderImpl extends QueryBuilderImpl<BoundedContext> implements BcQ
         }
         
         // Add predicate to existing chain
-        return this.where(bc => resolveBcTeam(bc)?.name === teamName);
+        return this.where(bc => effectiveTeam(bc)?.name === teamName);
     }
 
     withRole(role: string | Classification): BcQueryBuilder {
@@ -539,7 +528,7 @@ class BcQueryBuilderImpl extends QueryBuilderImpl<BoundedContext> implements BcQ
         }
         
         // Add predicate to existing chain
-        return this.where(bc => resolveBcRole(bc)?.name === roleName);
+        return this.where(bc => effectiveRole(bc)?.name === roleName);
     }
 
     withMetadata(key: string, value?: string): BcQueryBuilder {
@@ -551,7 +540,7 @@ class BcQueryBuilderImpl extends QueryBuilderImpl<BoundedContext> implements BcQ
         
         // Add predicate to existing chain
         return this.where(bc => {
-            const metadata = resolveBcMetadata(bc);
+            const metadata = metadataAsMap(bc);
             const metaValue = metadata.get(key);
             if (metaValue === undefined) {
                 return false;
@@ -585,35 +574,24 @@ export function augmentBoundedContext(bc: BoundedContext): void {
     const fqnProvider = new QualifiedNameProvider();
     
     // Define computed properties with getters for lazy evaluation
+    // Only include properties that add value beyond direct AST access:
+    // - effectiveRole/effectiveTeam: array precedence resolution
+    // - metadataMap: array to Map conversion
+    // - fqn: computed qualified name
+    // - helper methods: hasRole, hasTeam, hasMetadata
     Object.defineProperties(bc, {
-        // Semantic property names with transparent precedence rules
-        description: {
-            get: () => resolveBcDescription(bc),
+        effectiveRole: {
+            get: () => effectiveRole(bc),
             enumerable: true,
             configurable: true,
         },
-        resolvedRole: {
-            get: () => resolveBcRole(bc),
+        effectiveTeam: {
+            get: () => effectiveTeam(bc),
             enumerable: true,
             configurable: true,
         },
-        resolvedTeam: {
-            get: () => resolveBcTeam(bc),
-            enumerable: true,
-            configurable: true,
-        },
-        businessModel: {
-            get: () => resolveBcBusinessModel(bc),
-            enumerable: true,
-            configurable: true,
-        },
-        lifecycle: {
-            get: () => resolveBcLifecycle(bc),
-            enumerable: true,
-            configurable: true,
-        },
-        metadata: {
-            get: () => resolveBcMetadata(bc),
+        metadataMap: {
+            get: () => metadataAsMap(bc),
             enumerable: true,
             configurable: true,
         },
@@ -630,7 +608,7 @@ export function augmentBoundedContext(bc: BoundedContext): void {
         // Helper methods
         hasRole: {
             value: (name: string | Classification): boolean => {
-                const role = resolveBcRole(bc);
+                const role = effectiveRole(bc);
                 if (!role) return false;
                 const targetName = typeof name === 'string' ? name : name?.name;
                 if (!targetName) return false;
@@ -641,7 +619,7 @@ export function augmentBoundedContext(bc: BoundedContext): void {
         },
         hasTeam: {
             value: (name: string | Team): boolean => {
-                const team = resolveBcTeam(bc);
+                const team = effectiveTeam(bc);
                 if (!team) return false;
                 const targetName = typeof name === 'string' ? name : name?.name;
                 if (!targetName) return false;
@@ -652,7 +630,7 @@ export function augmentBoundedContext(bc: BoundedContext): void {
         },
         hasMetadata: {
             value: (key: string, value?: string): boolean => {
-                const metadata = resolveBcMetadata(bc);
+                const metadata = metadataAsMap(bc);
                 const metaValue = metadata.get(key);
                 if (metaValue === undefined) return false;
                 return value === undefined || metaValue === value;
@@ -667,27 +645,21 @@ export function augmentBoundedContext(bc: BoundedContext): void {
  * Augments Domain instances with SDK-resolved properties.
  * Called during model loading to enrich the AST.
  * 
+ * Only includes properties that add value beyond direct AST access:
+ * - fqn: computed qualified name
+ * - hasClassification: helper method
+ * 
+ * Direct access (no augmentation needed):
+ * - domain.description
+ * - domain.vision
+ * - domain.classification?.ref
+ * 
  * @param domain - Domain to augment
  */
 export function augmentDomain(domain: Domain): void {
     const fqnProvider = new QualifiedNameProvider();
     
     Object.defineProperties(domain, {
-        description: {
-            get: () => resolveDomainDescription(domain),
-            enumerable: true,
-            configurable: true,
-        },
-        vision: {
-            get: () => resolveDomainVision(domain),
-            enumerable: true,
-            configurable: true,
-        },
-        classification: {
-            get: () => resolveDomainClassification(domain),
-            enumerable: true,
-            configurable: true,
-        },
         fqn: {
             get: () => {
                 if (domain.$container && (isModel(domain.$container) || isNamespaceDeclaration(domain.$container))) {
@@ -701,7 +673,7 @@ export function augmentDomain(domain: Domain): void {
         // Helper methods
         hasClassification: {
             value: (name: string | Classification): boolean => {
-                const classification = resolveDomainClassification(domain);
+                const classification = domain.classification?.ref;
                 if (!classification) return false;
                 const targetName = typeof name === 'string' ? name : name?.name;
                 if (!targetName) return false;
@@ -800,12 +772,8 @@ function augmentModelInternal(model: Model): void {
         if (isBoundedContext(node)) {
             augmentBoundedContext(node);
             // Augment relationships inside this bounded context
-            for (const block of node.documentation) {
-                if (isRelationshipsBlock(block)) {
-                    for (const rel of block.relationships) {
-                        augmentRelationship(rel, node);
-                    }
-                }
+            for (const rel of node.relationships) {
+                augmentRelationship(rel, node);
             }
         } else if (isDomain(node)) {
             augmentDomain(node);
@@ -822,7 +790,7 @@ function augmentModelInternal(model: Model): void {
  * Augments all AST nodes in a model with SDK-resolved properties.
  * 
  * This function walks the entire AST and adds lazy getters for resolved
- * properties like `resolvedRole`, `resolvedTeam`, `resolvedDescription`, etc.
+ * properties like `effectiveRole`, `effectiveTeam`, etc.
  * 
  * Idempotent - safe to call multiple times on the same model.
  * Automatically called by `fromModel()`, `fromDocument()`, and `fromServices()`.
