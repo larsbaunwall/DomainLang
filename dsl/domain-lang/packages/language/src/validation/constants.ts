@@ -82,6 +82,13 @@ export const ValidationMessages = {
      */
     BOUNDED_CONTEXT_TEAM_CONFLICT: (bcName: string, inlineTeam?: string, blockTeam?: string) =>
         `Team specified both inline${inlineTeam ? ` ('by ${inlineTeam}')` : ''} and in block${blockTeam ? ` ('team: ${blockTeam}')` : ''}. Inline value takes precedence.`,
+
+    /**
+     * Warning when inline and block roles do not match.
+     * Highlights conflicting strategic classifications such as `as Core` with `role: Generic`.
+     */
+    BOUNDED_CONTEXT_ROLE_MISMATCH: (bcName: string, inlineRole?: string, blockRole?: string) =>
+        `Bounded Context '${bcName}' defines conflicting roles: inline${inlineRole ? ` ('as ${inlineRole}')` : ''} vs block${blockRole ? ` ('role: ${blockRole}')` : ''}. Inline value takes precedence.`,
     
     /**
      * Error message when an element is defined multiple times.

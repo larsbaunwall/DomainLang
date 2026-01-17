@@ -1,6 +1,5 @@
 import type { ValidationAcceptor } from 'langium';
-import type { BoundedContext, BoundedContextDocumentationBlock } from '../generated/ast.js';
-import { isDescriptionBlock, isRoleBlock, isTeamBlock, isBoundedContextClassificationBlock } from '../generated/ast.js';
+import type { BoundedContext } from '../generated/ast.js';
 import { ValidationMessages, buildCodeDescription } from './constants.js';
 
 /**
@@ -13,10 +12,7 @@ function validateBoundedContextHasDescription(
     bc: BoundedContext, 
     accept: ValidationAcceptor
 ): void {
-    const hasDescription = bc.documentation?.some(
-        (block: BoundedContextDocumentationBlock) => isDescriptionBlock(block) && block.description
-    );
-    if (!hasDescription) {
+    if (!bc.description) {
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_NO_DESCRIPTION(bc.name), { 
             node: bc,
             keyword: 'BoundedContext',
@@ -46,56 +42,50 @@ function validateBoundedContextHasDomain(
 }
 
 /**
- * Validates conflicts between inline and block properties in a bounded context.
- * Inline assignments ('as', 'by') should not be duplicated in documentation blocks.
- * When both forms are used, inline values take precedence.
+ * Validates conflicts between inline and block role assignment.
+ * Warns when both inline ('as') and block ('role:') are used.
+ * Inline values take precedence per PRS-008.
  *
  * FR-2.3: Inline/Block Conflict Validation
  */
-function validateBoundedContextInlineBlockConflicts(
+function validateBoundedContextRoleConflict(
     bc: BoundedContext,
     accept: ValidationAcceptor
 ): void {
-    // Role conflict: inline 'as' vs block 'role' or classifications.role
-    const inlineRoleName = bc.role?.ref?.name;
-    let blockRoleName: string | undefined;
-    if (bc.documentation) {
-        for (const block of bc.documentation) {
-            if (isRoleBlock(block) && block.role?.ref?.name) {
-                blockRoleName = block.role.ref.name;
-                break;
-            }
-            if (isBoundedContextClassificationBlock(block) && block.role?.ref?.name) {
-                blockRoleName = block.role.ref.name;
-                break;
-            }
-        }
-    }
-    if (inlineRoleName && blockRoleName) {
-        // Point to the inline role that conflicts
+    if (bc.role.length > 1) {
+        const inlineRoleName = bc.role[0].ref?.name;
+        const blockRoleName = bc.role[1].ref?.name;
+
+        // Warn if defined multiple times
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_ROLE_CONFLICT(bc.name, inlineRoleName, blockRoleName), {
             node: bc,
             property: 'role',
+            index: 1,
             codeDescription: buildCodeDescription('language.md', 'bounded-contexts')
         });
     }
+}
 
-    // Team conflict: inline 'by' vs block 'team'
-    const inlineTeamName = bc.team?.ref?.name;
-    let blockTeamName: string | undefined;
-    if (bc.documentation) {
-        for (const block of bc.documentation) {
-            if (isTeamBlock(block) && block.team?.ref?.name) {
-                blockTeamName = block.team.ref.name;
-                break;
-            }
-        }
-    }
-    if (inlineTeamName && blockTeamName) {
-        // Point to the inline team that conflicts
+/**
+ * Validates conflicts between inline and block team assignment.
+ * Warns when both inline ('by') and block ('team:') are used.
+ * Inline values take precedence per PRS-008.
+ *
+ * FR-2.3: Inline/Block Conflict Validation
+ */
+function validateBoundedContextTeamConflict(
+    bc: BoundedContext,
+    accept: ValidationAcceptor
+): void {
+    if (bc.team.length > 1) {
+        const inlineTeamName = bc.team[0].ref?.name;
+        const blockTeamName = bc.team[1].ref?.name;
+
+        // Warn if defined multiple times
         accept('warning', ValidationMessages.BOUNDED_CONTEXT_TEAM_CONFLICT(bc.name, inlineTeamName, blockTeamName), {
             node: bc,
             property: 'team',
+            index: 1,
             codeDescription: buildCodeDescription('language.md', 'bounded-contexts')
         });
     }
@@ -104,5 +94,6 @@ function validateBoundedContextInlineBlockConflicts(
 export const boundedContextChecks = [
     validateBoundedContextHasDescription,
     validateBoundedContextHasDomain,
-    validateBoundedContextInlineBlockConflicts
+    validateBoundedContextRoleConflict,
+    validateBoundedContextTeamConflict
 ]; 

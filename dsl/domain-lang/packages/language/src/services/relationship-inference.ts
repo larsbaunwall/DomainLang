@@ -51,14 +51,8 @@ function walkStructureElements(
  * @param context - The bounded context to process
  */
 function processContextRelationships(context: BoundedContext): void {
-    const relationshipsBlock = context.documentation.find(
-        block => 'relationships' in block
-    );
-    
-    if (relationshipsBlock && 'relationships' in relationshipsBlock) {
-        for (const rel of relationshipsBlock.relationships) {
-            enrichRelationship(rel);
-        }
+    for (const rel of context.relationships) {
+        enrichRelationship(rel);
     }
 }
 

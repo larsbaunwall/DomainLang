@@ -25,7 +25,6 @@ export function registerValidationChecks(services: DomainLangServices): void {
         ContextMap: contextMapChecks,
         DomainMap: domainMapChecks,
         Metadata: metadataChecks.Metadata,
-        MetadataBlock: metadataChecks.MetadataBlock,
         ImportStatement: importChecks.ImportStatement,
         Relationship: relationshipChecks,
     };
