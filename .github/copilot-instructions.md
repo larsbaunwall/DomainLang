@@ -16,7 +16,7 @@
 ## Project Context
 
 - **What:** Compilable DSL for DDD specification with LSP tooling
-- **Stack:** TypeScript 5.x, Langium 4.x, Node.js 18+, Vite, Vitest
+- **Stack:** TypeScript 5.x, Langium 4.x, Node.js 20+, Vite, Vitest
 - **Working Directory:** All commands run from `dsl/domain-lang/`
 - **Language-specific rules:** See `.github/instructions/` for TypeScript, testing, docs, and Langium guidelines
 
@@ -64,8 +64,7 @@ npm test                  # Run tests
 **For new grammar features, keywords, or DSL constructs:**
 - **language.md** - Full explanation, syntax, semantics, and usage examples
 - **quick-reference.md** - Concise example suitable for quick lookup
-- **syntax-examples.md** - Comprehensive examples with multiple patterns
-- **Example files** - Create `.dlang` example files demonstrating real-world usage
+- **Example files** - Create or extend `.dlang` example files demonstrating real-world usage
 - **JSDoc** - Comment grammar rules and validation functions
 
 ### Code Quality & Linting

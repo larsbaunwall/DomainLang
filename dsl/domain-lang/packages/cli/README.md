@@ -1,17 +1,41 @@
-# Command-line interface (CLI)
+# domain-lang-cli
 
-Check [this part](https://langium.org/docs/learn/minilogo/customizing_cli/) of the Langium Minilogo Tutorial as a useful guide to the CLI.
+Command line interface for working with DomainLang models.
 
-## What's in the folder?
+## Install
 
-- [package.json](./package.json) - The manifest file of your cli package.
-- [tsconfig.src.json](./tsconfig.src.json) - The package specific TypeScript compiler configuration extending the [base config](../../tsconfig.json).
-- [tsconfig.json](./tsconfig.json) - TypeScript compiler configuration options required for proper functionality of VSCode.
-- [bin/cli.js](bin/cli/cli.js) - Script referenced in the [package.json](./package.json) and used to execute the command-line interface.
-- [src/cli/main.ts](src/cli/main.ts) - The entry point of the command line interface (CLI) of your language.
-- [src/cli/generator.ts](src/cli/generator.ts) - The code generator used by the CLI to write output files from DSL documents.
-- [src/cli/util.ts](src/cli/util.ts) - Utility code for the CLI.
+This repository builds the CLI as part of the workspace. The binary is `domain-lang-cli`.
 
-## Instructions
+## Commands
 
-Run `node ./bin/cli` to see options for the CLI; `node ./bin/cli generate <file>` generates code for a given DSL file.
+### Model dependencies
+
+DomainLang supports a git-native model dependency workflow via model.yaml and a lock file.
+
+```bash
+# List dependencies (from lock file)
+domain-lang-cli model list
+
+# Add/remove dependencies in model.yaml
+domain-lang-cli model add <name> <owner/repo> [version]
+domain-lang-cli model remove <name>
+
+# Install and lock dependencies
+domain-lang-cli install
+
+# See dependency tree and impact analysis
+domain-lang-cli model tree [--commits]
+domain-lang-cli model deps <owner/repo>
+
+# Validate/audit
+domain-lang-cli model validate
+domain-lang-cli model audit
+domain-lang-cli model compliance
+
+# Clear cache
+domain-lang-cli cache-clear
+```
+
+### Code generation (experimental)
+
+`domain-lang-cli generate <file>` exists but currently produces an empty JavaScript stub. Treat it as experimental.

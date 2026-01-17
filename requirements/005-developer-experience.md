@@ -30,11 +30,10 @@ Location: `dsl/domain-lang/docs/`
 
 | File | Lines | Purpose |
 | ---- | ----- | ------- |
-| getting-started.md | 570 | 30-minute hands-on tutorial |
-| language.md | 725 | Complete language reference |
-| quick-reference.md | 455 | Cheat sheet for quick lookups |
-| syntax-examples.md | 1065 | Comprehensive examples |
-| README.md | 275 | Navigation hub |
+| getting-started.md | ~80 | Hands-on tutorial |
+| language.md | ~170 | Language reference |
+| quick-reference.md | ~120 | Syntax cheat sheet |
+| README.md | ~30 | Navigation hub |
 
 Plus 8 example `.dlang` files covering banking, healthcare, e-commerce domains.
 

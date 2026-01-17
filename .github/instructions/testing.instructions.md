@@ -404,7 +404,6 @@ test('handles large number of elements', async () => {
 
 - [ ] **language.md** — Add section explaining feature, syntax, and semantics
 - [ ] **quick-reference.md** — Add concise example suitable for quick lookup
-- [ ] **syntax-examples.md** — Add comprehensive examples showing usage patterns
 - [ ] **Examples** — Create `.dlang` example files demonstrating real-world usage
 - [ ] **JSDoc** — Document validation rules and AST interfaces with JSDoc
 

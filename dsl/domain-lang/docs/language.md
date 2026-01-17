@@ -1,514 +1,417 @@
-# DomainLang Language Reference
+# Language reference
 
-> The complete guide to every syntax element in DomainLang.
+This page is the authoritative reference for DomainLang syntax and meaning.
 
-This is your authoritative reference when you need to know exactly how a construct works. **New to DomainLang?** Start with the [Getting Started Guide](./getting-started.md) instead—it's friendlier.
+If you are learning the language, start with [getting-started.md](getting-started.md).
 
----
+Use [quick-reference.md](quick-reference.md) as a syntax cheat sheet.
 
-## How This Document Works
+## Keywords and aliases
 
-```mermaid
-graph LR
-    GS["📖 Getting Started"] -->|"learn the basics"| QR["📋 Quick Reference"]
-    QR -->|"look up syntax"| LR["📚 Language Reference"]
-    LR -->|"understand deeply"| SE["📝 Syntax Examples"]
-    
-    style LR fill:#e8f5e9
-```
+DomainLang accepts a small set of aliases for common constructs:
 
-Each section below covers one language construct with:
+| Concept | Keywords |
+| --- | --- |
+| Domain | `Domain`, `dom` |
+| Bounded context | `BoundedContext`, `bc` |
+| Context map | `ContextMap`, `cmap` |
+| Domain map | `DomainMap`, `dmap` |
+| Namespace | `Namespace`, `ns` |
+| Import | `import`, `Import` |
 
-1. **Grammar** — The formal syntax rules
-2. **Semantics** — What it means and how it behaves
-3. **Example** — Working code you can copy
+Some keywords accept multiple names for readability (covered in the relevant sections).
 
----
+## Model structure
 
-## Table of Contents
+A `.dlang` file produces a single `Model` that contains imports and declarations.
 
-- [Model Structure](#model-structure)
-- [Imports](#imports)
-- [Namespaces](#namespaces)
-- [Type Declarations](#type-declarations)
-- [Documentation Blocks](#documentation-blocks)
-- [Metadata](#metadata)
-- [Terminology and Decisions](#terminology-and-decisions)
-- [Context Maps and Relationships](#context-maps-and-relationships)
-- [Qualified Names and References](#qualified-names-and-references)
-- [Assignment Operators](#assignment-operators)
-- [Comments](#comments)
-- [Reference Examples](#reference-examples)
+You can mix declarations in any order:
 
----
+- Domains
+- Bounded contexts
+- Teams, classifications, metadata keys
+- Namespaces
+- Context maps and domain maps
 
-## Model Structure
+### Comments, identifiers, and strings
 
-Every `.dlang` file parses into a `Model` node:
-
-| Concept | Description |
-| ------- | ----------- |
-| **Entry rule** | Every file produces a single `Model` node |
-| **Structure elements** | Mix `Domain`, `BoundedContext`, `ContextMap`, `DomainMap`, and `Namespace` freely |
-| **Container semantics** | `Model` and `Namespace` act as hierarchical scopes |
-| **Qualified names** | Elements get fully qualified names (FQN) from ancestors |
+- Use `//` for line comments and `/* ... */` for block comments.
+- Use either single quotes (`'...'`) or double quotes (`"..."`) for strings.
+- Use identifiers that start with a letter or `_`, followed by letters, digits, `_`, or `-`.
+- Ignore whitespace (except inside strings).
 
 ```dlang
-import "./shared/classifications.dlang"
-import "acme/ddd-patterns@v2.1.0" as Patterns
+// Valid identifiers
+Domain Sales { description: "ok" }
+Domain sales_domain { description: "ok" }
+Domain sales-domain { description: "ok" }
 
-Namespace Shared {
-    Classification CoreDomain
-    Classification SupportingDomain
-}
-
-Namespace acme.sales {
-    Domain Sales { description: "Handles all sales operations" }
-}
+/* Strings support escapes like \" and \n */
+Domain Notes { description: "A \"quoted\" word" }
 ```
 
----
+## Assignment operators
 
-## Imports
+Most assignments accept any of these operators:
 
-DomainLang supports flexible imports for sharing and reusing models:
+- `:` (recommended for consistency)
+- `=`
+- `is`
 
-| Pattern | Example | Description |
-| ------- | ------- | ----------- |
-| Relative path | `import "./file.dlang"` | Local file |
-| With alias | `import "source" as Alias` | Namespace prefix |
-| Named import | `import { A, B } from "./file.dlang"` | Specific symbols |
-| Workspace root | `import "~/shared/core.dlang"` | From workspace root |
-| Git shorthand | `import "owner/repo@v1.0.0"` | Git repository |
-| Full URL | `import "https://..."` | Full Git URL |
-| Manifest name | `import "ddd-patterns" as P` | Defined in `model.yaml` |
+These operators are equivalent for properties, decisions, and relationship types.
 
-**How imports work:**
-
-- **Aliases** create namespace prefixes—access with `Patterns.AggregateRoot`
-- **Named imports** bring specific symbols into local scope
-- **Manifest names** resolve to pinned repository coordinates
+These operators are also supported in metadata entries.
 
 ```dlang
-import "./shared/classifications.dlang"
-import "~/contexts/sales.dlang"
-import "acme/ddd-patterns@v2.1.0" as Patterns
-import { CoreDomain } from "./classifications.dlang"
+Domain Sales {
+    description: "Sales"
+    vision = "Make buying easy"
+}
 
-Domain Sales { description: "Sales domain" }
-
-bc Checkout for Sales as Patterns.CoreDomain {
-    description: "Checkout"
+bc Orders for Sales {
+    description is "Order lifecycle"
 }
 ```
 
----
+## Domains
 
-## Namespaces
+Domains describe strategic areas of the business. Use `in` to express subdomain hierarchy.
 
-Namespaces organize large models into logical hierarchies:
-
-| Behavior | Description |
-| -------- | ----------- |
-| **Inheritance** | Nested namespaces inherit parent FQN |
-| **Prefixing** | Contained elements get namespace prefix |
-| **Resolution** | Closest-scope-wins shadowing rule |
+Keywords: `Domain`, `dom`.
 
 ```dlang
-Namespace acme.platform {
-    Classification CoreDomain
-    Team PlatformGuild
+Domain Enterprise { description: "Top-level" }
 
-    Domain Sales {
-        description: "Sales domain"
-        classification: CoreDomain
-    }
-
-    bc Orders for Sales by PlatformGuild {
-        description: "Order processing"
-    }
-}
-// FQNs: acme.platform.CoreDomain, acme.platform.Sales, etc.
-```
-
----
-
-## Type Declarations
-
-### Domain
-
-A **Domain** represents a strategic business area:
-
-```dlang
 Domain Sales in Enterprise {
-    description: "Handles all sales operations"
-    classification: Strategic
+    description: "Revenue generation"
+    vision: "Make buying easy"
 }
 ```
 
-| Element | Required | Description |
-| ------- | -------- | ----------- |
-| `Domain Name` | ✅ | Domain identifier |
-| `in ParentDomain` | ❌ | Parent for nesting |
-| `description` | ❌ | What this domain does |
-| `vision` | ❌ | Long-term strategic goal |
-| `classification` | ❌ | Reference to a Classification |
+Properties:
 
-### BoundedContext
+- `description` (string)
+- `vision` (string)
+- `classification` (reference to a `Classification`)
 
-A **BoundedContext** defines a model boundary:
+## Classifications, teams, and metadata keys
 
-```dlang
-Classification Core
-Team PaymentsTeam
-Domain Sales { description: "Sales domain" }
-
-bc Checkout for Sales as Core by PaymentsTeam {
-    description: "Checkout orchestration"
-    role: Core
-    team: PaymentsTeam
-    terminology {
-        term CheckoutSession: "Customer journey from cart to payment"
-    }
-}
-```
-
-| Element | Required | Description |
-| ------- | -------- | ----------- |
-| `BoundedContext` / `bc` | ✅ | Keywords are equivalent |
-| `Name` | ✅ | Context identifier |
-| `for Domain` | ❌ | Domain association |
-| `as Classification` | ❌ | Inline role |
-| `by Team` | ❌ | Inline ownership |
-
-### Classification and Team
-
-**Classifications** tag strategic roles. **Teams** capture ownership.
-
-```dlang
-Classification Strategic
-Team PaymentsTeam
-```
-
----
-
-## Documentation Blocks
-
-Documentation blocks add metadata to types:
-
-| Block | Purpose | Used In |
-| ----- | ------- | ------- |
-| `description` | Short summary | Domain, bc |
-| `vision` | Long-term intent | Domain |
-| `role` | Strategic classification | bc |
-| `team` | Responsible team | bc |
-| `businessModel` | Business model classification | bc |
-| `lifecycle` | Evolution stage | bc |
-| `metadata` / `meta` | Key-value operational data | bc |
-| `relationships` | Integration definitions | bc |
-| `terminology` | Term declarations | bc |
-| `decisions` | Governance documentation | bc |
-
-> **Precedence:** Inline (`as`, `by`) takes precedence over block properties.
+Use these declarations to create reusable vocabularies.
 
 ```dlang
 Classification CoreDomain
-Classification EventSourced
-Team SalesTeam
-Domain Sales { description: "Sales domain" }
+Classification Architectural
 
-bc OrderManagement for Sales {
-    description: "Handles order lifecycle"
-    role: CoreDomain
-    team: SalesTeam
-    businessModel: EventSourced
-    
+Team SalesTeam
+Team PlatformTeam
+
+Metadata Language
+Metadata Database
+```
+
+## Bounded contexts
+
+Bounded contexts describe model boundaries.
+
+Keywords: `BoundedContext`, `bc`.
+
+```dlang
+Classification CoreDomain
+Team SalesTeam
+
+Domain Sales { description: "Sales" }
+
+bc Orders for Sales as CoreDomain by SalesTeam {
+    description: "Order lifecycle"
+}
+```
+
+### Header semantics
+
+- `for DomainName` associates the bounded context with a domain
+- `as Classification` assigns one or more roles (Classifications)
+- `by Team` assigns one or more owning teams
+
+You can specify multiple roles or teams.
+
+```dlang
+Classification CoreDomain
+Classification SupportingDomain
+Team TeamA
+Team TeamB
+Domain Sales { description: "Sales" }
+
+bc Checkout for Sales as CoreDomain, SupportingDomain by TeamA, TeamB { }
+```
+
+### Body properties
+
+The bounded context body is optional. If present, it can contain these items (any order; repeat rules enforced by validation):
+
+- `description`
+- `role` (one or more Classification references)
+- `team` (one or more Team references)
+- `businessModel` (Classification reference)
+- `lifecycle` (Classification reference)
+- `metadata { Key: "Value" }`
+- `terminology { term ... }`
+- `decisions { decision|policy|rule ... }`
+- `relationships { ... }`
+
+#### Alternative block names
+
+DomainLang accepts multiple names for some blocks:
+
+- Metadata: `metadata { ... }` or `meta { ... }`
+- Relationships: `relationships { ... }`, `integrations { ... }`, or `connections { ... }`
+- Terminology: `terminology { ... }`, `language { ... }`, `glossary { ... }`, or `ubiquitous language { ... }`
+- Decisions: `decisions { ... }`, `constraints { ... }`, `rules { ... }`, or `policies { ... }`
+
+#### Alternative property names
+
+- Use `businessModel` or `business model`.
+
+```dlang
+Classification EventSourced
+Domain Sales { description: "Sales" }
+
+bc Orders for Sales {
+    business model: EventSourced
+}
+```
+
+### Precedence
+
+If you specify both inline header values and body values, inline values take precedence for the SDK's effective values.
+
+```dlang
+Classification CoreDomain
+Classification SupportingDomain
+Team TeamA
+Team TeamB
+Domain Sales { description: "Sales" }
+
+// Inline values exist alongside body values.
+// The SDK's effective values prefer the inline ones.
+bc Orders for Sales as CoreDomain by TeamA {
+    role: SupportingDomain
+    team: TeamB
+}
+```
+
+## Terminology
+
+Terminology captures ubiquitous language inside a bounded context.
+
+Use `term` (or `Term`) to define a name and optional meaning.
+Add `aka`/`synonyms` and `examples` to enrich the definition.
+
+`aka`/`synonyms` and `examples` accept both forms:
+
+- With assignment: `aka: Foo`, `examples: "A"`
+- Without assignment: `aka Foo`, `examples "A"`
+
+```dlang
+bc Orders for Sales {
     terminology {
-        term Order: "Customer purchase request"
-            aka: PurchaseOrder
-            examples: "Order #12345"
-    }
-    
-    decisions {
-        decision [CoreDomain] EventSourcing: "Capture every state change"
+        term Order: "A customer's request to purchase"
+            aka PurchaseOrder
+            examples "Order #12345"
     }
 }
 ```
 
-**Block aliases:**
+## Decisions, policies, and rules
 
-- `terminology` = `language` = `glossary`
-- `decisions` = `constraints` = `rules` = `policies`
-- `relationships` = `integrations` = `connections`
+Use `decisions` to record governance. A decision can optionally reference a `Classification` as a category.
 
----
+The following constructs are equivalent in structure:
+
+- `decision` / `Decision`
+- `policy` / `Policy`
+- `rule` / `Rule`
+
+They all use: optional category in `[Classification]`, then `Name`, then an assignment operator, then a string.
+
+You can also choose different block keywords: `decisions`, `constraints`, `rules`, or `policies`.
+
+```dlang
+Classification Architectural
+Classification Business
+
+bc Orders for Sales {
+    decisions {
+        decision [Architectural] EventSourcing: "Capture every state change"
+        policy [Business] Refunds: "Allow refunds within 30 days"
+        rule [Business] MinOrder: "Minimum order is $10"
+    }
+}
+```
 
 ## Metadata
 
-Capture operational and technical information:
+Metadata keys must be declared before use.
+
+Use `metadata { ... }` or `meta { ... }` inside a bounded context.
+Metadata entries use `Key` plus an assignment operator plus a string.
 
 ```dlang
 Metadata Language
-Metadata Framework
 Metadata Database
 
-Domain Sales { description: "Sales" }
-
-bc OrderContext for Sales {
-    description: "Order management"
-    
+bc Orders for Sales {
     metadata {
         Language: "TypeScript"
-        Framework: "NestJS"
+        Database = "PostgreSQL"
+    }
+}
+
+// Equivalent alternative syntax
+bc Orders for Sales {
+    meta {
+        Language is "TypeScript"
         Database: "PostgreSQL"
     }
 }
 ```
 
-> Metadata keys must be declared before use. Values are treated as strings.
+## Relationships
 
----
+A relationship connects two bounded contexts.
 
-## Terminology and Decisions
+Use relationships:
 
-### Terms
+- At the top level inside a `ContextMap`
+- Inside a bounded context `relationships`/`integrations`/`connections` block
 
-Document ubiquitous language:
+Syntax:
 
-```dlang
-terminology {
-    term Invoice: "Bill issued to a customer"
-        aka: BillingOrder
-        examples: "Invoice #2024-001"
-}
-```
+- Optional patterns on each side: `[OHS]`, `[ACL]`, `[SK]`, ...
+- A context reference on each side
+- One of these arrows: `->`, `<-`, `<->`, `><`
+- Optional relationship type: `: UpstreamDownstream` (you can also use `=` or `is`)
 
-| Element | Description |
-| ------- | ----------- |
-| `term Name: "description"` | Term definition |
-| `aka` / `synonyms` | Alternative names |
-| `examples` | Concrete instances |
+Context references:
 
-### Decisions
+- Use `this` to refer to the current bounded context (intended for relationships inside a bounded context block).
+- Use a qualified name to reference another bounded context.
 
-Document governance with categories referencing Classifications:
+Patterns (short or long form):
 
-```dlang
-Classification Architectural
-Classification Business
+- `PL` / `PublishedLanguage`
+- `OHS` / `OpenHostService`
+- `CF` / `Conformist`
+- `ACL` / `AntiCorruptionLayer`
+- `P` / `Partnership`
+- `SK` / `SharedKernel`
+- `BBoM` / `BigBallOfMud`
 
-decisions {
-    decision EventSourcing: "Use event sourcing"
-    decision [Architectural] UseKafka: "Use Kafka"
-    policy [Business] FreeShipping: "Free over $50"
-    rule [Business] MinOrder: "Minimum $10"
-}
-```
+Relationship types:
+
+- `Partnership`, `SharedKernel`, `CustomerSupplier`, `UpstreamDownstream`, `SeparateWays`
 
 ```dlang
-Classification Architectural
-Classification Business
-Classification Compliance
+Domain Sales { description: "Sales" }
+Domain Billing { description: "Billing" }
 
-Domain Sales { description: "Sales domain" }
-
-bc OrderProcessing for Sales {
-    description: "Order processing"
-    
-    decisions {
-        decision [Architectural] EventSourcing: "Capture every change"
-        policy [Business] RefundPolicy: "Allow refunds within 30 days"
-        rule [Compliance] DataRetention: "Store data for 7 years"
+bc Orders for Sales {
+    relationships {
+        [OHS] this -> [ACL] acme.billing.Payments : UpstreamDownstream
+        this >< acme.legacy.LegacyBilling : SeparateWays
     }
 }
-```
 
-> **Note:** Categories like `[Architectural]` must reference a declared `Classification`. Create your own classification vocabulary to match your organization's governance model.
+Namespace acme.billing {
+    bc Payments for Billing { }
+}
 
----
-
-## Context Maps and Relationships
-
-### ContextMap
-
-Shows how bounded contexts integrate:
-
-```dlang
-ContextMap WebExperience {
-    contains ApplicationFramework, Listings, Checkout
-    
-    [SK] ApplicationFramework <-> Listings : SharedKernel
-    [OHS] Checkout -> [ACL] Listings
+Namespace acme.legacy {
+    bc LegacyBilling { }
 }
 ```
 
-| Element | Description |
-| ------- | ----------- |
-| `contains` | Contexts in this map |
-| `->` / `<-` | Upstream/downstream |
-| `<->` | Bidirectional |
-| `><` | Separate Ways |
-| `[ROLE]` | DDD pattern |
-| `: TypeName` | Relationship type |
+## Context maps
 
-### DomainMap
+Context maps list contexts and describe integrations.
 
-Visualizes domain portfolios:
+Keyword: `ContextMap`, `cmap`.
+
+Use `contains` to list bounded contexts. The grammar uses multi-target references (`[+BoundedContext]`), so a single name can resolve to multiple bounded contexts when you have duplicates (for example across imports or namespaces).
 
 ```dlang
-DomainMap CorporatePortfolio {
+ContextMap Integration {
+    contains Checkout, Payments
+    [OHS] Checkout -> [ACL] Payments
+}
+```
+
+Arrows:
+
+- `->` upstream to downstream
+- `<-` downstream to upstream
+- `<->` bidirectional
+- `><` separate ways
+
+Patterns:
+
+- `PL`, `OHS`, `CF`, `ACL`, `P`, `SK`, `BBoM`
+
+You can reference the current bounded context as `this` inside a `relationships` block.
+
+## Domain maps
+
+Domain maps list domains.
+
+Keyword: `DomainMap`, `dmap`.
+
+```dlang
+DomainMap Portfolio {
     contains Sales, Support
 }
 ```
 
-### Relationship Patterns
+## Namespaces and qualified names
 
-| Pattern | Abbrev | Meaning |
-| ------- | ------ | ------- |
-| Published Language | `PL` | Documented API |
-| Open Host Service | `OHS` | Standardized service |
-| Conformist | `CF` | Follows upstream |
-| Anti-Corruption Layer | `ACL` | Translation layer |
-| Partnership | `P` | Mutual dependency |
-| Shared Kernel | `SK` | Shared model |
-| Big Ball of Mud | `BBoM` | Legacy marker |
+Namespaces create hierarchical scopes and fully qualified names (FQN) using dot-separated identifiers.
 
-### Relationship Examples
+Keyword: `Namespace`, `ns`.
 
 ```dlang
-ContextMap Integration {
-    contains A, B, C
+Namespace acme.sales {
+    Domain Sales { description: "Sales" }
+    bc Orders for Sales { }
+}
 
-    A -> B                              // Simple
-    [OHS] A -> [ACL] B                  // With patterns
-    [SK] A <-> B : SharedKernel         // Bidirectional
-    A >< C                              // Separate ways
+ContextMap System {
+    contains acme.sales.Orders
 }
 ```
 
-**Self-reference with `this`:**
+Resolution uses closest-scope-wins.
+
+## Imports
+
+Imports let you split models across files and reuse shared vocabularies.
+
+DomainLang supports two forms:
+
+1. Named imports:
 
 ```dlang
-bc Orders for Sales {
-    relationships {
-        [OHS] this -> ExternalPaymentSystem
-    }
-}
+import { CoreDomain, SalesTeam } from "./shared.dlang"
 ```
 
----
-
-## Qualified Names and References
-
-| Concept | Description |
-| ------- | ----------- |
-| `QualifiedName` | Dot-separated identifiers (e.g., `acme.sales.Sales`) |
-| Identifiers | Letters, underscores, hyphens after first char |
-| Cross-references | `[Type:QualifiedName]` syntax |
-| Resolution | Closest-scope-wins |
-
-**Special:** `this` resolves to containing bounded context.
-
----
-
-## Assignment Operators
-
-Three equivalent styles:
-
-| Operator | Style | Example |
-| -------- | ----- | ------- |
-| `:` | JSON/YAML | `description: "Order"` |
-| `=` | Programming | `team = SalesTeam` |
-| `is` | Natural language | `role is Core` |
-
-> **Recommendation:** Use `:` consistently.
-
----
-
-## Comments
+1. Module imports with optional integrity and alias:
 
 ```dlang
-// Line comment
-
-/* Block comment */
+import "./shared.dlang"
+import "./shared.dlang" as Shared
+import "owner/repo@v1.0.0" as External
+import "owner/repo@v1.0.0" integrity "sha256-..." as Pinned
 ```
 
-Whitespace is insignificant. Strings support escapes (`\n`, `\"`, unicode).
-
----
-
-## Reference Examples
-
-### Minimal Example
+Use `~/` in a string to refer to a workspace-relative path:
 
 ```dlang
-Classification CoreDomain
-
-Domain CustomerExperience {
-    description: "Overall customer journey"
-    classification: CoreDomain
-}
-
-bc Onboarding for CustomerExperience as CoreDomain {
-    description: "Account sign-up and activation"
-    
-    terminology {
-        term ActivationEmail: "Message confirming new account"
-    }
-}
-
-ContextMap CustomerJourney {
-    contains Onboarding
-}
+import "~/shared/core.dlang"
 ```
-
-### Advanced Example
-
-```dlang
-import "acme/ddd-patterns@v2.1.0" as Patterns
-
-Namespace acme.platform.customer {
-    Classification CoreDomain
-    Classification SupportingDomain
-    Team PlatformGuild
-
-    Domain Sales {
-        description: "Sales funnel, pricing, and ordering"
-        classification: CoreDomain
-    }
-
-    bc Checkout for Sales as CoreDomain by PlatformGuild {
-        description: "Order capture and payment"
-        
-        relationships {
-            [PL] this -> PricingContext : UpstreamDownstream
-        }
-        
-        terminology {
-            term CheckoutSession: "End-to-end purchase flow"
-        }
-        
-        decisions {
-            decision [CoreDomain] EventSourcing: "Record each cart change"
-        }
-    }
-
-    bc PricingContext for Sales as SupportingDomain {
-        description: "Pricing calculations"
-    }
-
-    ContextMap StrategicRelationships {
-        contains Checkout, PricingContext
-        [SK] Checkout <-> PricingContext : SharedKernel
-    }
-}
-```
-
----
-
-## See Also
-
-- [Getting Started Guide](./getting-started.md) — Tutorial
-- [Quick Reference](./quick-reference.md) — Cheat sheet
-- [Syntax Examples](./syntax-examples.md) — More patterns
-- [Grammar Review](./design-docs/GRAMMAR_REVIEW_2025.md) — Design decisions

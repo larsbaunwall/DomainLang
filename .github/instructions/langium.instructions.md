@@ -386,7 +386,6 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
 
 - [ ] Update language documentation with syntax explanation and semantics
 - [ ] Add concise example to quick reference guide
-- [ ] Add comprehensive examples to syntax examples documentation
 - [ ] Create `.dlang` example files in the examples directory
 - [ ] Add JSDoc comments to grammar rules and generated types
 - [ ] Document any new validation rules in the rule's JSDoc
@@ -394,7 +393,6 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
 **Documentation files to update (in `dsl/domain-lang/docs/`):**
 - `language.md` - Full syntax and semantics
 - `quick-reference.md` - Concise examples for quick lookup
-- `syntax-examples.md` - Comprehensive, copy-paste ready examples
 - `examples/*.dlang` - Real-world example models
 
 **Skip documentation for:**

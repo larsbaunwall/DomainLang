@@ -46,7 +46,7 @@ So that teams understand which systems are stable.
 | Grammar | ✅ Complete | `Metadata` element, MetadataBlock, MetadataEntry rules added |
 | Validation | ✅ Complete | Duplicate key detection, empty block warnings |
 | Tests | ✅ Complete | 12 test cases covering parsing, validation, edge cases |
-| Documentation | ✅ Complete | language.md, quick-reference.md, syntax-examples.md |
+| Documentation | ✅ Complete | language.md, quick-reference.md |
 | Examples | ✅ Complete | metadata-local-definition.dlang, metadata-polyglot.dlang |
 
 **Current Capability**:

@@ -108,7 +108,7 @@ BoundedContext:
 ;
 
 MetadataEntry:
-    key=[Metadata:QualifiedName] ':' value=STRING
+    key=[Metadata:QualifiedName] Assignment value=STRING
 ;
 
 

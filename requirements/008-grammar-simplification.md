@@ -553,28 +553,22 @@ expect(bc.role?.[0]?.ref?.name).toBe('Core');
    - Remove block-based examples
    - Ensure all property names match new grammar
 
-3. **`docs/syntax-examples.md`** - Comprehensive code examples
-   - Update all Domain examples to use direct properties
-   - Update all BoundedContext examples to use direct properties
-   - Ensure `terminology` keyword is used (not `terms`)
-   - Verify collection syntax (metadata, relationships, decisions)
-
-4. **`docs/getting-started.md`** - Beginner tutorial
+3. **`docs/getting-started.md`** - Beginner tutorial
    - Update first example to use new syntax
    - Ensure tutorial examples are correct
    - Update any mentions of AST structure
 
-5. **`packages/language/README.md`** - Package documentation
+4. **`packages/language/README.md`** - Package documentation
    - Update AST structure description
    - Correct examples if present
    - Update SDK usage examples
 
-6. **`packages/language/src/sdk/README.md`** - SDK documentation
+5. **`packages/language/src/sdk/README.md`** - SDK documentation
    - Update augmented properties list (remove documentation arrays)
    - Update code examples to use direct properties
    - Simplify resolution examples
 
-7. **Example files (`examples/*.dlang`)**
+6. **Example files (`examples/*.dlang`)**
    - `examples/banking-system.dlang`
    - `examples/customer-facing.dlang`
    - `examples/domains.dlang`
@@ -859,7 +853,6 @@ grep -rn "DescriptionBlock\|VisionBlock\|RoleBlock\|TeamBlock" packages/
 
 - [ ] `docs/language.md` - Grammar and AST sections updated
 - [ ] `docs/quick-reference.md` - All syntax examples corrected
-- [ ] `docs/syntax-examples.md` - All code samples use new properties
 - [ ] `docs/getting-started.md` - Tutorial examples validated
 - [ ] `packages/language/README.md` - Package docs updated
 - [ ] `packages/language/src/sdk/README.md` - SDK docs updated
@@ -926,7 +919,7 @@ grep -rn "DescriptionBlock\|VisionBlock\|RoleBlock\|TeamBlock" packages/
 **Related ADRs:**
 
 - [ADR-002: Architectural Review 2025](../adr/002-architectural-review-2025.md) - Discusses AST ergonomics and maintainability
-- [Grammar Review 2025](../dsl/domain-lang/docs/design-docs/GRAMMAR_REVIEW_2025.md) - Identified documentation block complexity as technical debt
+- (Historical) Grammar review notes were removed during docs consolidation; use git history if needed.
 
 ---
 

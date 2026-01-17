@@ -305,7 +305,7 @@ coverage: {
 ## References
 
 - [Original PRS-001](./001-language-design-improvements.md)
-- [Grammar Review 2025](../dsl/domain-lang/docs/design-docs/GRAMMAR_REVIEW_2025.md)
+- (Historical) Grammar review notes were removed during docs consolidation; use git history if needed.
 - [Langium 4.x Documentation](https://langium.org/docs/)
 - [TypeScript ESLint Rules](https://typescript-eslint.io/rules/)
 

@@ -54,8 +54,8 @@ describe('Metadata Parsing', () => {
             bc OrderContext for Sales {
                 description: "Order management"
                 metadata {
-                    Language: "TypeScript"
-                    Framework: "NestJS"
+                    Language = "TypeScript"
+                    Framework is "NestJS"
                     Database: "PostgreSQL"
                 }
             }
@@ -80,7 +80,7 @@ describe('Metadata Parsing', () => {
             Domain Sales {}
             bc OrderContext for Sales {
                 meta {
-                    Language: "Java"
+                    Language is "Java"
                 }
             }
         `;

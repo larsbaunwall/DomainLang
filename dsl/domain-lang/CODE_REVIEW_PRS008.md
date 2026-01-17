@@ -529,9 +529,9 @@ Property names reflect DDD semantics:
    - Add property access examples
    - Show array precedence patterns
 
-3. **Update syntax-examples.md**
-   - Include both inline and block syntax
-   - Show conflict validation
+3. **Update example .dlang files**
+    - Include both inline and block syntax
+    - Show conflict validation
 
 4. **Update repository instructions**
    - Document new AST structure
