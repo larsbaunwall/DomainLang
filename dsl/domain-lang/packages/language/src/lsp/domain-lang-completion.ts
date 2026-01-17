@@ -180,14 +180,14 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
 
         const container = node.$container;
 
-        // Inside BoundedContext body: only documentation blocks
+        // Inside BoundedContext body: suggest missing scalar properties and collections
         if (ast.isBoundedContext(container)) {
             this.addBoundedContextCompletions(container, acceptor, context);
             super.completionFor(context, next, acceptor);
             return;
         }
 
-        // Inside Domain body: only documentation blocks
+        // Inside Domain body: suggest missing scalar properties
         if (ast.isDomain(container)) {
             this.addDomainCompletions(container, acceptor, context);
             super.completionFor(context, next, acceptor);
@@ -208,8 +208,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             return;
         }
 
-        // Inside RelationshipsBlock: integration patterns
-        if (ast.isRelationshipsBlock(container)) {
+        if (ast.isRelationship(node) || ast.isRelationship(container)) {
             this.addRelationshipCompletions(acceptor, context);
             super.completionFor(context, next, acceptor);
             return;
@@ -238,19 +237,14 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
     }
 
     /**
-     * Add documentation block completions for BoundedContext.
-     * Based on BoundedContextDocumentationBlock union from grammar.
+     * Add property/collection completions for BoundedContext.
      */
     private addBoundedContextCompletions(
         node: ast.BoundedContext,
         acceptor: CompletionAcceptor,
         context: CompletionContext
     ): void {
-        // Check which blocks already exist
-        const existingTypes = new Set(node.documentation.map(doc => doc.$type));
-
-        // Suggest description if not present
-        if (!existingTypes.has('DescriptionBlock')) {
+        if (!node.description) {
             acceptor(context, {
                 label: '⚡ description',
                 kind: CompletionItemKind.Snippet,
@@ -261,9 +255,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        // Suggest team if not present (can be property via 'by' OR documentation block)
-        const hasTeamBlock = existingTypes.has('TeamBlock');
-        if (!node.team && !hasTeamBlock) {
+        if (node.team.length === 0) {
             acceptor(context, {
                 label: '⚡ team',
                 kind: CompletionItemKind.Snippet,
@@ -274,9 +266,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        // Suggest role if not present (can be property via 'as' OR documentation block)
-        const hasRoleBlock = existingTypes.has('RoleBlock');
-        if (!node.role && !hasRoleBlock) {
+        if (node.role.length === 0) {
             acceptor(context, {
                 label: '⚡ role',
                 kind: CompletionItemKind.Snippet,
@@ -287,8 +277,29 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        // Suggest terminology block if not present
-        if (!existingTypes.has('TerminologyBlock')) {
+        if (!node.businessModel) {
+            acceptor(context, {
+                label: '⚡ businessModel',
+                kind: CompletionItemKind.Snippet,
+                insertText: 'businessModel: ${1:Commercial}',
+                insertTextFormat: InsertTextFormat.Snippet,
+                documentation: '📝 Snippet: Classify the business model',
+                sortText: '0_snippet_businessModel'
+            });
+        }
+
+        if (!node.lifecycle) {
+            acceptor(context, {
+                label: '⚡ lifecycle',
+                kind: CompletionItemKind.Snippet,
+                insertText: 'lifecycle: ${1:Active}',
+                insertTextFormat: InsertTextFormat.Snippet,
+                documentation: '📝 Snippet: Define the lifecycle stage',
+                sortText: '0_snippet_lifecycle'
+            });
+        }
+
+        if (node.terminology.length === 0) {
             acceptor(context, {
                 label: '⚡ terminology',
                 kind: CompletionItemKind.Snippet,
@@ -303,8 +314,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        // Suggest decisions block if not present
-        if (!existingTypes.has('DecisionsBlock')) {
+        if (node.decisions.length === 0) {
             acceptor(context, {
                 label: '⚡ decisions',
                 kind: CompletionItemKind.Snippet,
@@ -319,8 +329,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        // Suggest relationships block if not present
-        if (!existingTypes.has('RelationshipsBlock')) {
+        if (node.relationships.length === 0) {
             acceptor(context, {
                 label: '⚡ relationships',
                 kind: CompletionItemKind.Snippet,
@@ -335,8 +344,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        // Suggest metadata block if not present
-        if (!existingTypes.has('MetadataBlock')) {
+        if (node.metadata.length === 0) {
             acceptor(context, {
                 label: '⚡ metadata',
                 kind: CompletionItemKind.Snippet,
@@ -350,64 +358,17 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
                 sortText: '0_snippet_metadata'
             });
         }
-
-        // Suggest classifications block if not present
-        if (!existingTypes.has('BoundedContextClassificationBlock')) {
-            acceptor(context, {
-                label: '⚡ classifications',
-                kind: CompletionItemKind.Snippet,
-                insertText: [
-                    'classifications {',
-                    '\trole: ${1:Core}',
-                    '\tbusinessModel: ${2:Commercial}',
-                    '\tlifecycle: ${3:Active}',
-                    '}'
-                ].join('\n'),
-                insertTextFormat: InsertTextFormat.Snippet,
-                documentation: '📝 Snippet: Define role, business model, and lifecycle',
-                sortText: '0_snippet_classifications'
-            });
-        }
-
-        // Suggest businessModel if not present
-        if (!existingTypes.has('BusinessModelBlock')) {
-            acceptor(context, {
-                label: '⚡ businessModel',
-                kind: CompletionItemKind.Snippet,
-                insertText: 'businessModel: ${1:Commercial}',
-                insertTextFormat: InsertTextFormat.Snippet,
-                documentation: '📝 Snippet: Classify the business model',
-                sortText: '0_snippet_businessModel'
-            });
-        }
-
-        // Suggest lifecycle if not present
-        if (!existingTypes.has('LifecycleBlock')) {
-            acceptor(context, {
-                label: '⚡ lifecycle',
-                kind: CompletionItemKind.Snippet,
-                insertText: 'lifecycle: ${1:Active}',
-                insertTextFormat: InsertTextFormat.Snippet,
-                documentation: '📝 Snippet: Define the lifecycle stage',
-                sortText: '0_snippet_lifecycle'
-            });
-        }
     }
 
     /**
-     * Add documentation block completions for Domain.
-     * Based on DomainDocumentationBlock union from grammar.
+     * Add property completions for Domain.
      */
     private addDomainCompletions(
         node: ast.Domain,
         acceptor: CompletionAcceptor,
         context: CompletionContext
     ): void {
-        // Check which blocks already exist
-        const existingTypes = new Set(node.documentation.map(doc => doc.$type));
-
-        // Suggest description if not present
-        if (!existingTypes.has('DescriptionBlock')) {
+        if (!node.description) {
             acceptor(context, {
                 label: '⚡ description',
                 kind: CompletionItemKind.Snippet,
@@ -418,8 +379,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        // Suggest vision if not present
-        if (!existingTypes.has('VisionBlock')) {
+        if (!node.vision) {
             acceptor(context, {
                 label: '⚡ vision',
                 kind: CompletionItemKind.Snippet,
@@ -430,8 +390,7 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        // Suggest classification if not present
-        if (!existingTypes.has('DomainClassificationBlock')) {
+        if (!node.classification) {
             acceptor(context, {
                 label: '⚡ classification',
                 kind: CompletionItemKind.Snippet,
