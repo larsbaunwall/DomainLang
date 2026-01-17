@@ -148,6 +148,99 @@ npm run build   # Must succeed
 npm test        # Must pass
 ```
 
+## Model Query SDK
+
+The SDK provides programmatic access to DomainLang models for tools, CLI commands, and LSP services.
+
+### When to Use the SDK
+
+**Use the SDK when:**
+
+- Building CLI tools that analyze models
+- Implementing LSP features (hover, validation, completion)
+- Writing tests that query model structure
+- Creating reports or metrics from models
+- Implementing code generators
+
+**Key Features:**
+
+- **Zero-copy AST augmentation** - Adds semantic properties to AST nodes without reloading
+- **Fluent query builders** - `query.boundedContexts().withRole('Core').withTeam('SalesTeam')`
+- **O(1) indexed lookups** - Fast access by FQN, name, team, role, metadata
+- **Type-safe patterns** - No magic strings for integration patterns
+- **Null-safe helpers** - Defensive programming built-in
+
+### SDK Architecture
+
+```text
+Entry Points:
+  loadModelFromText()  → Browser-safe in-memory parsing
+  loadModel()          → Node.js file loader (from sdk/loader-node)
+  fromDocument()       → Zero-copy LSP integration
+  fromModel()          → Direct AST wrapping
+
+Flow:
+  1. Load/wrap model
+  2. AST augmentation runs automatically
+  3. Query API ready for use
+```
+
+### Common SDK Patterns
+
+**In LSP Services (Hover, Validation):**
+
+```typescript
+import { fromDocument } from '../sdk/index.js';
+
+export class MyHoverProvider {
+    getHover(document: LangiumDocument<Model>): string {
+        const query = fromDocument(document);
+        const bc = query.boundedContext('OrderContext');
+        return bc?.description ?? 'No description';
+    }
+}
+```
+
+**In CLI Tools:**
+
+```typescript
+import { loadModel } from 'domain-lang-language/sdk/loader-node';
+
+const { query } = await loadModel('./model.dlang');
+const coreContexts = query.boundedContexts()
+    .withRole('Core')
+    .toArray();
+```
+
+**In Tests:**
+
+```typescript
+import { loadModelFromText } from '../../src/sdk/loader.js';
+
+const { query } = await loadModelFromText(`
+    Domain Sales { vision: "v" }
+    bc OrderContext for Sales
+`);
+expect(query.bc('OrderContext')?.name).toBe('OrderContext');
+```
+
+### SDK Implementation Guidelines
+
+**Property Resolution:**
+
+- Precedence rules: inline header > block > classification
+- Document precedence in JSDoc on augmented properties
+- Use optional chaining for null safety: `bc.role?.ref?.name`
+
+**Performance:**
+
+- Indexes built once, reused for queries
+- Lazy evaluation in query builders
+- No copying - augmentation happens in-place
+
+**Documentation:**
+See `packages/language/src/sdk/README.md` for complete API reference.
+
 ## Performance Optimization
 
 ### Optimization Process

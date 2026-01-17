@@ -64,12 +64,49 @@ Always ask:
 ```
 
 **JSDoc Requirements:**
+
 - All public functions/classes must have JSDoc
 - Include at least one `@example` for complex functions
 - Document thrown errors with `@throws`
 - Use `@deprecated` with migration guidance
 
-### 2. Grammar Documentation (Hover Tooltips)
+### 2. SDK Documentation
+
+The Model Query SDK requires special documentation attention:
+
+**SDK-specific documentation:**
+
+- Document precedence rules in JSDoc (inline > block > classification)
+- Include usage examples for both LSP and standalone contexts
+- Highlight null safety and optional chaining patterns
+- Show both fluent query chains AND direct lookups
+
+**Example SDK JSDoc:**
+
+```typescript
+/**
+ * Resolves the role for a BoundedContext.
+ * 
+ * Precedence:
+ * 1. Header inline (`as` keyword) - highest priority
+ * 2. Standalone RoleBlock
+ * 3. BoundedContextClassificationBlock.role
+ * 
+ * @param bc - BoundedContext AST node
+ * @returns Classification reference or undefined
+ * 
+ * @example
+ * ```typescript
+ * // Direct resolution
+ * const role = resolveBcRole(bc);
+ * 
+ * // Via augmented property
+ * const role = bc.resolvedRole;
+ * ```
+ */
+```
+
+### 3. Grammar Documentation (Hover Tooltips)
 
 ```langium
 /**

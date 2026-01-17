@@ -12,15 +12,16 @@ DomainLang is a multi-package workspace for modeling Domain-Driven Design (DDD) 
 	- Browse [Syntax Examples](./docs/syntax-examples.md) for real-world modeling patterns.
 
 2. **Packages**
-	- [`packages/language`](./packages/language/README.md): Core Langium grammar, language server, and tests.
-	- [`packages/cli`](./packages/cli/README.md): CLI for validation and code generation.
-	- [`packages/extension`](./packages/extension/langium-quickstart.md): VS Code extension for rich IDE support.
-	- [`packages/demo`](./packages/demo/README.md): Browser demo powered by Vite.
+    - [`packages/language`](./packages/language/README.md): Core Langium grammar, language server, and tests.
+        - [`src/sdk`](./packages/language/src/sdk/README.md): Model Query SDK for programmatic access.
+    - [`packages/cli`](./packages/cli/README.md): CLI for validation and code generation.
+    - [`packages/extension`](./packages/extension/langium-quickstart.md): VS Code extension for rich IDE support.
+    - [`packages/demo`](./packages/demo/README.md): Browser demo powered by Vite.
 
 3. **Scripts**
-	- `npm run langium:generate`: Regenerate grammar after editing `.langium` files.
-	- `npm run build --workspace packages/language`: Build the language server.
-	- `npm test --workspace packages/language`: Run the test suite.
+    - `npm run langium:generate`: Regenerate grammar after editing `.langium` files.
+    - `npm run build --workspace packages/language`: Build the language server.
+    - `npm test --workspace packages/language`: Run the test suite.
 
 ## Layout
 

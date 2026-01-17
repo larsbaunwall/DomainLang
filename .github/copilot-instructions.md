@@ -40,8 +40,7 @@ npm test                  # Run tests
 | Generated AST | `packages/language/src/generated/**` | **🔴 NEVER EDIT** - auto-generated |
 | LSP Features | `packages/language/src/lsp/` | Hover, completion, formatting |
 | Validation | `packages/language/src/validation/` | Domain rules, BC checks |
-| Services | `packages/language/src/services/` | Import resolution, workspace |
-| Tests | `packages/language/test/` | Parsing, linking, validation tests |
+| Services | `packages/language/src/services/` | Import resolution, workspace || **Model Query SDK** | `packages/language/src/sdk/` | **Programmatic model queries** || Tests | `packages/language/test/` | Parsing, linking, validation tests |
 
 ## Critical Rules
 
@@ -148,7 +147,39 @@ npm test                  # Must pass
 | Domain | `Domain Sales { vision: "..." }` |
 | Subdomain | `Domain Orders in Sales {}` |
 | BoundedContext | `bc OrderContext for Sales as Core by SalesTeam` |
-| ContextMap | `ContextMap Sales { contains OrderContext, BillingContext }` |
+## Model Query SDK
+
+The SDK provides programmatic access to DomainLang models:
+
+**Key Capabilities:**
+- Zero-copy AST augmentation with semantic properties (`description`, `resolvedRole`, `resolvedTeam`, `metadata`, `fqn`)
+- Fluent query builders with lazy evaluation (`query.boundedContexts().withRole('Core').withTeam('SalesTeam')`)
+- O(1) indexed lookups by FQN, name, team, role, and metadata
+- Type-safe pattern matching for DDD integration patterns
+- Browser-safe loaders and Node.js file loader
+
+**Entry Points:**
+- `loadModelFromText(text)` - Browser-safe in-memory parsing
+- `loadModel(file)` - Node.js file loader (from `sdk/loader-node`)
+- `fromDocument(document)` - Zero-copy LSP integration
+- `fromModel(model)` - Direct AST wrapping
+
+**Usage Example:**
+```typescript
+import { loadModelFromText } from 'domain-lang-language/sdk';
+
+const { query } = await loadModelFromText(`
+  Domain Sales { vision: "Sales" }
+  bc OrderContext for Sales as Core by SalesTeam
+`);
+
+const coreContexts = query.boundedContexts()
+  .withRole('Core')
+  .withTeam('SalesTeam')
+  .toArray();
+```
+
+**Documentation:** See `packages/language/src/sdk/README.md` for complete API reference.| ContextMap | `ContextMap Sales { contains OrderContext, BillingContext }` |
 | Relationships | `[OHS] this -> [CF] PaymentContext` |
 | Namespace | `namespace acme.sales { ... }` |
 | Import | `import "owner/repo@v1.0.0"` |

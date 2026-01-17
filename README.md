@@ -29,6 +29,7 @@ BoundedContext OrderProcessing for Sales as CoreDomain by SalesTeam {
 - 💡 **IDE support** — Syntax highlighting, auto-completion, hover docs, and go-to-definition
 - 🤝 **Collaboration** — Shared language between business experts and developers
 - 📊 **Visualization** — Generate context maps and diagrams
+- 🔌 **Query SDK** — Programmatic access to models with fluent API and O(1) lookups
 
 ---
 
@@ -81,6 +82,7 @@ ContextMap Platform {
 | [**Quick Reference**](./dsl/domain-lang/docs/quick-reference.md) | Syntax cheat sheet |
 | [**Syntax Examples**](./dsl/domain-lang/docs/syntax-examples.md) | Copy-paste patterns |
 | [**Language Reference**](./dsl/domain-lang/docs/language.md) | Complete grammar specification |
+| [**Model Query SDK**](./dsl/domain-lang/packages/language/src/sdk/README.md) | Programmatic API for querying models |
 | [**Documentation Hub**](./dsl/domain-lang/docs/README.md) | Full documentation index |
 
 ---
@@ -92,6 +94,7 @@ DomainLang/
 ├── dsl/domain-lang/           # Main DSL implementation
 │   ├── packages/
 │   │   ├── language/          # Grammar and language services
+│   │   │   └── src/sdk/       # Model Query SDK
 │   │   ├── cli/               # Command-line interface
 │   │   └── extension/         # VS Code extension
 │   ├── docs/                  # Documentation
