@@ -38,6 +38,7 @@ ADRs follow the naming pattern: `NNN-title-in-kebab-case.md`
 - `title-in-kebab-case` = Short descriptive title in lowercase with hyphens
 
 **Examples:**
+
 - `001-langium-framework-selection.md`
 - `002-git-native-import-system.md`
 - `003-semver-versioning-scheme.md`
@@ -121,26 +122,30 @@ Be specific and clear about:
 - **Add a note** at the top linking to the new ADR if superseded
 
 **Example:**
+
 ```markdown
 # 003. Old Decision
 
-> **Note:** This ADR has been superseded by [ADR-015](015-new-decision.md)
+> [!NOTE]
+> This ADR has been superseded by [ADR-015](015-new-decision.md)
 
 Date: 2024-01-15
 Status: Superseded by ADR-015
 ```
 
+
 ## How to Create an ADR
 
 The **Software Architect** agent is responsible for creating ADRs. To request an ADR:
 
-```
+```text
 @software-architect: Document the decision to use Langium framework as an ADR,
 including the alternatives we considered (custom parser, Tree-sitter, ANTLR)
 and why we chose Langium.
 ```
 
 The architect will:
+
 1. Analyze the decision context
 2. Document alternatives and trade-offs
 3. Create the ADR file with proper numbering
@@ -161,3 +166,5 @@ See future ADRs in this directory for examples of well-written architecture deci
 **Managed by:** Software Architect agent
 **Location:** `/adr/`
 **Format:** Markdown (`.md`)
+
+<!-- End of file -->

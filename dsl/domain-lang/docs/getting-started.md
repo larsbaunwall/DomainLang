@@ -11,6 +11,9 @@ This tutorial is for architects and developers who want a practical introduction
 - VS Code + the DomainLang extension (recommended)
 - If you build from source: Node.js 20 (Volta is configured)
 
+> [!TIP]
+> Use the VS Code extension for syntax highlighting, validation, and navigation while you learn the language.
+
 ## Step 1: Define a domain
 
 ```dlang
@@ -73,6 +76,9 @@ ContextMap BookstoreSystem {
 ## Step 6: Organize with namespaces (optional)
 
 Namespaces create qualified names.
+
+> [!TIP]
+> Use namespaces to group related concepts (domains, bounded contexts, and shared vocabularies) as your model grows.
 
 ```dlang
 Namespace Bookstore.Core {

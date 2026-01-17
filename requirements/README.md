@@ -5,14 +5,15 @@ This directory contains Product Requirement Specifications (PRSs) for DomainLang
 ## Active Requirements
 
 | PRS | Title | Status | Priority | Effort |
-|-----|-------|--------|----------|--------|
+| --- | ----- | ------ | -------- | ------ |
 | [002](./002-language-consistency.md) | Language Consistency and Validation | Active | High | 3 weeks |
 | [003](./003-tactical-ddd-patterns.md) | Tactical DDD Pattern Support | Planned | High | 8 weeks |
 | [004](./004-implementation-bridge.md) | Implementation Bridge | Planned | Medium | 4 weeks |
 | [005](./005-developer-experience.md) | Developer Experience Enhancements | Planned | Medium | 3 weeks |
 | [001](./001-language-design-improvements.md) | Language Design Improvements (2025 Review) | Superseded | - | - |
 
-**Note**: PRS-001 was divided into PRS-002 through PRS-005 for better focus and tracking.
+> [!NOTE]
+> PRS-001 was divided into PRS-002 through PRS-005 for better focus and tracking.
 
 ## What is a PRS?
 
@@ -49,6 +50,7 @@ PRSs follow the naming pattern: `NNN-title-in-kebab-case.md`
 - `title-in-kebab-case` = Short descriptive title in lowercase with hyphens
 
 **Examples:**
+
 - `001-git-native-imports.md`
 - `002-package-versioning.md`
 - `003-cli-dependency-management.md`
@@ -177,13 +179,14 @@ Additional context, links to discussions, prototypes, etc.
 
 The **Software Architect** agent is responsible for creating PRSs. To request a PRS:
 
-```
+```text
 @software-architect: Create a PRS for adding package versioning support.
 We need to support semantic versioning for imported packages, including
 version constraints and lock file management.
 ```
 
 The architect will:
+
 1. Explore the problem space with you
 2. Define user stories and success criteria
 3. Document functional and non-functional requirements
@@ -193,7 +196,7 @@ The architect will:
 ## PRS vs ADR
 
 | Aspect | PRS | ADR |
-|--------|-----|-----|
+| ------ | --- | --- |
 | **Purpose** | What to build | How/why to build it |
 | **Focus** | Requirements, user value | Architecture, trade-offs |
 | **Audience** | Product, users, implementers | Technical team |
@@ -217,3 +220,5 @@ See future PRSs in this directory for examples of well-written requirements.
 **Managed by:** Software Architect agent
 **Location:** `/requirements/`
 **Format:** Markdown (`.md`)
+
+<!-- End of file -->

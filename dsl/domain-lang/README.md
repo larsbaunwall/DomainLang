@@ -21,6 +21,9 @@ This folder contains the DomainLang implementation (language, CLI, VS Code exten
 
 ## Common commands
 
+> [!IMPORTANT]
+> Run these commands from `dsl/domain-lang/`.
+
 ```bash
 # After editing packages/language/src/domain-lang.langium
 npm run langium:generate
@@ -37,3 +40,6 @@ npm test
 # Lint (must be clean)
 npm run lint
 ```
+
+> [!IMPORTANT]
+> Keep `npm run lint` at 0 errors and 0 warnings before merging changes.

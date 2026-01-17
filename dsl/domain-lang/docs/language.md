@@ -23,15 +23,15 @@ Some keywords accept multiple names for readability (covered in the relevant sec
 
 ## Model structure
 
-A `.dlang` file produces a single `Model` that contains imports and declarations.
+A `.dlang` file produces a single `Model` (the root node) that contains imports and declarations.
 
 You can mix declarations in any order:
 
-- Domains
-- Bounded contexts
-- Teams, classifications, metadata keys
-- Namespaces
-- Context maps and domain maps
+- Domains (strategic business areas)
+- Bounded contexts (model boundaries)
+- Teams, classifications, and metadata keys (reusable vocabulary)
+- Namespaces (hierarchical scopes)
+- Context maps and domain maps (architecture views)
 
 ### Comments, identifiers, and strings
 
@@ -51,6 +51,8 @@ Domain Notes { description: "A \"quoted\" word" }
 ```
 
 ## Assignment operators
+
+An assignment sets a property value (or relationship type) using a consistent syntax.
 
 Most assignments accept any of these operators:
 
@@ -75,7 +77,7 @@ bc Orders for Sales {
 
 ## Domains
 
-Domains describe strategic areas of the business. Use `in` to express subdomain hierarchy.
+A domain is a sphere of knowledge or activity in Domain-Driven Design (DDD). Use `in` to express subdomain hierarchy.
 
 Keywords: `Domain`, `dom`.
 
@@ -96,7 +98,11 @@ Properties:
 
 ## Classifications, teams, and metadata keys
 
-Use these declarations to create reusable vocabularies.
+Use these declarations to create reusable vocabularies:
+
+- A `Classification` labels and categorizes things (for example, Core/Supporting/Generic, or Architectural/Business).
+- A `Team` represents the people responsible for a domain or bounded context.
+- A `Metadata` declaration defines a key you can use in metadata blocks.
 
 ```dlang
 Classification CoreDomain
@@ -111,7 +117,7 @@ Metadata Database
 
 ## Bounded contexts
 
-Bounded contexts describe model boundaries.
+A bounded context defines the boundary within which a domain model is defined and applicable.
 
 Keywords: `BoundedContext`, `bc`.
 
@@ -203,6 +209,8 @@ bc Orders for Sales as CoreDomain by TeamA {
 
 Terminology captures ubiquitous language inside a bounded context.
 
+A `term` defines a name and meaning that the team uses consistently.
+
 Use `term` (or `Term`) to define a name and optional meaning.
 Add `aka`/`synonyms` and `examples` to enrich the definition.
 
@@ -223,7 +231,9 @@ bc Orders for Sales {
 
 ## Decisions, policies, and rules
 
-Use `decisions` to record governance. A decision can optionally reference a `Classification` as a category.
+Use `decisions` to record governance.
+
+A decision/policy/rule records an explicit constraint or choice, optionally categorized by a `Classification`.
 
 The following constructs are equivalent in structure:
 
@@ -250,7 +260,10 @@ bc Orders for Sales {
 
 ## Metadata
 
-Metadata keys must be declared before use.
+Metadata adds key/value annotations to a bounded context (for example, tech choices or operational details).
+
+> [!IMPORTANT]
+> Declare metadata keys with `Metadata Name` before using them in `metadata`/`meta` blocks.
 
 Use `metadata { ... }` or `meta { ... }` inside a bounded context.
 Metadata entries use `Key` plus an assignment operator plus a string.
@@ -277,7 +290,7 @@ bc Orders for Sales {
 
 ## Relationships
 
-A relationship connects two bounded contexts.
+A relationship connects two bounded contexts and can describe both direction and integration patterns.
 
 Use relationships:
 
@@ -332,7 +345,7 @@ Namespace acme.legacy {
 
 ## Context maps
 
-Context maps list contexts and describe integrations.
+A context map visualizes bounded contexts and documents the relationships between them.
 
 Keyword: `ContextMap`, `cmap`.
 
@@ -360,7 +373,7 @@ You can reference the current bounded context as `this` inside a `relationships`
 
 ## Domain maps
 
-Domain maps list domains.
+A domain map visualizes domains and provides a high-level view of domain organization.
 
 Keyword: `DomainMap`, `dmap`.
 
@@ -372,7 +385,11 @@ DomainMap Portfolio {
 
 ## Namespaces and qualified names
 
-Namespaces create hierarchical scopes and fully qualified names (FQN) using dot-separated identifiers.
+A namespace creates a hierarchical scope.
+
+A qualified name (FQN) identifies something uniquely using dot-separated identifiers.
+
+Use namespaces to organize concepts by area (for example, `acme.sales`, `acme.billing`, `acme.shared`) so domains, bounded contexts, and vocabularies stay discoverable and avoid naming collisions.
 
 Keyword: `Namespace`, `ns`.
 
@@ -393,6 +410,8 @@ Resolution uses closest-scope-wins.
 
 Imports let you split models across files and reuse shared vocabularies.
 
+An import brings declarations from another `.dlang` file into the current model.
+
 DomainLang supports two forms:
 
 1. Named imports:
@@ -410,7 +429,8 @@ import "owner/repo@v1.0.0" as External
 import "owner/repo@v1.0.0" integrity "sha256-..." as Pinned
 ```
 
-Use `~/` in a string to refer to a workspace-relative path:
+> [!TIP]
+> Use `~/` in a string to refer to a workspace-relative path.
 
 ```dlang
 import "~/shared/core.dlang"

@@ -2,6 +2,9 @@
 
 This folder contains the end-user documentation for writing `.dlang` models.
 
+> [!TIP]
+> Start with Getting started, keep Quick reference open while you model, and use Language reference when you need exact semantics.
+
 ## Read this in order
 
 1. [Getting started](getting-started.md): build a small model end-to-end
@@ -11,6 +14,9 @@ This folder contains the end-user documentation for writing `.dlang` models.
 ## Examples
 
 Browse ready-to-run models in [../examples/](../examples/):
+
+> [!NOTE]
+> The examples are the fastest way to learn idiomatic structure and naming.
 
 - [Customer-facing](../examples/customer-facing.dlang)
 - [Banking system](../examples/banking-system.dlang)

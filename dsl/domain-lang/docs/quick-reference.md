@@ -2,6 +2,9 @@
 
 Use this page as a syntax cheat sheet. For explanations and semantics, see language.md.
 
+> [!TIP]
+> Keep this page open while you write models, and jump to the language reference when you need edge cases or precedence rules.
+
 ## Minimal model
 
 ```dlang
