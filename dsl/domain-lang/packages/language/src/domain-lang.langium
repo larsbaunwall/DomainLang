@@ -67,46 +67,44 @@ Type:
 Domain:
     (/** A Domain represents a sphere of knowledge, influence, or activity. In DDD, it is the subject area to which the user applies a program. Example: Sales, Shipping, Accounting. */ 'Domain' | 'dom') name=ID ('in' parent=[Domain:QualifiedName])?
     '{'
-        documentation+=DomainDocumentationBlock*
+        ('description' Assignment description=STRING)?
+        ('vision' Assignment vision=STRING)?
+        ('classification' Assignment classification=[Classification])?
     '}'
-;
-
-DomainDocumentationBlock:
-      {DescriptionBlock} 'description' Assignment description=STRING
-    | {VisionBlock} 'vision' Assignment vision=STRING
-    | {DomainClassificationBlock} 'classification' Assignment classification=[Classification]
 ;
 
 /**
  * Bounded Context - A boundary within which a domain model is defined.
  * Central pattern in DDD for managing complexity and team boundaries.
  * Belongs to exactly ONE domain (fundamental DDD principle).
+ * Body properties can appear in any order. Validation enforces at-most-once constraint.
  */
 BoundedContext:
     (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'bc') name=ID 
     ('for' domain=[Domain:QualifiedName])?
     (
-        ('as' role=[Classification:QualifiedName])?
-        ('by' team=[Team:QualifiedName])?
+        ('as' role+=[Classification:QualifiedName])?
+        ('by' team+=[Team:QualifiedName])?
     )?
-    ('{' documentation+=BoundedContextDocumentationBlock* '}')?
-;
-
-BoundedContextDocumentationBlock:
-      {DescriptionBlock} 'description' Assignment description=STRING
-    | {TeamBlock} TeamAssignment Assignment team=[Team:QualifiedName]
-    | {RoleBlock} 'role' Assignment role=[Classification:QualifiedName]
-    | {BusinessModelBlock} ('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName]
-    | {LifecycleBlock} ('lifecycle') Assignment lifecycle=[Classification:QualifiedName]
-    | {MetadataBlock} ('metadata' | 'meta') '{' (entries+=MetadataEntry)* '}'
-    | {BoundedContextClassificationBlock} 'classifications' '{'
-        (RoleAssignment Assignment role=[Classification:QualifiedName])?
-        (BusinessModelAssignment Assignment businessModel=[Classification:QualifiedName])?
-        (LifecycleAssignment Assignment lifecycle=[Classification:QualifiedName])?
-      '}'
-    | {RelationshipsBlock} ('relationships' | 'integrations' | 'connections') '{' (relationships += Relationship ((",")? relationships += Relationship)*)* '}'
-    | {TerminologyBlock} ('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' (terms += DomainTerm (",")?)* '}'
-    | {DecisionsBlock} ('decisions' | 'constraints' | 'rules' | 'policies') '{' (decisions += AbstractDecision (',')?)* '}'
+    ('{' 
+        (
+            ('description' Assignment description=STRING) |
+            ('role' Assignment role+=[Classification:QualifiedName]) |
+            (TeamAssignment Assignment team+=[Team:QualifiedName]) |
+            (('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName]) |
+            ('lifecycle' Assignment lifecycle=[Classification:QualifiedName]) |
+            (('metadata' | 'meta') '{' (metadata+=MetadataEntry)* '}') |
+            (('relationships' | 'integrations' | 'connections') '{' 
+                (relationships += Relationship ((",")? relationships += Relationship)*)*
+            '}') |
+            (('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' 
+                (terminology += DomainTerm (",")?)* 
+            '}') |
+            (('decisions' | 'constraints' | 'rules' | 'policies') '{' 
+                (decisions += AbstractDecision (',')?)* 
+            '}')
+        )*
+    '}')?
 ;
 
 MetadataEntry:
@@ -317,63 +315,10 @@ NamespaceDeclaration:
 ;
 
 // ============================================================================
-// SECTION 8: METADATA INTERFACES (DOCUMENTATION BLOCKS)
+// SECTION 8: METADATA INTERFACES (DOCUMENTATION BLOCKS) - REMOVED
 // ============================================================================
 
-/**
- * Interfaces for attaching rich metadata to elements.
- * Used for description, vision, classifiers, teams, relationships, etc.
- */
-
-interface DescriptionBlock {
-    description: string
-}
-
-interface VisionBlock {
-    vision: string
-}
-
-interface DomainClassificationBlock {
-    classification?: @Classification
-}
-
-interface TeamBlock {
-    team?: @Team
-}
-
-interface RoleBlock {
-    role?: @Classification
-}
-
-interface BusinessModelBlock {
-    businessModel?: @Classification
-}
-
-interface LifecycleBlock {
-    lifecycle?: @Classification
-}
-
-interface MetadataBlock {
-    entries: MetadataEntry[]
-}
-
-interface BoundedContextClassificationBlock {
-    role?: @Classification
-    businessModel?: @Classification
-    lifecycle?: @Classification
-}
-
-interface RelationshipsBlock {
-    relationships: Relationship[]
-}
-
-interface TerminologyBlock {
-    terms: DomainTerm[]
-}
-
-interface DecisionsBlock {
-    decisions: AbstractDecision[]
-}
+// Documentation blocks have been replaced by direct properties
 
 // ============================================================================
 // SECTION 9: HELPER RULES & FRAGMENTS
@@ -382,15 +327,15 @@ interface DecisionsBlock {
 /**
  * Assignment fragments for classifier and team blocks.
  */
-fragment RoleAssignment returns string: 'role';
-fragment BusinessModelAssignment returns string: 'businessModel';
-fragment LifecycleAssignment returns string: 'lifecycle';
-fragment TeamAssignment returns string: 'team';
+RoleAssignment returns string: 'role';
+BusinessModelAssignment returns string: 'businessModel';
+LifecycleAssignment returns string: 'lifecycle';
+TeamAssignment returns string: 'team';
 
 /**
  * Assignment operators - flexible syntax.
  */
-fragment Assignment returns string: 
+Assignment returns string: 
     (':' | 'is' | '=')
 ;
 
