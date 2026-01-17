@@ -18,6 +18,10 @@
             "types": "./out/index.d.ts",
             "default": "./out/index.js"
         },
+        "./sdk": {
+            "types": "./out/sdk/index.d.ts",
+            "default": "./out/sdk/index.js"
+        },
             "./main-browser": {
                 "types": "./out/main-browser.d.ts",
                 "default": "./out/main-browser.js"

@@ -2,7 +2,8 @@ export * from './domain-lang-module.js';
 export * from './generated/ast.js';
 export * from './generated/grammar.js';
 export * from './generated/module.js';
-export * from './main.js';
+// Note: main.js is intentionally NOT exported here - it's the LSP entry point
+// and creates a connection when imported, which breaks CLI/SDK standalone usage
 export * from './ast-augmentation.js';
 
 // Export services
