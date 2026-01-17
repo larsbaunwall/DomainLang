@@ -54,17 +54,12 @@ describe('Scoping: Edge Cases', () => {
         expectValidDocument(document);
         
         // 'this' should resolve to the containing bounded context
-        const bc = getAllBoundedContexts(document).find(bc => 
-            bc.documentation?.some(d => 'relationships' in d)
-        );
+        const bc = getAllBoundedContexts(document).find(bc => bc.relationships.length > 0);
         
         expect(bc).toBeDefined();
-        if (bc && bc.documentation) {
-            const relationshipBlock = bc.documentation.find(d => 'relationships' in d);
-            if (relationshipBlock && 'relationships' in relationshipBlock) {
-                const relationship = relationshipBlock.relationships[0];
-                expect(relationship.left).toBeDefined();
-            }
+        if (bc) {
+            const relationship = bc.relationships[0];
+            expect(relationship.left).toBeDefined();
         }
     });
 
@@ -97,8 +92,8 @@ describe('Scoping: Edge Cases', () => {
         // Arrange
         const input = s`
             BoundedContext OrderContext for NonExistentDomain {
-                team: NonExistentTeam
                 role: NonExistentClassification
+                team: NonExistentTeam
             }
         `;
 

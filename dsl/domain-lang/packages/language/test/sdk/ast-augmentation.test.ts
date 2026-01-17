@@ -5,10 +5,12 @@
  * to BoundedContext, Domain, and Relationship AST nodes.
  */
 
+/* eslint-disable @typescript-eslint/no-non-null-assertion -- Test assertions use ! to verify expected values exist */
+
 import { describe, test, expect } from 'vitest';
 import { loadModelFromText, Pattern, matchesPattern } from '../../src/sdk/index.js';
 import type { BoundedContext, Domain, Relationship } from '../../src/generated/ast.js';
-import { isBoundedContext, isDomain, isRelationshipsBlock, isContextMap } from '../../src/generated/ast.js';
+import { isBoundedContext, isDomain, isContextMap } from '../../src/generated/ast.js';
 import { AstUtils } from 'langium';
 
 // Import the augmentation module to enable TypeScript type extensions
@@ -31,7 +33,7 @@ describe('SDK AST Augmentation', () => {
             expect(bc!.description).toBe('Handles order processing');
         });
         
-        test('resolvedRole returns role from header inline', async () => {
+        test('effectiveRole returns role from header inline', async () => {
             const { model } = await loadModelFromText(`
                 Classification Core
                 Domain Sales { vision: "v" }
@@ -40,10 +42,10 @@ describe('SDK AST Augmentation', () => {
             
             const bc = findFirst<BoundedContext>(model, isBoundedContext);
             expect(bc).toBeDefined();
-            expect(bc!.resolvedRole?.name).toBe('Core');
+            expect(bc!.effectiveRole?.name).toBe('Core');
         });
         
-        test('resolvedTeam returns team from header inline', async () => {
+        test('effectiveTeam returns team from header inline', async () => {
             const { model } = await loadModelFromText(`
                 Team SalesTeam
                 Domain Sales { vision: "v" }
@@ -52,7 +54,7 @@ describe('SDK AST Augmentation', () => {
             
             const bc = findFirst<BoundedContext>(model, isBoundedContext);
             expect(bc).toBeDefined();
-            expect(bc!.resolvedTeam?.name).toBe('SalesTeam');
+            expect(bc!.effectiveTeam?.name).toBe('SalesTeam');
         });
         
         test('hasRole() checks role by name', async () => {
@@ -129,8 +131,8 @@ describe('SDK AST Augmentation', () => {
         test('description returns first description block', async () => {
             const { model } = await loadModelFromText(`
                 Domain Sales {
-                    vision: "Sales domain description"
                     description: "Sales domain description"
+                    vision: "Sales domain vision"
                 }
             `);
             
@@ -143,6 +145,7 @@ describe('SDK AST Augmentation', () => {
             const { model } = await loadModelFromText(`
                 Classification CoreDomain
                 Domain Sales {
+                    description: "d"
                     vision: "v"
                     classification: CoreDomain
                 }
@@ -322,12 +325,8 @@ function findFirst<T>(model: unknown, guard: (node: unknown) => node is T): T | 
 
 function findFirstRelationship(model: unknown): Relationship | undefined {
     for (const node of AstUtils.streamAllContents(model as import('langium').AstNode)) {
-        if (isBoundedContext(node)) {
-            for (const block of node.documentation) {
-                if (isRelationshipsBlock(block) && block.relationships.length > 0) {
-                    return block.relationships[0];
-                }
-            }
+        if (isBoundedContext(node) && node.relationships.length > 0) {
+            return node.relationships[0];
         }
         if (isContextMap(node) && node.relationships.length > 0) {
             return node.relationships[0];

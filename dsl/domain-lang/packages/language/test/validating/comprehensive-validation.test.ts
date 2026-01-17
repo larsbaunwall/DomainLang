@@ -428,8 +428,8 @@ describe('Validation Tests', () => {
                 Classification Core
                 
                 BoundedContext TestBC for Sales {
-                    team: SalesTeam
                     role: Core
+                    team: SalesTeam
                 }
             `;
 

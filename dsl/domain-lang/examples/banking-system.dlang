@@ -79,11 +79,6 @@ bc AccountManagement for CustomerAccounts
             examples: "Active", "Frozen", "Closed", "Dormant"
     }
 
-    classifiers {
-        role: CoreDomain
-        businessModel: MissionCritical
-        evolution: HighlyRegulated
-    }
 
     decisions {
         decision [architectural] EventSourcing:
@@ -95,10 +90,10 @@ bc AccountManagement for CustomerAccounts
         decision [security] EncryptionAtRest:
             "Encrypt all account data at rest using AES-256"
 
-        policy [business] NegativeBalanceProhibited:
+        policy NegativeBalanceProhibited:
             "Prevent overdrafts without overdraft protection"
 
-        policy [business] DormantAccountPolicy:
+        policy DormantAccountPolicy:
             "Mark accounts dormant after 12 months of inactivity"
 
         rule [compliance] KYC:
@@ -135,11 +130,6 @@ bc PaymentProcessing for Payments
             aka: PaymentDetails, TransactionReference
     }
 
-    classifiers {
-        role: CoreDomain
-        businessModel: MissionCritical
-        evolution: HighlyRegulated
-    }
 
     decisions {
         decision [architectural] SagaPattern:
@@ -148,10 +138,10 @@ bc PaymentProcessing for Payments
         decision [technical] Kafka:
             "Use Kafka for reliable payment event streaming"
 
-        policy [business] PaymentLimits:
+        policy PaymentLimits:
             "Daily transfer limits: $10,000 domestic, $5,000 international"
 
-        policy [business] CutoffTimes:
+        policy CutoffTimes:
             "Same-day processing cutoff at 5 PM local time"
 
         rule [compliance] AML:
@@ -191,7 +181,7 @@ bc FraudDetection for Compliance
         decision [technical] StreamProcessing:
             "Process transactions in real-time using stream processing"
 
-        policy [business] AutomaticBlocking:
+        policy AutomaticBlocking:
             "Automatically block transactions with fraud score > 90"
 
         rule [compliance] SARFiling:
@@ -246,10 +236,10 @@ bc CustomerService for CustomerAccounts
     }
 
     decisions {
-        policy [business] ResponseTime:
+        policy ResponseTime:
             "Respond to customer inquiries within 24 hours"
 
-        policy [business] DisputeWindow:
+        policy DisputeWindow:
             "Accept transaction disputes within 60 days"
     }
 }
@@ -277,7 +267,7 @@ bc CardManagement for Payments
         decision [security] EMVChip:
             "Use EMV chip technology for all cards"
 
-        policy [business] InstantCardBlocking:
+        policy InstantCardBlocking:
             "Allow customers to instantly block cards via mobile app"
 
         rule [compliance] PCIDSSCompliance:

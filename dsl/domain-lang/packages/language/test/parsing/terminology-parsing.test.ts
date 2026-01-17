@@ -38,12 +38,12 @@ describe('Basic Terminology Parsing', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
+        const terms = bc.terminology ?? [];
         
-        expect(terminologyBlock).toBeDefined();
-        expect(terminologyBlock.terms).toHaveLength(1);
-        expect(terminologyBlock.terms[0].name).toBe('Order');
-        expect(terminologyBlock.terms[0].meaning).toBe('A customer purchase request');
+        expect(terms).toBeDefined();
+        expect(terms).toHaveLength(1);
+        expect(terms[0].name).toBe('Order');
+        expect(terms[0].meaning).toBe('A customer purchase request');
     });
 
     test('should parse term without meaning', async () => {
@@ -64,10 +64,10 @@ describe('Basic Terminology Parsing', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
+        const terms = bc.terminology ?? [];
         
-        expect(terminologyBlock.terms[0].name).toBe('Order');
-        expect(terminologyBlock.terms[0].meaning).toBeUndefined();
+        expect(terms[0].name).toBe('Order');
+        expect(terms[0].meaning).toBeUndefined();
     });
 
     test('should parse multiple terms', async () => {
@@ -90,10 +90,10 @@ describe('Basic Terminology Parsing', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
+        const terms = bc.terminology ?? [];
         
-        expect(terminologyBlock.terms).toHaveLength(3);
-        expect(terminologyBlock.terms.map((t: any) => t.name)).toEqual(['Order', 'Customer', 'Product']);
+        expect(terms).toHaveLength(3);
+        expect(terms.map((t: any) => t.name)).toEqual(['Order', 'Customer', 'Product']);
     });
 });
 
@@ -120,8 +120,8 @@ describe('Term Keyword Variants', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock.terms[0].name).toBe('Order');
+        const terms = bc.terminology ?? [];
+        expect(terms[0].name).toBe('Order');
     });
 });
 
@@ -148,8 +148,8 @@ describe('Terminology Block Keyword Variants', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock).toBeDefined();
+        const terms = bc.terminology ?? [];
+        expect(terms).toBeDefined();
     });
 
     test('should parse glossary keyword', async () => {
@@ -170,8 +170,8 @@ describe('Terminology Block Keyword Variants', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock).toBeDefined();
+        const terms = bc.terminology ?? [];
+        expect(terms).toBeDefined();
     });
 
     test('should parse ubiquitous language keyword', async () => {
@@ -192,8 +192,8 @@ describe('Terminology Block Keyword Variants', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock).toBeDefined();
+        const terms = bc.terminology ?? [];
+        expect(terms).toBeDefined();
     });
 });
 
@@ -220,10 +220,10 @@ describe('Term Synonyms', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
+        const terms = bc.terminology ?? [];
         
-        expect(terminologyBlock.terms[0].synonyms).toHaveLength(1);
-        expect(terminologyBlock.terms[0].synonyms[0]).toBe('Client');
+        expect(terms[0].synonyms).toHaveLength(1);
+        expect(terms[0].synonyms[0]).toBe('Client');
     });
 
     test('should parse term with multiple synonyms using aka', async () => {
@@ -244,10 +244,10 @@ describe('Term Synonyms', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
+        const terms = bc.terminology ?? [];
         
-        expect(terminologyBlock.terms[0].synonyms).toHaveLength(3);
-        expect(terminologyBlock.terms[0].synonyms).toEqual(['Client', 'Buyer', 'Purchaser']);
+        expect(terms[0].synonyms).toHaveLength(3);
+        expect(terms[0].synonyms).toEqual(['Client', 'Buyer', 'Purchaser']);
     });
 
     test('should parse term with synonyms keyword', async () => {
@@ -268,9 +268,9 @@ describe('Term Synonyms', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
+        const terms = bc.terminology ?? [];
         
-        expect(terminologyBlock.terms[0].synonyms).toEqual(['Item', 'Good', 'Merchandise']);
+        expect(terms[0].synonyms).toEqual(['Item', 'Good', 'Merchandise']);
     });
 });
 
@@ -297,10 +297,10 @@ describe('Term Examples', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
+        const terms = bc.terminology ?? [];
         
-        expect(terminologyBlock.terms[0].examples).toHaveLength(2);
-        expect(terminologyBlock.terms[0].examples).toEqual(['Laptop', 'Mouse']);
+        expect(terms[0].examples).toHaveLength(2);
+        expect(terms[0].examples).toEqual(['Laptop', 'Mouse']);
     });
 
 
@@ -329,8 +329,8 @@ describe('Complex Term Definitions', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        const term = terminologyBlock.terms[0];
+        const terms = bc.terminology ?? [];
+        const term = terms[0];
         
         expect(term.name).toBe('Customer');
         expect(term.meaning).toBe('A person or organization that purchases products');
@@ -358,12 +358,12 @@ describe('Complex Term Definitions', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
+        const terms = bc.terminology ?? [];
         
-        expect(terminologyBlock.terms).toHaveLength(3);
-        expect(terminologyBlock.terms[0].synonyms).toEqual(['Purchase']);
-        expect(terminologyBlock.terms[1].synonyms).toEqual(['OrderLine']);
-        expect(terminologyBlock.terms[2].examples).toHaveLength(2);
+        expect(terms).toHaveLength(3);
+        expect(terms[0].synonyms).toEqual(['Purchase']);
+        expect(terms[1].synonyms).toEqual(['OrderLine']);
+        expect(terms[2].examples).toHaveLength(2);
     });
 });
 
@@ -451,8 +451,8 @@ describe('Terminology Edge Cases', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock.terms).toHaveLength(0);
+        const terms = bc.terminology ?? [];
+        expect(terms).toHaveLength(0);
     });
 
     test('should parse terms with hyphens in names', async () => {
@@ -473,8 +473,8 @@ describe('Terminology Edge Cases', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock.terms[0].name).toBe('line-item');
+        const terms = bc.terminology ?? [];
+        expect(terms[0].name).toBe('line-item');
     });
 
     test('should parse terms with underscores in names', async () => {
@@ -495,8 +495,8 @@ describe('Terminology Edge Cases', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock.terms[0].name).toBe('order_id');
+        const terms = bc.terminology ?? [];
+        expect(terms[0].name).toBe('order_id');
     });
 
     test('should handle terms with comma separators', async () => {
@@ -518,7 +518,7 @@ describe('Terminology Edge Cases', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const terminologyBlock = bc.documentation?.find(d => 'terms' in d) as any;
-        expect(terminologyBlock.terms).toHaveLength(2);
+        const terms = bc.terminology ?? [];
+        expect(terms).toHaveLength(2);
     });
 });

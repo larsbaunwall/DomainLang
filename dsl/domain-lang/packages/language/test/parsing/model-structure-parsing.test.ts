@@ -176,16 +176,10 @@ describe('Grammar Completeness Tests', () => {
                     
                     BoundedContext TestBC for Test {
                         description: "Test context"
-                        team: TestTeam
                         role: Core
+                        team: TestTeam
                         businessModel: SaaS
                         lifecycle: Mature
-                        
-                        classifications {
-                            role: Core
-                            businessModel: SaaS
-                            lifecycle: Mature
-                        }
                         
                         relationships {
                             [OHS] this -> [CF] TestBC : CustomerSupplier

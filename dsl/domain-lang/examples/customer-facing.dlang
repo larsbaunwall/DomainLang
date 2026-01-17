@@ -27,16 +27,14 @@ Namespace CustomerFacing {
 
     BoundedContext Listings for Inventory {
         description: "Customer-facing product discovery and merchandising"
-        classifiers {
-            role: CoreDomain
-        }
+        role: CoreDomain
         terminology {
             term Product: "An item that can be purchased"
                 examples: "Laptop #12345", "Mouse #67890"
             term SKU: "Stock keeping unit identifier"
         }
         decisions {
-            policy [business] NoBackorders: "Do not allow orders without available stock"
+            policy NoBackorders: "Do not allow orders without available stock"
             rule [compliance] ProductMustHaveSku: "Every product requires a SKU for audit trails"
         }
     }

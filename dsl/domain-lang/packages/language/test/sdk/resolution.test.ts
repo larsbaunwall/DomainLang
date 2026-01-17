@@ -1,28 +1,29 @@
 /**
  * SDK Resolution Functions Tests
  * 
- * Comprehensive tests for property resolution with precedence rules.
- * Validates correct property extraction from AST nodes.
+ * Tests for property resolution functions that provide value beyond direct AST access.
+ * Only tests functions with precedence logic or data transformation:
+ * - effectiveRole: Array-based precedence (header inline → body)
+ * - effectiveTeam: Array-based precedence (header inline → body)
+ * - metadataAsMap: Array to Map conversion
+ * 
+ * Direct AST properties (no resolution needed) are tested in AST augmentation tests.
  */
 
 import { describe, test, expect } from 'vitest';
 import { loadModelFromText } from '../../src/sdk/loader.js';
 import {
-    resolveBcDescription,
-    resolveBcRole,
-    resolveBcTeam,
-    resolveBcMetadata,
-    resolveDomainDescription,
-    resolveDomainVision,
-    resolveDomainClassification
+    effectiveRole,
+    effectiveTeam,
+    metadataAsMap,
 } from '../../src/sdk/resolution.js';
 import type { BoundedContext, Domain } from '../../src/generated/ast.js';
 
 describe('SDK Resolution Functions', () => {
     
-    describe('resolveBcDescription()', () => {
+    describe('Direct AST Properties (no resolution needed)', () => {
         
-        test('resolves description from documentation block', async () => {
+        test('bc.description is a direct property', async () => {
             // Arrange
             const { query } = await loadModelFromText(`
                 Domain Sales { vision: "v" }
@@ -33,49 +34,93 @@ describe('SDK Resolution Functions', () => {
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const resolved = resolveBcDescription(bc);
             
-            // Assert
-            expect(resolved).toBe('Manages orders');
+            // Assert - direct property access, no resolution function needed
+            expect(bc.description).toBe('Manages orders');
         });
         
-        test('returns undefined when no description provided', async () => {
+        test('bc.businessModel is a direct reference', async () => {
             // Arrange
             const { query } = await loadModelFromText(`
-                Domain Sales { vision: "v" }
-                bc OrderContext for Sales
-            `);
-            
-            // Act
-            const bc = query.bc('OrderContext') as BoundedContext;
-            const resolved = resolveBcDescription(bc);
-            
-            // Assert
-            expect(resolved).toBeUndefined();
-        });
-        
-        test('handles multiple documentation blocks by returning first description', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
+                Classification Commercial
                 Domain Sales { vision: "v" }
                 bc OrderContext for Sales {
-                    description: "first description"
-                    terminology {
-                        term Order: "an order"
-                    }
+                    businessModel: Commercial
                 }
             `);
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const resolved = resolveBcDescription(bc);
             
-            // Assert
-            expect(resolved).toBe('first description');
+            // Assert - direct reference access
+            expect(bc.businessModel?.ref?.name).toBe('Commercial');
+        });
+        
+        test('bc.lifecycle is a direct reference', async () => {
+            // Arrange
+            const { query } = await loadModelFromText(`
+                Classification Active
+                Domain Sales { vision: "v" }
+                bc OrderContext for Sales {
+                    lifecycle: Active
+                }
+            `);
+            
+            // Act
+            const bc = query.bc('OrderContext') as BoundedContext;
+            
+            // Assert - direct reference access
+            expect(bc.lifecycle?.ref?.name).toBe('Active');
+        });
+        
+        test('domain.description is a direct property', async () => {
+            // Arrange
+            const { query } = await loadModelFromText(`
+                Domain Sales {
+                    description: "Sales domain"
+                    vision: "v"
+                }
+            `);
+            
+            // Act
+            const domain = query.domain('Sales') as Domain;
+            
+            // Assert - direct property access
+            expect(domain.description).toBe('Sales domain');
+        });
+        
+        test('domain.vision is a direct property', async () => {
+            // Arrange
+            const { query } = await loadModelFromText(`
+                Domain Sales { vision: "Handle sales" }
+            `);
+            
+            // Act
+            const domain = query.domain('Sales') as Domain;
+            
+            // Assert - direct property access
+            expect(domain.vision).toBe('Handle sales');
+        });
+        
+        test('domain.classification is a direct reference', async () => {
+            // Arrange
+            const { query } = await loadModelFromText(`
+                Classification Core
+                Domain Sales {
+                    vision: "v"
+                    classification: Core
+                }
+            `);
+            
+            // Act
+            const domain = query.domain('Sales') as Domain;
+            
+            // Assert - direct reference access
+            expect(domain.classification?.ref?.name).toBe('Core');
         });
     });
     
-    describe('resolveBcRole()', () => {
+    describe('effectiveRole()', () => {
         
         test('resolves bounded context role from header', async () => {
             // Arrange
@@ -92,8 +137,8 @@ describe('SDK Resolution Functions', () => {
             const shippingBc = query.bc('ShippingContext') as BoundedContext;
             
             // Assert
-            expect(resolveBcRole(orderBc)?.name).toBe('Core');
-            expect(resolveBcRole(shippingBc)?.name).toBe('Supporting');
+            expect(effectiveRole(orderBc)?.name).toBe('Core');
+            expect(effectiveRole(shippingBc)?.name).toBe('Supporting');
         });
         
         test('returns undefined when role not specified', async () => {
@@ -105,14 +150,14 @@ describe('SDK Resolution Functions', () => {
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const resolved = resolveBcRole(bc);
+            const resolved = effectiveRole(bc);
             
             // Assert
             expect(resolved).toBeUndefined();
         });
     });
     
-    describe('resolveBcTeam()', () => {
+    describe('effectiveTeam()', () => {
         
         test('resolves responsible team from header', async () => {
             // Arrange
@@ -129,8 +174,8 @@ describe('SDK Resolution Functions', () => {
             const paymentBc = query.bc('PaymentContext') as BoundedContext;
             
             // Assert
-            expect(resolveBcTeam(orderBc)?.name).toBe('SalesTeam');
-            expect(resolveBcTeam(paymentBc)?.name).toBe('PaymentTeam');
+            expect(effectiveTeam(orderBc)?.name).toBe('SalesTeam');
+            expect(effectiveTeam(paymentBc)?.name).toBe('PaymentTeam');
         });
         
         test('returns undefined when team not assigned', async () => {
@@ -142,14 +187,14 @@ describe('SDK Resolution Functions', () => {
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const resolved = resolveBcTeam(bc);
+            const resolved = effectiveTeam(bc);
             
             // Assert
             expect(resolved).toBeUndefined();
         });
     });
     
-    describe('resolveBcMetadata()', () => {
+    describe('metadataAsMap()', () => {
         
         test('resolves metadata key-value pairs', async () => {
             // Arrange
@@ -169,7 +214,7 @@ describe('SDK Resolution Functions', () => {
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const metadata = resolveBcMetadata(bc);
+            const metadata = metadataAsMap(bc);
             
             // Assert
             expect(metadata.get('tier')).toBe('critical');
@@ -186,7 +231,7 @@ describe('SDK Resolution Functions', () => {
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const metadata = resolveBcMetadata(bc);
+            const metadata = metadataAsMap(bc);
             
             // Assert
             expect(metadata.size).toBe(0);
@@ -203,156 +248,14 @@ describe('SDK Resolution Functions', () => {
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const metadata = resolveBcMetadata(bc);
+            const metadata = metadataAsMap(bc);
             
             // Assert
             expect(metadata.size).toBe(0);
         });
     });
     
-    describe('resolveDomainDescription()', () => {
-        
-        test('resolves domain description from documentation block', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Domain Sales {
-                    description: "Manages sales operations"
-                    vision: "v"
-                }
-            `);
-            
-            // Act
-            const domain = query.domain('Sales') as Domain;
-            const resolved = resolveDomainDescription(domain);
-            
-            // Assert
-            expect(resolved).toBe('Manages sales operations');
-        });
-        
-        test('returns undefined when no description', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Domain Sales { vision: "v" }
-            `);
-            
-            // Act
-            const domain = query.domain('Sales') as Domain;
-            const resolved = resolveDomainDescription(domain);
-            
-            // Assert
-            expect(resolved).toBeUndefined();
-        });
-    });
-    
-    describe('resolveDomainVision()', () => {
-        
-        test('resolves domain vision statement', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Domain Sales {
-                    vision: "Provide world-class sales capabilities"
-                }
-            `);
-            
-            // Act
-            const domain = query.domain('Sales') as Domain;
-            const resolved = resolveDomainVision(domain);
-            
-            // Assert
-            expect(resolved).toBe('Provide world-class sales capabilities');
-        });
-        
-        test('returns undefined when vision not specified', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Domain Sales { }
-            `);
-            
-            // Act
-            const domain = query.domain('Sales') as Domain;
-            const resolved = resolveDomainVision(domain);
-            
-            // Assert
-            expect(resolved).toBeUndefined();
-        });
-        
-        test('handles empty vision string', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Domain Sales { vision: "" }
-            `);
-            
-            // Act
-            const domain = query.domain('Sales') as Domain;
-            const resolved = resolveDomainVision(domain);
-            
-            // Assert
-            expect(resolved).toBe('');
-        });
-    });
-    
-    describe('resolveDomainClassification()', () => {
-        
-        test('resolves domain classification', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Classification Core
-                Classification Supporting
-                Domain Sales {
-                    vision: "v"
-                    classification: Core
-                }
-                Domain Inventory {
-                    vision: "v"
-                    classification: Supporting
-                }
-            `);
-            
-            // Act
-            const salesDomain = query.domain('Sales') as Domain;
-            const inventoryDomain = query.domain('Inventory') as Domain;
-            
-            // Assert
-            expect(resolveDomainClassification(salesDomain)?.name).toBe('Core');
-            expect(resolveDomainClassification(inventoryDomain)?.name).toBe('Supporting');
-        });
-        
-        test('returns undefined when classification not specified', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Domain Sales { vision: "v" }
-            `);
-            
-            // Act
-            const domain = query.domain('Sales') as Domain;
-            const resolved = resolveDomainClassification(domain);
-            
-            // Assert
-            expect(resolved).toBeUndefined();
-        });
-    });
-    
-    describe('Resolution with Various Node Structures', () => {
-        
-        test('resolves from deeply nested documentation blocks', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Domain Sales { vision: "v" }
-                bc OrderContext for Sales {
-                    description: "main description"
-                    terminology {
-                        term Order: "document"
-                    }
-                }
-            `);
-            
-            // Act
-            const bc = query.bc('OrderContext') as BoundedContext;
-            const resolved = resolveBcDescription(bc);
-            
-            // Assert
-            expect(resolved).toBe('main description');
-        });
+    describe('Metadata with Various Node Structures', () => {
         
         test('resolves metadata with special characters in values', async () => {
             // Arrange
@@ -368,45 +271,27 @@ describe('SDK Resolution Functions', () => {
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const metadata = resolveBcMetadata(bc);
+            const metadata = metadataAsMap(bc);
             
             // Assert
             expect(metadata.get('pattern')).toBe('[a-zA-Z0-9_]*');
         });
-    });
-    
-    describe('Edge Cases and Error Conditions', () => {
         
-        test('handles missing referenced classification gracefully', async () => {
+        test('handles bc without metadata', async () => {
             // Arrange
             const { query } = await loadModelFromText(`
-                Classification Core
-                Domain Sales {
-                    vision: "v"
+                Domain Sales { vision: "v" }
+                bc OrderContext for Sales {
+                    description: "test"
                 }
             `);
             
             // Act
-            const domain = query.domain('Sales') as Domain;
-            const resolved = resolveDomainClassification(domain);
+            const bc = query.bc('OrderContext') as BoundedContext;
+            const metadata = metadataAsMap(bc);
             
             // Assert
-            expect(resolved).toBeUndefined();
-        });
-        
-        test('handles domain without any documentation blocks', async () => {
-            // Arrange
-            const { query } = await loadModelFromText(`
-                Domain Sales { }
-            `);
-            
-            // Act
-            const domain = query.domain('Sales') as Domain;
-            
-            // Assert
-            expect(resolveDomainDescription(domain)).toBeUndefined();
-            expect(resolveDomainVision(domain)).toBeUndefined();
-            expect(resolveDomainClassification(domain)).toBeUndefined();
+            expect(metadata.size).toBe(0);
         });
     });
 });

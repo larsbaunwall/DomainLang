@@ -74,9 +74,9 @@ describe('FR-2.3: Inline/Block Conflict Validation', () => {
             }
             
             BoundedContext Inventory for Sales {
+                description: "Handles inventory operations"
                 role: Core
                 team: SalesTeam
-                description: "Handles inventory operations"
             }
         `);
         // Ensure no conflict warnings appear

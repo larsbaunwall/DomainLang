@@ -258,7 +258,7 @@ describe('bc Inline Assignment Variants', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        expect(bc.role?.ref?.name).toBe('Core');
+        expect(bc.role?.[0]?.ref?.name).toBe('Core');
     });
 
     test('should parse by keyword for team', async () => {
@@ -275,7 +275,7 @@ describe('bc Inline Assignment Variants', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        expect(bc.team?.ref?.name).toBe('SalesTeam');
+        expect(bc.team?.[0]?.ref?.name).toBe('SalesTeam');
     });
 });
 

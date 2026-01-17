@@ -266,8 +266,8 @@ describe('Team Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        expect(bc.team?.ref).toBeDefined();
-        expect(bc.team?.ref?.name).toBe('SalesTeam');
+        expect(bc.team?.[0]?.ref).toBeDefined();
+        expect(bc.team?.[0]?.ref?.name).toBe('SalesTeam');
     });
 
     test('should resolve team reference in BC documentation block', async () => {
@@ -287,11 +287,8 @@ describe('Team Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const teamBlock = bc.documentation?.find(d => 'team' in d);
-        expect(teamBlock).toBeDefined();
-        if (teamBlock && 'team' in teamBlock) {
-            expect(teamBlock.team?.ref?.name).toBe('ProductTeam');
-        }
+        const team = bc.team?.[0];
+        expect(team?.ref?.name).toBe('ProductTeam');
     });
 
     test('should resolve qualified team reference', async () => {
@@ -314,11 +311,8 @@ describe('Team Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const teamBlock = bc.documentation?.find(d => 'team' in d);
-        expect(teamBlock).toBeDefined();
-        if (teamBlock && 'team' in teamBlock) {
-            expect(teamBlock.team?.ref?.name).toBe('EngineeringTeam');
-        }
+        const team = bc.team?.[0];
+        expect(team?.ref?.name).toBe('EngineeringTeam');
     });
 });
 
@@ -342,8 +336,8 @@ describe('Classification Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        expect(bc.role?.ref).toBeDefined();
-        expect(bc.role?.ref?.name).toBe('Core');
+        expect(bc.role?.[0]?.ref).toBeDefined();
+        expect(bc.role?.[0]?.ref?.name).toBe('Core');
     });
 
     test('should resolve classification in domain classification block', async () => {
@@ -364,8 +358,7 @@ describe('Classification Reference Linking', () => {
         expectValidDocument(document);
         const model = document.parseResult.value;
         const domain = model.children.find(c => c.$type === 'Domain') as any;
-        const classifierBlock = domain.documentation?.find((d: any) => 'classification' in d);
-        expect(classifierBlock?.classification?.ref?.name).toBe('Strategic');
+        expect(domain.classification?.ref?.name).toBe('Strategic');
     });
 
     test('should resolve classification in decision bracket syntax', async () => {
@@ -387,8 +380,8 @@ describe('Classification Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const decisionsBlock = bc.documentation?.find(d => 'decisions' in d) as any;
-        expect(decisionsBlock?.decisions[0]?.classification?.ref?.name).toBe('Architectural');
+        const decisions = bc.decisions ?? [];
+        expect(decisions[0]?.classification?.ref?.name).toBe('Architectural');
     });
 
     test('should resolve qualified classification reference', async () => {
@@ -413,8 +406,8 @@ describe('Classification Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        const decisionsBlock = bc.documentation?.find(d => 'decisions' in d) as any;
-        expect(decisionsBlock?.decisions[0]?.classification?.ref?.name).toBe('Technical');
+        const decisions = bc.decisions ?? [];
+        expect(decisions[0]?.classification?.ref?.name).toBe('Technical');
     });
 });
 
@@ -518,14 +511,11 @@ describe('This Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bcs = document.parseResult.value.children.filter(isBoundedContext) as BoundedContext[];
-        const bcWithRelationships = bcs.find(bc => 
-            bc.documentation?.some(d => 'relationships' in d)
-        );
+        const bcWithRelationships = bcs.find(bc => bc.relationships.length > 0);
         
         expect(bcWithRelationships).toBeDefined();
         if (bcWithRelationships) {
-            const relBlock = bcWithRelationships.documentation?.find(d => 'relationships' in d) as any;
-            const rel = relBlock.relationships[0];
+            const rel = bcWithRelationships.relationships[0];
             // 'this' is represented by ThisRef type, not a link
             expect(rel.left.$type).toBe('ThisRef');
             expect(rel.right.link?.ref?.name).toBe('PaymentContext');
@@ -569,8 +559,8 @@ describe('Complex Linking Scenarios', () => {
             c => isNamespaceDeclaration(c) && c.name === 'billing'
         ) as any;
         const paymentBC = billingNs?.children.find(isBoundedContext) as BoundedContext;
-        const teamBlock = paymentBC?.documentation?.find(d => 'team' in d) as any;
-        expect(teamBlock?.team?.ref?.name).toBe('SalesTeam');
+        const team = paymentBC?.team?.[0];
+        expect(team?.ref?.name).toBe('SalesTeam');
     });
 
     test('should resolve nested Namespace qualified names', async () => {

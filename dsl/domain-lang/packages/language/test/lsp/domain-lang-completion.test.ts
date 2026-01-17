@@ -121,12 +121,13 @@ describe('DomainLangCompletionProvider', () => {
             `;
             const document = await testServices.parse(input);
             const bc = (document.parseResult.value as any).children[1];
-            const relationshipsBlock = bc.documentation.find((d: any) => ast.isRelationshipsBlock(d));
+            const relationships = bc.relationships;
+            expect(relationships).toBeDefined();
             
             // Act - get completions for relationships block
             const completions: any[] = [];
             const context = {
-                node: relationshipsBlock,
+                node: bc,
                 tokenOffset: 0,
                 tokenEndOffset: 0,
                 document,

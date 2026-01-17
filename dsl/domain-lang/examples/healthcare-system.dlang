@@ -86,11 +86,6 @@ bc ElectronicHealthRecords for PatientCare
             examples: "Penicillin", "Peanuts", "Latex"
     }
 
-    classifications {
-        role: CoreDomain
-        businessModel: HIPAACompliant
-        lifecycle: PatientSafetyCritical
-    }
 
     decisions {
         decision [architectural] HL7FHIR:
@@ -102,7 +97,7 @@ bc ElectronicHealthRecords for PatientCare
         decision [security] EndToEndEncryption:
             "Encrypt all PHI (Protected Health Information) end-to-end"
 
-        policy [business] RecordRetention:
+        policy RecordRetention:
             "Retain medical records for minimum 7 years after last encounter"
 
         rule [compliance] HIPAAPrivacy:
@@ -146,13 +141,13 @@ bc AppointmentScheduling for Administration
         decision [technical] CalendarSync:
             "Sync with provider calendars using CalDAV protocol"
 
-        policy [business] CancellationPolicy:
+        policy CancellationPolicy:
             "Allow cancellations up to 24 hours before appointment"
 
-        policy [business] NoShowPolicy:
+        policy NoShowPolicy:
             "Mark no-shows after 15 minutes past appointment time"
 
-        policy [business] OverbookingStrategy:
+        policy OverbookingStrategy:
             "Allow 10% overbooking for high no-show appointment types"
     }
 }
@@ -181,11 +176,6 @@ bc MedicationManagement for Pharmacy
             aka: DrugList
     }
 
-    classifications {
-        role: CoreDomain
-        businessModel: PatientSafetyCritical
-        lifecycle: HIPAACompliant
-    }
 
     decisions {
         decision [technical] DrugDatabase:
@@ -194,7 +184,7 @@ bc MedicationManagement for Pharmacy
         decision [technical] BarcodeScanning:
             "Use barcode scanning for medication verification"
 
-        policy [clinical] DoubleCh eck:
+        policy [clinical] DoubleCheck:
             "Require pharmacist double-check for high-risk medications"
 
         rule [compliance] DEACompliance:
@@ -300,7 +290,7 @@ bc PatientBilling for Administration
         decision [technical] EDI837:
             "Use EDI 837 format for electronic claims submission"
 
-        policy [business] TimelyClaims:
+        policy TimelyClaims:
             "Submit claims within 48 hours of service"
 
         rule [compliance] HIPAATransactions:

@@ -16,7 +16,6 @@ import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
 import {
     isBoundedContext,
     isMetadata,
-    isMetadataBlock,
 } from '../../src/generated/ast.js';
 
 describe('Metadata Parsing', () => {
@@ -70,12 +69,8 @@ describe('Metadata Parsing', () => {
 
         // Assert
         expect(bc).toBeDefined();
-        expect(bc!.documentation).toBeDefined();
-        const metadataBlock = bc!.documentation!.find(
-            (d): d is any => isMetadataBlock(d)
-        );
-        expect(metadataBlock).toBeDefined();
-        expect(metadataBlock!.entries).toHaveLength(3);
+        const entries = bc!.metadata ?? [];
+        expect(entries).toHaveLength(3);
     });
 
     test('should parse metadata block with alternative meta keyword', async () => {
@@ -95,14 +90,11 @@ describe('Metadata Parsing', () => {
         expectValidDocument(document);
         const model = document.parseResult.value;
         const bc = model.children.find((c) => isBoundedContext(c));
-        const metadataBlock = bc!.documentation!.find(
-            (d): d is any => isMetadataBlock(d)
-        );
+        const entries = bc!.metadata ?? [];
 
         // Assert
-        expect(metadataBlock).toBeDefined();
-        expect(metadataBlock!.entries).toHaveLength(1);
-        expect(metadataBlock!.entries[0]!.value).toBe('Java');
+        expect(entries).toHaveLength(1);
+        expect(entries[0]?.value).toBe('Java');
     });
 
     test('should parse multiple metadata entries', async () => {
@@ -129,19 +121,15 @@ describe('Metadata Parsing', () => {
         expectValidDocument(document);
         const model = document.parseResult.value;
         const bc = model.children.find((c) => isBoundedContext(c));
-        const metadataBlock = bc!.documentation!.find(
-            (d): d is any => isMetadataBlock(d)
-        );
+        const entries = bc!.metadata ?? [];
 
         // Assert
-        expect(metadataBlock).toBeDefined();
-        expect(metadataBlock!.entries).toHaveLength(4);
-        
-        // Check specific entries
-        expect(metadataBlock!.entries[0]!.key.ref?.name).toBe('Language');
-        expect(metadataBlock!.entries[0]!.value).toBe('TypeScript');
-        expect(metadataBlock!.entries[2]!.key.ref?.name).toBe('Database');
-        expect(metadataBlock!.entries[2]!.value).toBe('PostgreSQL');
+        expect(entries).toHaveLength(4);
+
+        expect(entries[0]?.key.ref?.name).toBe('Language');
+        expect(entries[0]?.value).toBe('TypeScript');
+        expect(entries[2]?.key.ref?.name).toBe('Database');
+        expect(entries[2]?.value).toBe('PostgreSQL');
     });
 
     test('should allow empty metadata block', async () => {
@@ -158,13 +146,10 @@ describe('Metadata Parsing', () => {
         expectValidDocument(document);
         const model = document.parseResult.value;
         const bc = model.children.find((c) => isBoundedContext(c));
-        const metadataBlock = bc!.documentation!.find(
-            (d): d is any => isMetadataBlock(d)
-        );
+        const entries = bc!.metadata ?? [];
 
         // Assert
-        expect(metadataBlock).toBeDefined();
-        expect(metadataBlock!.entries).toHaveLength(0);
+        expect(entries).toHaveLength(0);
     });
 
     test('should handle metadata with special characters in values', async () => {
@@ -186,14 +171,11 @@ describe('Metadata Parsing', () => {
         expectValidDocument(document);
         const model = document.parseResult.value;
         const bc = model.children.find((c) => isBoundedContext(c));
-        const metadataBlock = bc!.documentation!.find(
-            (d): d is any => isMetadataBlock(d)
-        );
+        const entries = bc!.metadata ?? [];
 
         // Assert
-        expect(metadataBlock).toBeDefined();
-        expect(metadataBlock!.entries[0]!.value).toBe('github.com/company/payment-service');
-        expect(metadataBlock!.entries[1]!.value).toBe('https://api.payment.com:8080/v1');
+        expect(entries[0]?.value).toBe('github.com/company/payment-service');
+        expect(entries[1]?.value).toBe('https://api.payment.com:8080/v1');
     });
 
     test('should support string values with single quotes', async () => {
@@ -213,13 +195,10 @@ describe('Metadata Parsing', () => {
         expectValidDocument(document);
         const model = document.parseResult.value;
         const bc = model.children.find((c) => isBoundedContext(c));
-        const metadataBlock = bc!.documentation!.find(
-            (d): d is any => isMetadataBlock(d)
-        );
+        const entries = bc!.metadata ?? [];
 
         // Assert
-        expect(metadataBlock).toBeDefined();
-        expect(metadataBlock!.entries[0]!.value).toBe('Python');
+        expect(entries[0]?.value).toBe('Python');
     });
 });
 
@@ -253,13 +232,9 @@ describe('Metadata with Documentation Blocks', () => {
 
         // Assert
         expect(bc).toBeDefined();
-        expect(bc!.documentation).toHaveLength(2);
-        const hasDescription = bc!.documentation!.some(
-            (d) => 'description' in d && d.description === 'Manages order operations'
-        );
-        const hasMetadata = bc!.documentation!.some((d) => isMetadataBlock(d));
-        expect(hasDescription).toBe(true);
-        expect(hasMetadata).toBe(true);
+        expect(bc!.description).toBe('Manages order operations');
+        const metadata = bc!.metadata ?? [];
+        expect(metadata).toHaveLength(2);
     });
 
     test('should combine metadata with team assignment', async () => {
@@ -285,15 +260,11 @@ describe('Metadata with Documentation Blocks', () => {
 
         // Assert
         expect(bc).toBeDefined();
-        // Verify team documentation block is present
-        const teamBlock = bc!.documentation!.find(
-            (d) => 'team' in d && d.team?.ref?.name === 'PaymentTeam'
-        );
-        expect(teamBlock).toBeDefined();
-        const metadataBlock = bc!.documentation!.find(
-            (d): d is any => isMetadataBlock(d)
-        );
-        expect(metadataBlock).toBeDefined();
+        expect((bc!.team?.[0])?.ref?.name).toBe('PaymentTeam');
+        const metadata = bc!.metadata ?? [];
+        expect(metadata).toHaveLength(1);
+        expect(metadata[0]?.key.ref?.name).toBe('Language');
+        expect(metadata[0]?.value).toBe('Java');
     });
 
     test('should allow metadata mixed with other documentation blocks', async () => {
@@ -306,8 +277,8 @@ describe('Metadata with Documentation Blocks', () => {
             Domain Sales {}
             bc ComplexContext for Sales {
                 description: "Complex bounded context"
-                team: DevTeam
                 role: Core
+                team: DevTeam
                 metadata {
                     Language: "TypeScript"
                     Database: "MongoDB"
@@ -326,8 +297,15 @@ describe('Metadata with Documentation Blocks', () => {
 
         // Assert
         expect(bc).toBeDefined();
-        expect(bc!.documentation).toBeDefined();
-        expect(bc!.documentation!.length).toBeGreaterThanOrEqual(3);
+        expect(bc!.description).toBe('Complex bounded context');
+        expect((bc!.team?.[0])?.ref?.name).toBe('DevTeam');
+        expect((bc!.role?.[0])?.ref?.name).toBe('Core');
+
+        const metadata = bc!.metadata ?? [];
+        const terms = bc!.terminology ?? [];
+
+        expect(metadata).toHaveLength(2);
+        expect(terms).toHaveLength(1);
     });
 });
 

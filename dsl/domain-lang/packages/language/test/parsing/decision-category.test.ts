@@ -62,11 +62,10 @@ describe('Decision Classification', () => {
         
         // Assert
         expect(bc).toBeDefined();
-        const decisionsBlock = bc!.documentation.find(d => d.$type === 'DecisionsBlock');
-        expect(decisionsBlock).toBeDefined();
-        expect(decisionsBlock!.decisions).toHaveLength(2);
-        expect(decisionsBlock!.decisions[0].classification?.ref?.name).toBe('Architectural');
-        expect(decisionsBlock!.decisions[1].classification?.ref?.name).toBe('Business');
+        const decisions = bc!.decisions ?? [];
+        expect(decisions).toHaveLength(2);
+        expect(decisions[0].classification?.ref?.name).toBe('Architectural');
+        expect(decisions[1].classification?.ref?.name).toBe('Business');
     });
 
     test('should support qualified names for decision Classification', async () => {
@@ -94,9 +93,8 @@ describe('Decision Classification', () => {
         
         // Assert
         expect(bc).toBeDefined();
-        const decisionsBlock = bc!.documentation.find(d => d.$type === 'DecisionsBlock');
-        expect(decisionsBlock).toBeDefined();
-        expect(decisionsBlock!.decisions[0].classification?.ref?.name).toBe('Architectural');
+        const decisions = bc!.decisions ?? [];
+        expect(decisions[0].classification?.ref?.name).toBe('Architectural');
     });
 
     test('should share Classifications between context roles and decisions', async () => {
@@ -123,9 +121,9 @@ describe('Decision Classification', () => {
         
         // Assert
         expect(bc).toBeDefined();
-        expect(bc!.role?.ref?.name).toBe('Core');
-        const decisionsBlock = bc!.documentation.find(d => d.$type === 'DecisionsBlock');
-        expect(decisionsBlock!.decisions[0].classification?.ref?.name).toBe('Architectural');
-        expect(decisionsBlock!.decisions[1].classification?.ref?.name).toBe('Core');
+        expect(bc!.role?.[0]?.ref?.name).toBe('Core');
+        const decisions = bc!.decisions ?? [];
+        expect(decisions[0].classification?.ref?.name).toBe('Architectural');
+        expect(decisions[1].classification?.ref?.name).toBe('Core');
     });
 });
