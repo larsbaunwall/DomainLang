@@ -1,6 +1,6 @@
-# DomainLang
+<img src="images/icon.png" width="100" />
 
-![DomainLang logo](images/icon.png)
+# DomainLang
 
 [![Build](https://github.com/larsbaunwall/DomainLang/actions/workflows/build.yml/badge.svg)](https://github.com/larsbaunwall/DomainLang/actions/workflows/build.yml)
 [![VS Marketplace](https://vsmarketplacebadges.dev/version/thinkability.domain-lang.svg)](https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang)
