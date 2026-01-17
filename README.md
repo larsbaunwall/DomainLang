@@ -29,7 +29,39 @@ BoundedContext OrderProcessing for Sales as CoreDomain by SalesTeam {
 - 💡 **IDE support** — Syntax highlighting, auto-completion, hover docs, and go-to-definition
 - 🤝 **Collaboration** — Shared language between business experts and developers
 - 📊 **Visualization** — Generate context maps and diagrams
-- 🔌 **Query SDK** — Programmatic access to models with fluent API and O(1) lookups
+
+### 🔌 Model Query SDK
+
+Build tools and automation on top of your architecture models with a powerful programmatic API:
+
+```typescript
+import { loadModel } from 'domain-lang-language/sdk/loader-node';
+
+// Load and query your architecture
+const { query } = await loadModel('./architecture.dlang');
+
+// Find all Core contexts owned by specific teams
+const criticalContexts = query.boundedContexts()
+    .withRole('Core')
+    .withTeam('PaymentTeam');
+
+// Analyze your architecture
+for (const bc of criticalContexts) {
+    console.log(`${bc.name}: ${bc.description}`);
+    console.log(`  Team: ${bc.resolvedTeam?.name}`);
+    console.log(`  Metadata:`, Object.fromEntries(bc.metadata));
+}
+```
+
+**Use cases:**
+
+- 📊 Generate compliance reports and architecture metrics
+- 🔍 Build custom linters and validation rules
+- 🤖 Create CI/CD checks for architectural governance
+- 📈 Track team ownership and bounded context evolution
+- 🔗 Build custom visualizations and diagram generators
+
+[→ Explore the SDK documentation](./dsl/domain-lang/packages/language/src/sdk/README.md)
 
 ---
 
