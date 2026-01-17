@@ -1,43 +1,93 @@
 
 # DomainLang Workspace
 
-DomainLang is a multi-package workspace for modeling Domain-Driven Design (DDD) architectures using a modern, namespace-centric DSL. Each package targets a different delivery channel, but all share the same grammar and test suite.
+> The home of DomainLang—where architecture becomes code.
 
-## Quick Start
+This monorepo contains everything you need to model, validate, and query Domain-Driven Design architectures.
 
-1. **Explore the Language**
-	- Start with the [Getting Started Guide](./docs/getting-started.md) for a hands-on introduction.
-	- Dive into the [Quick Reference](./docs/quick-reference.md) for syntax at a glance.
-	- Consult the [Language Reference](./docs/language.md) for a formal grammar overview.
-	- Browse [Syntax Examples](./docs/syntax-examples.md) for real-world modeling patterns.
+```mermaid
+graph LR
+    subgraph You["👤 You"]
+        Write["Write .dlang"]
+    end
+    
+    subgraph DomainLang["⚙️ DomainLang"]
+        Lang["Language Package"]
+        CLI["CLI Tools"]
+        Ext["VS Code Extension"]
+    end
+    
+    subgraph Output["📊 Output"]
+        Valid["Validated Model"]
+        Query["SDK Queries"]
+    end
+    
+    Write --> Lang --> Valid
+    Write --> Ext
+    Valid --> Query
+```
 
-2. **Packages**
-    - [`packages/language`](./packages/language/README.md): Core Langium grammar, language server, and tests.
-        - [`src/sdk`](./packages/language/src/sdk/README.md): Model Query SDK for programmatic access.
-    - [`packages/cli`](./packages/cli/README.md): CLI for validation and code generation.
-    - [`packages/extension`](./packages/extension/langium-quickstart.md): VS Code extension for rich IDE support.
-    - [`packages/demo`](./packages/demo/README.md): Browser demo powered by Vite.
+## 🚀 Get Started
 
-3. **Scripts**
-    - `npm run langium:generate`: Regenerate grammar after editing `.langium` files.
-    - `npm run build --workspace packages/language`: Build the language server.
-    - `npm test --workspace packages/language`: Run the test suite.
+| I want to... | Go here |
+| ------------ | ------- |
+| **Learn the language** | [Getting Started Guide](./docs/getting-started.md) |
+| **Look up syntax** | [Quick Reference](./docs/quick-reference.md) |
+| **See examples** | [Syntax Examples](./docs/syntax-examples.md) |
+| **Understand the grammar** | [Language Reference](./docs/language.md) |
 
-## Layout
+## 📦 Packages
 
-- [package.json](./package.json): Workspace manifest and shared scripts.
-- [docs/](./docs): All documentation—start here for language details.
-- [examples/](./examples): Sample `.dlang` models for reference and testing.
-- [tsconfig.json](./tsconfig.json): Shared TypeScript config.
-- [tsconfig.build.json](./tsconfig.build.json): Build-specific TypeScript settings.
-- [.gitignore](.gitignore): Files ignored by Git.
+| Package | Purpose |
+| ------- | ------- |
+| [`language`](./packages/language/README.md) | Core grammar, language server, and [SDK](./packages/language/src/sdk/README.md) |
+| [`cli`](./packages/cli/README.md) | Command-line validation and generation |
+| [`extension`](./packages/extension/langium-quickstart.md) | VS Code extension for IDE support |
+| [`demo`](./packages/demo/README.md) | Browser-based playground |
 
-## Learn More
+## 🛠️ Development Commands
 
-- [Getting Started](./docs/getting-started.md): Beginner-friendly walkthrough.
-- [Quick Reference](./docs/quick-reference.md): Syntax cheat sheet.
-- [Language Reference](./docs/language.md): Formal grammar and semantics.
-- [Syntax Examples](./docs/syntax-examples.md): Comprehensive modeling patterns.
-- [Design Docs](./docs/design-docs/GRAMMAR_REVIEW_2025.md): Deep dives into grammar and architecture.
+```bash
+# After editing .langium grammar files
+npm run langium:generate
 
-After editing the grammar, always regenerate and rebuild the language package. For advanced usage, see the CLI and extension docs in their respective package folders.
+# Build everything
+npm run build
+
+# Build only the language package (faster iteration)
+npm run build --workspace packages/language
+
+# Run tests
+npm test --workspace packages/language
+```
+
+## 📁 Repository Layout
+
+```text
+dsl/domain-lang/
+├── docs/              # Documentation (start here!)
+├── examples/          # Sample .dlang models
+├── packages/
+│   ├── language/      # Grammar, parser, and SDK
+│   ├── cli/           # Command-line tools
+│   ├── extension/     # VS Code extension
+│   └── demo/          # Online playground
+└── tsconfig.json      # Shared TypeScript config
+```
+
+## 📚 Documentation
+
+All documentation lives in [docs/](./docs):
+
+- **[Getting Started](./docs/getting-started.md)** — Build your first model
+- **[Quick Reference](./docs/quick-reference.md)** — Syntax at a glance
+- **[Syntax Examples](./docs/syntax-examples.md)** — Copy-paste patterns
+- **[Language Reference](./docs/language.md)** — Complete grammar specification
+
+For design decisions and deep dives, see [docs/design-docs/](./docs/design-docs/).
+
+## ⚡ Quick Tips
+
+- Always run `npm run langium:generate` after editing the grammar
+- Use `npm run build --workspace packages/language` for faster iteration
+- Browse [examples/](./examples) for real-world modeling patterns
