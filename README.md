@@ -1,12 +1,46 @@
-<img src="images/icon.png" width="100" />
+<p align="center">
+  <img src="images/icon.png" width="120" alt="DomainLang Logo" />
+</p>
 
-# DomainLang
+<h1 align="center">DomainLang</h1>
 
-[![Tests](https://github.com/larsbaunwall/DomainLang/actions/workflows/build.yml/badge.svg)](https://github.com/larsbaunwall/DomainLang/actions/workflows/build.yml) [![Visual Studio Marketplace](https://vsmarketplacebadges.dev/version/thinkability.domain-lang.svg)](https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang)
+<p align="center">
+  <strong>Model your architecture. Share your vision. Build with confidence.</strong>
+</p>
 
-**DomainLang** is a domain-specific language (DSL) for modeling software architectures using Domain-Driven Design (DDD) principles. Write your architecture as code, validate it with tooling, and generate artifacts for your teams.
+<p align="center">
+  <a href="https://github.com/larsbaunwall/DomainLang/actions/workflows/build.yml"><img src="https://github.com/larsbaunwall/DomainLang/actions/workflows/build.yml/badge.svg" alt="Tests" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang"><img src="https://vsmarketplacebadges.dev/version/thinkability.domain-lang.svg" alt="VS Marketplace" /></a>
+</p>
+
+<p align="center">
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="./dsl/domain-lang/docs/getting-started.md">Tutorial</a> •
+  <a href="./dsl/domain-lang/docs/README.md">Documentation</a> •
+  <a href="https://larsbaunwall.github.io/DomainLang/index.html">Try Online</a>
+</p>
+
+---
+
+**DomainLang** brings Domain-Driven Design to life through code. Define bounded contexts, capture ubiquitous language, and map integrations—all in a clean, readable syntax that both developers and domain experts can understand.
+
+```mermaid
+graph LR
+    subgraph Your Architecture
+        D["🏛 Domain"] --> BC["📦 Bounded Context"]
+        BC --> T["📖 Terminology"]
+        BC --> R["🔗 Relationships"]
+    end
+    
+    DL["DomainLang"] -->|"models"| D
+    DL -->|"validates"| BC
+    DL -->|"documents"| T
+```
 
 ```dlang
+Classification CoreDomain
+Team SalesTeam
+
 Domain Sales {
     description: "Revenue generation and customer acquisition"
 }
@@ -22,6 +56,15 @@ BoundedContext OrderProcessing for Sales as CoreDomain by SalesTeam {
 
 ---
 
+## Why DomainLang?
+
+| Challenge | Solution |
+|-----------|----------|
+| **Architecture docs go stale** | Living documentation that evolves with your code |
+| **Terminology confusion** | Ubiquitous language captured alongside models |
+| **Design drift** | Validation rules catch violations early |
+| **Siloed knowledge** | Readable syntax bridges business and tech |
+
 ## ✨ Features
 
 - 📝 **Architecture as code** — Express DDD concepts in a clean, readable syntax
@@ -32,55 +75,49 @@ BoundedContext OrderProcessing for Sales as CoreDomain by SalesTeam {
 
 ### 🔌 Model Query SDK
 
-Build tools and automation on top of your architecture models with a powerful programmatic API:
+Go beyond documentation—build tools and automation on your architecture:
 
 ```typescript
 import { loadModel } from 'domain-lang-language/sdk/loader-node';
 
-// Load and query your architecture
 const { query } = await loadModel('./architecture.dlang');
 
-// Find all Core contexts owned by specific teams
+// Find critical contexts for compliance audits
 const criticalContexts = query.boundedContexts()
     .withRole('Core')
     .withTeam('PaymentTeam');
 
-// Analyze your architecture
 for (const bc of criticalContexts) {
     console.log(`${bc.name}: ${bc.description}`);
-    console.log(`  Team: ${bc.resolvedTeam?.name}`);
-    console.log(`  Metadata:`, Object.fromEntries(bc.metadata));
 }
 ```
 
-**Use cases:**
+**What you can build:**
 
-- 📊 Generate compliance reports and architecture metrics
-- 🔍 Build custom linters and validation rules
-- 🤖 Create CI/CD checks for architectural governance
-- 📈 Track team ownership and bounded context evolution
-- 🔗 Build custom visualizations and diagram generators
+- 📊 Compliance reports and architecture metrics
+- 🤖 CI/CD checks for architectural governance
+- 📈 Team ownership dashboards
+- 🔗 Custom visualizations and diagram generators
 
-[→ Explore the SDK documentation](./dsl/domain-lang/packages/language/src/sdk/README.md)
+[→ SDK Documentation](./dsl/domain-lang/packages/language/src/sdk/README.md)
 
 ---
 
 ## 🚀 Quick Start
 
-### Try it Online
+### Try It Now
 
-Experience DomainLang instantly in the [**online editor**](https://larsbaunwall.github.io/DomainLang/index.html) — no installation required.
+Experience DomainLang instantly in the [**online playground**](https://larsbaunwall.github.io/DomainLang/index.html) — no installation required.
 
 ### Install the VS Code Extension
 
-1. Open VS Code
-2. Go to Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
-3. Search for "DomainLang"
-4. Click Install
+1. Open VS Code Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
+2. Search for **"DomainLang"**
+3. Click **Install**
 
-### Your First Model
+### Create Your First Model
 
-Create a file named `my-domain.dlang`:
+Create `my-domain.dlang`:
 
 ```dlang
 Classification CoreDomain
@@ -104,47 +141,42 @@ ContextMap Platform {
 }
 ```
 
----
-
-## 📖 Documentation
-
-| Resource | Description |
-| -------- | ----------- |
-| [**Getting Started**](./dsl/domain-lang/docs/getting-started.md) | Hands-on tutorial (30 min) |
-| [**Quick Reference**](./dsl/domain-lang/docs/quick-reference.md) | Syntax cheat sheet |
-| [**Syntax Examples**](./dsl/domain-lang/docs/syntax-examples.md) | Copy-paste patterns |
-| [**Language Reference**](./dsl/domain-lang/docs/language.md) | Complete grammar specification |
-| [**Model Query SDK**](./dsl/domain-lang/packages/language/src/sdk/README.md) | Programmatic API for querying models |
-| [**Documentation Hub**](./dsl/domain-lang/docs/README.md) | Full documentation index |
+**Next:** Follow the [Getting Started tutorial](./dsl/domain-lang/docs/getting-started.md) for a complete walkthrough.
 
 ---
 
-## 📁 Project Structure
+## 📖 Learn DomainLang
+
+| When you want to... | Read this |
+| ------------------- | --------- |
+| Build your first model | [Getting Started](./dsl/domain-lang/docs/getting-started.md) (30 min) |
+| Look up syntax quickly | [Quick Reference](./dsl/domain-lang/docs/quick-reference.md) |
+| Copy-paste common patterns | [Syntax Examples](./dsl/domain-lang/docs/syntax-examples.md) |
+| Understand the full grammar | [Language Reference](./dsl/domain-lang/docs/language.md) |
+| Query models programmatically | [SDK Documentation](./dsl/domain-lang/packages/language/src/sdk/README.md) |
+
+[→ Full Documentation Hub](./dsl/domain-lang/docs/README.md)
+
+---
+
+## 🏗️ Project Structure
 
 ```text
 DomainLang/
-├── dsl/domain-lang/           # Main DSL implementation
+├── dsl/domain-lang/           # Core implementation
 │   ├── packages/
-│   │   ├── language/          # Grammar and language services
-│   │   │   └── src/sdk/       # Model Query SDK
-│   │   ├── cli/               # Command-line interface
+│   │   ├── language/          # Grammar & language server
+│   │   ├── cli/               # Command-line tools
 │   │   └── extension/         # VS Code extension
-│   ├── docs/                  # Documentation
+│   ├── docs/                  # Full documentation
 │   └── examples/              # Example models
-├── adr/                       # Architecture Decision Records
+├── adr/                       # Architecture decisions
 └── requirements/              # Product requirements
 ```
 
 ---
 
-## 🛠️ Development
-
-### Prerequisites
-
-- Node.js 18+
-- npm 9+
-
-### Build from Source
+## 🛠️ Build from Source
 
 ```bash
 cd dsl/domain-lang
@@ -154,36 +186,31 @@ npm run build              # Compile TypeScript
 npm test                   # Run tests
 ```
 
-### Grammar
-
-The language is built with [Langium](https://langium.org/). The grammar definition is at:
-[`packages/language/src/domain-lang.langium`](./dsl/domain-lang/packages/language/src/domain-lang.langium)
-
-Interactive syntax diagram: [Railway diagram](./dsl/domain-lang/docs/syntax-diagram.html)
+The grammar is built with [Langium](https://langium.org/). View the definition: [domain-lang.langium](./dsl/domain-lang/packages/language/src/domain-lang.langium)
 
 ---
 
-## 💡 Background
+## 💡 Inspiration
 
-Inspired by the [ContextMapper DSL](https://github.com/ContextMapper/context-mapper-dsl), DomainLang aims to provide a more complete DDD specification language—one that serves both as diagrams-as-code and as a semantic, compilable model of domain-driven architecture.
+DomainLang builds on ideas from [ContextMapper DSL](https://github.com/ContextMapper/context-mapper-dsl), aiming to provide a more complete DDD specification language—one that works both as diagrams-as-code and as a semantic, compilable architecture model.
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Whether it's bug reports, feature requests, or pull requests.
+We welcome contributions of all kinds:
 
 - 🐛 **Found a bug?** [Open an issue](https://github.com/larsbaunwall/DomainLang/issues)
 - 💡 **Have an idea?** [Start a discussion](https://github.com/larsbaunwall/DomainLang/discussions)
-- 📖 **Improve docs?** PRs are always welcome
+- 📖 **Improve the docs?** PRs are always welcome
 
 ---
 
 ## 📬 Get in Touch
 
-I'd love to hear from you! Please submit an issue, and I'll get back to you as soon as possible.
+Have feedback? Questions? I'd love to hear from you—especially if you have experience with language design or domain-driven design.
 
-Feedback is especially welcome if you have experience with language design or domain-driven design.
+[Open an issue](https://github.com/larsbaunwall/DomainLang/issues) and I'll respond as soon as possible.
 
 ---
 
