@@ -2,14 +2,16 @@
 
 Fluent, type-safe query API for DomainLang models.
 
-## Architecture
+## SDK Architecture
 
 The SDK is **read-only and query-focused**. It provides:
-- Augmented AST properties (`resolvedRole`, `resolvedTeam`, etc.)
+
+- Augmented AST properties (`effectiveRole`, `effectiveTeam`, etc.)
 - Fluent query chains with lazy iteration
 - O(1) indexed lookups by FQN/name
 
 The SDK does **NOT** manage:
+
 - Workspace lifecycle (LSP/WorkspaceManager handles this)
 - File watching or change detection (LSP handles this)
 - Cross-file import resolution (DocumentBuilder handles this)
@@ -17,7 +19,7 @@ The SDK does **NOT** manage:
 ## Entry Points by Deployment Target
 
 | Target | Entry Point | Browser-Safe | Notes |
-|--------|-------------|--------------|-------|
+| --- | --- | --- | --- |
 | VS Code Extension | `fromDocument()` | ✅ | Zero-copy LSP integration |
 | Web Editor | `fromDocument()`, `loadModelFromText()` | ✅ | Browser-compatible |
 | CLI (Node.js) | `loadModel()` | ❌ | Requires `sdk/loader-node` |
@@ -118,7 +120,7 @@ query.boundedContexts()
 // Custom predicates
 query.domains()
   .where(d => d.parent !== undefined)
-  .where(d => d.sdkClassification?.name === 'Core')
+  .where(d => d.classification?.ref?.name === 'Core')  // Direct reference access
 ```
 
 ### Direct Lookups (O(1))
@@ -135,30 +137,50 @@ const context = query.boundedContext('OrderContext');
 const fqn = query.fqn(bc);
 ```
 
-## SDK-Resolved Properties
+## SDK-Augmented Properties
 
-The SDK augments AST nodes with resolved properties using `resolved*` prefixes
-to avoid conflicts with existing AST properties while maintaining discoverability:
+The SDK augments AST nodes **only for properties that add value beyond direct access**:
 
 ### BoundedContext
 
+**Augmented (precedence resolution, transformation, computed):**
+
 ```typescript
-bc.resolvedDescription   // Resolved from DescriptionBlock
-bc.resolvedRole          // Header inline → RoleBlock → ClassificationBlock.role
-bc.resolvedTeam          // Header inline → TeamBlock
-bc.resolvedBusinessModel // ClassificationBlock → BusinessModelBlock
-bc.resolvedLifecycle     // ClassificationBlock → LifecycleBlock
-bc.resolvedMetadataMap   // Merged from all MetadataBlock
+bc.effectiveRole         // Inline header (`as`) → body (`role:`) precedence
+bc.effectiveTeam         // Inline header (`by`) → body (`team:`) precedence  
+bc.metadataMap           // Metadata entries as ReadonlyMap<string, string>
 bc.fqn                   // Computed fully qualified name
+bc.hasRole('Core')       // Check if role matches
+bc.hasTeam('SalesTeam')  // Check if team matches
+bc.hasMetadata('Lang')   // Check if metadata key exists
+```
+
+**Direct AST access (no augmentation needed):**
+
+```typescript
+bc.description           // Direct string property
+bc.businessModel?.ref    // Direct reference to Classification
+bc.lifecycle?.ref        // Direct reference to Classification
+bc.relationships         // Direct array of Relationship
+bc.terminology           // Direct array of DomainTerm
+bc.decisions             // Direct array of AbstractDecision
 ```
 
 ### Domain
 
+**Augmented (computed):**
+
 ```typescript
-domain.resolvedDescription      // First DescriptionBlock
-domain.resolvedVision          // First VisionBlock
-domain.resolvedClassification  // First DomainClassificationBlock
-domain.fqn                     // Computed fully qualified name
+domain.fqn                    // Computed fully qualified name
+domain.hasClassification('Core')  // Check classification matches
+```
+
+**Direct AST access (no augmentation needed):**
+
+```typescript
+domain.description       // Direct string property
+domain.vision            // Direct string property
+domain.classification?.ref  // Direct reference to Classification
 ```
 
 ## Examples
@@ -174,8 +196,9 @@ const results = query.boundedContexts()
   .toArray();
 
 for (const bc of results) {
-  console.log(`${bc.sdkFqn}: ${bc.sdkDescription}`);
-  console.log(`  Team: ${bc.sdkTeam?.name ?? 'unassigned'}`);
+  console.log(`${bc.fqn}: ${bc.description ?? 'n/a'}`);
+  console.log(`  Team: ${bc.effectiveTeam?.name ?? 'unassigned'}`);
+  console.log(`  Lifecycle: ${bc.lifecycle?.ref?.name ?? 'n/a'}`);
 }
 ```
 
@@ -196,17 +219,18 @@ for (const rel of relationships) {
 }
 ```
 
+
 ### Extract Documentation
 
 ```typescript
 const docs = query.boundedContexts()
-  .where(bc => bc.sdkDescription !== undefined)
+  .where(bc => bc.description !== undefined)
   .toArray()
   .map(bc => ({
-    fqn: bc.sdkFqn,
-    description: bc.sdkDescription,
-    team: bc.sdkTeam?.name,
-    metadata: Object.fromEntries(bc.sdkMetadataMap),
+    fqn: bc.fqn,
+    description: bc.description,
+    team: bc.effectiveTeam?.name,
+    metadata: Object.fromEntries(bc.metadataMap),
   }));
 
 console.log(JSON.stringify(docs, null, 2));
@@ -214,19 +238,24 @@ console.log(JSON.stringify(docs, null, 2));
 
 ## Resolution Rules
 
-The SDK uses deterministic precedence for resolving 0..1 properties:
+The SDK provides precedence resolution **only for properties with multiple assignment locations**:
 
-| Property | Precedence |
-|----------|-----------|
-| `bc.sdkRole` | Header inline (`as`) → RoleBlock → ClassificationBlock.role |
-| `bc.sdkTeam` | Header inline (`by`) → TeamBlock |
-| `bc.sdkDescription` | First DescriptionBlock |
-| `bc.sdkMetadata` | Merge all MetadataBlock; later overrides |
-| `bc.sdkBusinessModel` | ClassificationBlock → BusinessModelBlock |
-| `bc.sdkLifecycle` | ClassificationBlock → LifecycleBlock |
-| `domain.sdkDescription` | First DescriptionBlock |
-| `domain.sdkVision` | First VisionBlock |
-| `domain.sdkClassification` | First DomainClassificationBlock |
+| Augmented Property | Precedence | Why Augmented |
+| --- | --- | --- |
+| `bc.effectiveRole` | Header inline (`as`) → body (`role:`) | Array-based precedence |
+| `bc.effectiveTeam` | Header inline (`by`) → body (`team:`) | Array-based precedence |
+| `bc.metadataMap` | Later entries override earlier | Array to Map conversion |
+
+**Direct access (no precedence needed):**
+
+| Property | Access Pattern | Why Direct |
+| --- | --- | --- |
+| `bc.description` | Direct | Single location |
+| `bc.businessModel?.ref` | Direct reference | Single location |
+| `bc.lifecycle?.ref` | Direct reference | Single location |
+| `domain.description` | Direct | Single location |
+| `domain.vision` | Direct | Single location |
+| `domain.classification?.ref` | Direct reference | Single location |
 
 ## Performance
 
@@ -238,7 +267,7 @@ The SDK uses deterministic precedence for resolving 0..1 properties:
 
 The SDK is an **internal module** within the language package:
 
-```
+```text
 packages/language/src/sdk/
 ├── index.ts          # Public API
 ├── types.ts          # Type definitions
@@ -251,14 +280,16 @@ packages/language/src/sdk/
 ### Internal vs Public
 
 **Public** (exported from `sdk/index.ts`):
+
 - `loadModel`, `loadModelFromText`
 - `fromModel`, `fromDocument`, `fromServices`
 - `Query`, `QueryBuilder`, `BcQueryBuilder`
 - Type definitions
 
 **Internal** (not exported):
-- `resolveRole`, `resolveTeam`, `resolveBcMetadata`, etc.
+
+- `effectiveRole`, `effectiveTeam`, `metadataAsMap`, etc.
 - `buildIndexes`, `buildFqnIndex`, etc.
 - Implementation classes
 
-Use SDK-resolved properties (`bc.sdkRole`) instead of calling resolution functions directly.
+Use SDK-augmented properties (`bc.effectiveRole`) instead of calling resolution functions directly.
