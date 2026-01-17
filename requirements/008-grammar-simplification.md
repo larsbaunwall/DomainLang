@@ -1,10 +1,12 @@
 # PRS-008: Grammar Simplification - Direct Property Access
 
-**Status**: Proposed  
+**Status**: Implemented ✅  
 **Priority**: High  
 **Target Version**: 2.3.0  
-**Effort Estimate**: 1 week  
-**Dependencies**: PRS-007 (Model Query SDK)
+**Effort Estimate**: 5 days (1 work week)  
+**Dependencies**: PRS-007 (Model Query SDK) - SDK core is implemented but not yet adopted across the codebase. This PRS will simplify the SDK and drive adoption.
+
+> ⚠️ **ATTENTION TO DETAIL REQUIRED:** This change touches the entire codebase—grammar, SDK, validation, LSP, tests, and documentation. Every file accessing `documentation` arrays must be updated. Missing a single location will cause runtime errors or incorrect behavior. Use the search patterns in this document systematically.
 
 ---
 
@@ -61,11 +63,11 @@ Domain:
 BoundedContext:
     'bc' name=ID 
     ('for' domain=[Domain:QualifiedName])?
-    (('as' role=[Classification:QualifiedName])? ('by' team=[Team:QualifiedName])?)?
+    (('as' role+=[Classification:QualifiedName])? ('by' team+=[Team:QualifiedName])?)?
     ('{' 
         ('description' Assignment description=STRING)?
-        ('role' Assignment role=[Classification:QualifiedName])?
-        (TeamAssignment Assignment team=[Team:QualifiedName])?
+        ('role' Assignment role+=[Classification:QualifiedName])?
+        (TeamAssignment Assignment team+=[Team:QualifiedName])?
         (('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName])?
         ('lifecycle' Assignment lifecycle=[Classification:QualifiedName])?
         (('metadata' | 'meta') '{' (metadata+=MetadataEntry)* '}')?
@@ -82,15 +84,21 @@ BoundedContext:
 ;
 ```
 
+> **Implementation Note:** The `role` and `team` properties use `+=` operator to create arrays (`Reference<Classification>[]` and `Reference<Team>[]`). This allows both inline (`as`, `by`) and block (`role:`, `team:`) syntax to coexist. Grammar order ensures inline takes precedence (appears first in array). Validation warns when both forms are used.
+
 **Proposed AST access** (direct):
 
 ```typescript
-// ✅ Direct property access
+// ✅ Direct property access for scalars
 const hasDescription = bc.description !== undefined;
 
-// ✅ Simplified SDK resolution
+// ✅ Simplified SDK resolution for dual-location properties
 export function resolveBcRole(bc: BoundedContext): Classification | undefined {
-    return bc.role?.ref;  // Single source of truth
+    return bc.role?.[0]?.ref;  // Grammar order ensures inline (header) wins
+}
+
+export function resolveBcTeam(bc: BoundedContext): Team | undefined {
+    return bc.team?.[0]?.ref;  // Grammar order ensures inline (header) wins
 }
 ```
 
@@ -116,7 +124,7 @@ This creates:
 ## Goals
 
 | Goal | Measure |
-|------|---------|
+| ---- | ------- |
 | **Ergonomic AST** | Direct property access: `bc.description` instead of iteration |
 | **Simplified SDK** | Resolution functions become one-liners |
 | **Clear semantics** | Single source of truth for each property (no precedence) |
@@ -127,6 +135,29 @@ This creates:
 
 - Support for multiple blocks of the same type (e.g., two `description` properties)
 - Changes to syntax keywords (same keywords, different AST structure)
+
+---
+
+## User Story
+
+As a **DomainLang SDK consumer**,  
+I want to access BoundedContext and Domain properties directly (e.g., `bc.description`, `bc.role`),  
+So that I can query models without iterating arrays, using type guards, or understanding block precedence rules.
+
+**Secondary:**
+
+As a **DomainLang contributor**,  
+I want a simpler AST structure with flat properties,  
+So that validation, LSP, and SDK code is easier to write, test, and maintain.
+
+---
+
+## Out of Scope
+
+- **Multiple property values** - No support for multiple descriptions or visions per element
+- **Keyword changes** - Same DSL keywords, only AST structure changes
+- **Migration tooling** - No automatic migration of existing `.dlang` files (breaking change is acceptable since no external users exist)
+- **Runtime backwards compatibility** - This is a clean-slate improvement
 
 ---
 
@@ -208,12 +239,12 @@ BoundedContextDocumentationBlock:
 BoundedContext:
     'bc' name=ID 
     ('for' domain=[Domain:QualifiedName])?
-    (('as' role=[Classification:QualifiedName])? ('by' team=[Team:QualifiedName])?)?
+    (('as' role+=[Classification:QualifiedName])? ('by' team+=[Team:QualifiedName])?)?
     ('{' 
         // Scalar properties (direct access)
         ('description' Assignment description=STRING)?
-        ('role' Assignment role=[Classification:QualifiedName])?
-        (TeamAssignment Assignment team=[Team:QualifiedName])?
+        ('role' Assignment role+=[Classification:QualifiedName])?
+        (TeamAssignment Assignment team+=[Team:QualifiedName])?
         (('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName])?
         ('lifecycle' Assignment lifecycle=[Classification:QualifiedName])?
         
@@ -232,14 +263,16 @@ BoundedContext:
 ;
 ```
 
+> **Implementation Note:** The `role` and `team` properties use `+=` operator (arrays) rather than `=` (single reference). This allows both inline header syntax (`as`, `by`) and block syntax (`role:`, `team:`) to coexist. Grammar order ensures inline values appear first in the array (index 0). Validation warns when both forms are used.
+
 **Generated AST:**
 
 ```typescript
 interface BoundedContext extends AstNode {
     name: string;
     domain?: Reference<Domain>;
-    role?: Reference<Classification>;
-    team?: Reference<Team>;
+    role: Reference<Classification>[];  // Array: [0]=inline, [1]=block if both present
+    team: Reference<Team>[];             // Array: [0]=inline, [1]=block if both present
     
     // Scalar properties
     description?: string;
@@ -254,12 +287,12 @@ interface BoundedContext extends AstNode {
 }
 ```
 
+> **SDK Access Pattern:** Use `resolveBcRole(bc)` and `resolveBcTeam(bc)` from the SDK for precedence-aware access, or access `bc.role[0]?.ref` directly for the effective value.
+
 **Property naming rationale:**
 
 - **`terminology` (not `terms`):** Matches the keyword and better reflects the DDD concept of Ubiquitous Language - a shared vocabulary within a Bounded Context.
 - **`decisions` (singular collection):** In DDD, Decisions, Policies, Business Rules, and Constraints are all forms of domain governance. The grammar accepts multiple keywords (`decisions`, `constraints`, `rules`, `policies`) for natural language, but they all map to the same collection. This avoids property proliferation while maintaining linguistic flexibility.
-
-```typescript
 
 ### Key Design Decisions
 
@@ -274,10 +307,17 @@ All properties use Langium's optional operator (`?`), which:
 
 #### Decision 2: Flat Scalars, Structured Collections
 
-**Scalar values** (description, role, team):
+**Scalar values** (description, vision, businessModel, lifecycle):
 
 - Direct properties for O(1) access
 - Single occurrence enforced by grammar
+
+**Dual-location properties** (role, team):
+
+- Use arrays (`+=` operator) to support both inline and block syntax
+- Grammar order provides natural precedence (inline first)
+- SDK resolution functions return `array[0]` for effective value
+- Validation warns when both inline and block are used
 
 **Collections** (relationships, terminology, decisions):
 
@@ -285,19 +325,24 @@ All properties use Langium's optional operator (`?`), which:
 - Allows multiple items within the block
 - Natural syntax: `relationships { ... }`
 
-#### Decision 3: Remove Precedence Logic
+#### Decision 3: Grammar-Based Precedence (Implemented)
 
-**Current behavior:**
+**Original proposal:** Remove precedence logic entirely, error if both inline and block used.
 
-- Inline `as` beats block `role:` beats `classifications { role: ... }`
-- Complex resolution logic in SDK
-- Confusing for users
+**Implemented approach:** Use arrays with grammar-order precedence.
 
-**New behavior:**
+- Inline `as`/`by` syntax appears first in grammar → first array element
+- Block `role:`/`team:` syntax appears second → second array element
+- `bc.role[0]?.ref` always gives the effective (winning) value
+- Validation warns when `bc.role.length > 1` (both forms used)
 
-- If inline `as` is used, that's the role (header wins)
-- If block `role:` is used, that's the role
-- If both are used, validation error (explicit conflict)
+**Why this is better:**
+
+- ✅ Backwards compatible - existing files still parse
+- ✅ No breaking change for SDK consumers
+- ✅ Clear precedence via array index
+- ✅ Validation catches ambiguous usage
+- ✅ Simple resolution: `return bc.role?.[0]?.ref`
 
 #### Decision 4: Order Independence
 
@@ -326,6 +371,8 @@ bc OrderContext {
 ---
 
 ## Implementation Plan
+
+> 🔴 **CRITICAL:** Before starting each phase, perform a **full codebase search** for the patterns listed below. After completing each phase, verify **zero occurrences remain**. Do not proceed to the next phase until the current phase passes all tests.
 
 ### Phase 1: Grammar Changes (Breaking)
 
@@ -359,15 +406,25 @@ export function resolveBcDescription(bc: BoundedContext): string | undefined {
 }
 ```
 
-**After:**
+**After (Implemented):**
 
 ```typescript
+// Direct property access - trivially simple
 export function resolveBcDescription(bc: BoundedContext): string | undefined {
-    return bc.description;  // Direct access - function may be unnecessary
+    return bc.description;
+}
+
+// Array-based resolution for dual-location properties
+export function resolveBcRole(bc: BoundedContext): Classification | undefined {
+    return bc.role?.[0]?.ref;  // Grammar order ensures inline wins
+}
+
+export function resolveBcTeam(bc: BoundedContext): Team | undefined {
+    return bc.team?.[0]?.ref;  // Grammar order ensures inline wins
 }
 ```
 
-**Consider:** Can we remove resolution functions entirely and just use direct properties?
+**Note:** Resolution functions remain useful for SDK consumers who want precedence-aware access without understanding array semantics.
 
 ### Phase 3: Validation Updates
 
@@ -389,7 +446,7 @@ function validateBoundedContextHasDescription(bc: BoundedContext, accept: Valida
 }
 ```
 
-**After:**
+**After (Implemented):**
 
 ```typescript
 function validateBoundedContextHasDescription(bc: BoundedContext, accept: ValidationAcceptor): void {
@@ -399,9 +456,23 @@ function validateBoundedContextHasDescription(bc: BoundedContext, accept: Valida
 }
 ```
 
-**New validations needed:**
+**Conflict detection for dual-location properties (Implemented):**
 
-- Warn/error if both inline and block properties are defined (e.g., `as Core` + `role: Generic`)
+```typescript
+function validateNoRoleConflict(bc: BoundedContext, accept: ValidationAcceptor): void {
+    if (bc.role.length > 1) {
+        accept('warning', `Role specified in both header ('as') and body ('role:'). Using header value.`, 
+            { node: bc, property: 'role' });
+    }
+}
+
+function validateNoTeamConflict(bc: BoundedContext, accept: ValidationAcceptor): void {
+    if (bc.team.length > 1) {
+        accept('warning', `Team specified in both header ('by') and body ('team:'). Using header value.`,
+            { node: bc, property: 'team' });
+    }
+}
+```
 
 ### Phase 4: LSP Updates
 
@@ -422,13 +493,14 @@ if (ast.isBoundedContext(node)) {
 }
 ```
 
-**After:**
+**After (Implemented):**
 
 ```typescript
 if (ast.isBoundedContext(node)) {
     const description = n.description;
-    const team = n.team;
-    // Direct access - much cleaner
+    const team = resolveBcTeam(n);  // Returns n.team?.[0]?.ref
+    const role = resolveBcRole(n);  // Returns n.role?.[0]?.ref
+    // Direct access for scalars, SDK resolution for arrays
 }
 ```
 
@@ -443,7 +515,8 @@ if (ast.isBoundedContext(node)) {
 1. Search for `documentation.find(`, `documentation.some(`, `documentation?.find`
 2. Replace with direct property access
 3. Update assertions to check properties directly
-4. Remove unused type guard imports
+4. For role/team, use array access: `bc.role?.[0]?.ref`
+5. Remove unused type guard imports
 
 **Example:**
 
@@ -452,8 +525,15 @@ if (ast.isBoundedContext(node)) {
 const descBlock = bc.documentation?.find(isDescriptionBlock);
 expect(descBlock?.description).toBe('Test');
 
-// After
+// After (Implemented)
 expect(bc.description).toBe('Test');
+
+// Before (role/team)
+const roleBlock = bc.documentation?.find(isRoleBlock);
+expect(roleBlock?.role?.ref?.name).toBe('Core');
+
+// After (Implemented) - array access
+expect(bc.role?.[0]?.ref?.name).toBe('Core');
 ```
 
 ### Phase 6: Documentation Updates
@@ -504,29 +584,29 @@ expect(bc.description).toBe('Test');
 
 **Repository instruction files to update:**
 
-8. **`.github/copilot-instructions.md`** - Main Copilot guidance
+1. **`.github/copilot-instructions.md`** - Main Copilot guidance
    - Update architecture table if AST structure mentioned
    - Ensure validation examples use direct properties
 
-9. **`.github/instructions/langium.instructions.md`** - Langium-specific rules
+2. **`.github/instructions/langium.instructions.md`** - Langium-specific rules
    - Update grammar patterns and examples
    - Document new property access patterns
    - Remove references to documentation block traversal
 
-10. **`.github/instructions/typescript.instructions.md`** - TypeScript guidelines
-    - Update AST access patterns
-    - Remove examples showing `documentation.find()` traversal
-    - Add examples of direct property access
-    - Update SDK usage patterns
+3. **`.github/instructions/typescript.instructions.md`** - TypeScript guidelines
+   - Update AST access patterns
+   - Remove examples showing `documentation.find()` traversal
+   - Add examples of direct property access
+   - Update SDK usage patterns
 
-11. **`.github/instructions/testing.instructions.md`** - Test patterns
-    - Update test assertion examples
-    - Document new patterns for checking properties
-    - Remove block-based test patterns
+4. **`.github/instructions/testing.instructions.md`** - Test patterns
+   - Update test assertion examples
+   - Document new patterns for checking properties
+   - Remove block-based test patterns
 
 **Grammar documentation (JSDoc):**
 
-12. **`packages/language/src/domain-lang.langium`**
+1. **`packages/language/src/domain-lang.langium`**
     - Add/update JSDoc for Domain properties
     - Add/update JSDoc for BoundedContext properties
     - Ensure hover tooltips are accurate
@@ -570,16 +650,18 @@ interface Domain {
 
 interface BoundedContext {
     description?: string;
-    role?: Reference<Classification>;
-    team?: Reference<Team>;
+    role: Reference<Classification>[];   // Array: inline header + block body
+    team: Reference<Team>[];             // Array: inline header + block body
     businessModel?: Reference<Classification>;
     lifecycle?: Reference<Classification>;
-    metadataEntries: MetadataEntry[];
+    metadata: MetadataEntry[];      // Renamed from entries in MetadataBlock
     relationships: Relationship[];
-    terminology: DomainTerm[];
+    terminology: DomainTerm[];       // Renamed from terms in TerminologyBlock
     decisions: AbstractDecision[];
 }
 ```
+
+> **Note:** `role` and `team` are arrays because they can be assigned in both the header (`as`, `by`) and body (`role:`, `team:`). Grammar order ensures the header value appears first (index 0), providing natural precedence.
 
 ### Code Update Patterns
 
@@ -617,15 +699,19 @@ const metadata = metaBlock?.entries ?? [];
 const metadata = bc.metadata;  // Always an array, never undefined
 ```
 
-#### Pattern 4: SDK Resolution
+#### Pattern 4: Role/Team Resolution (Dual-Location Properties)
 
 ```typescript
-// ❌ Old code - complex precedence
+// ❌ Old code - complex precedence with block iteration
 import { resolveBcRole } from '../sdk/resolution.js';
-const role = resolveBcRole(bc);
+const role = resolveBcRole(bc);  // Searched header, then body, then classifications block
 
-// ✅ New code - direct access (consider removing resolution functions)
-const role = bc.role?.ref;
+// ✅ New code - array access (grammar order provides precedence)
+const role = bc.role?.[0]?.ref;  // [0] = header value if present, else body value
+
+// Or use SDK resolution function (same behavior, clearer intent)
+import { resolveBcRole } from '../sdk/resolution.js';
+const role = resolveBcRole(bc);  // Returns bc.role?.[0]?.ref
 ```
 
 ---
@@ -635,7 +721,7 @@ const role = bc.role?.ref;
 ### Immediate Benefits
 
 | Benefit | Impact |
-|---------|--------|
+| ------- | ------ |
 | **Cleaner AST** | Direct properties instead of union arrays |
 | **Simpler code** | Remove type guards and iteration logic |
 | **Better IDE support** | Autocomplete shows actual properties |
@@ -655,7 +741,7 @@ const role = bc.role?.ref ?? roleBlock?.role?.ref ?? classBlock?.role?.ref;
 **After (1 line):**
 
 ```typescript
-const role = bc.role?.ref;
+const role = bc.role?.[0]?.ref;  // Grammar order provides precedence
 ```
 
 ### Maintenance
@@ -664,6 +750,33 @@ const role = bc.role?.ref;
 - ✅ No precedence rules to document and enforce
 - ✅ Simpler validation logic (direct property checks)
 - ✅ Less duplication across modules
+
+---
+
+## Acceptance Testing
+
+### Test Scenarios
+
+1. **Direct property parsing** - Verify `bc.description`, `bc.role`, `domain.vision` are populated correctly
+2. **Order independence** - Properties defined in any order produce identical AST
+3. **Collection properties** - `metadata`, `relationships`, `terminology`, `decisions` arrays populate correctly
+4. **Inline vs block conflict** - Validation error when both `as Core` and `role: Generic` are used
+5. **Empty bodies** - `bc Name {}` and `Domain Name {}` parse without errors
+6. **All examples pass** - Every file in `examples/*.dlang` parses successfully
+
+### Regression Tests
+
+- All existing parsing tests updated and passing
+- All validation tests updated and passing
+- SDK query tests work with new AST structure
+- LSP hover/completion work correctly
+
+### Manual Verification
+
+- [ ] VS Code extension loads without errors
+- [ ] Syntax highlighting unchanged
+- [ ] Hover tooltips show correct property values
+- [ ] Autocompletion suggests new properties inside blocks
 
 ---
 
@@ -676,9 +789,56 @@ const role = bc.role?.ref;
 - **Documentation validation:** All example files must parse successfully before merging
 - **Backward compatibility:** None - this is a clean slate improvement since no external users exist yet
 
+### 🔍 Required Search Patterns
+
+**Run these searches before and after each phase to ensure complete coverage:**
+
+```bash
+# Type guards to remove (must be zero after Phase 2)
+grep -rn "isDescriptionBlock\|isVisionBlock\|isRoleBlock\|isTeamBlock" packages/
+grep -rn "isBusinessModelBlock\|isLifecycleBlock\|isMetadataBlock" packages/
+grep -rn "isBoundedContextClassificationBlock\|isDomainClassificationBlock" packages/
+
+# Documentation array access (must be zero after Phase 3)
+grep -rn "documentation\.find\|documentation\.some\|documentation\.filter" packages/
+grep -rn "documentation\?\.find\|documentation\?\.some" packages/
+grep -rn "\.documentation" packages/
+
+# Resolution function imports (review after Phase 2)
+grep -rn "resolveBcRole\|resolveBcTeam\|resolveBcDescription" packages/
+grep -rn "resolveDomainVision\|resolveDomainDescription" packages/
+
+# Block type imports (must be zero after completion)
+grep -rn "DomainDocumentationBlock\|BoundedContextDocumentationBlock" packages/
+grep -rn "DescriptionBlock\|VisionBlock\|RoleBlock\|TeamBlock" packages/
+```
+
+**Expected results after full implementation:**
+
+- All search patterns above return **0 matches** in `packages/language/src/`
+- Only documentation files may reference old patterns (in "before" examples)
+
+---
+
+## Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+| ---- | ---------- | ------ | ---------- |
+| Grammar ambiguity with optional properties | Low | High | Thorough testing of property order combinations |
+| Performance regression in parsing | Low | Medium | Benchmark before/after; Langium handles optional properties efficiently |
+| **Missed code locations using old AST** | **High** | **High** | **Systematic grep searches (see Required Search Patterns); Zero-tolerance policy - all searches must return 0 matches before merge** |
+| Documentation drift | Medium | Low | Checklist-driven updates; CI validation of example files |
+| Tests passing but incomplete coverage | Medium | Medium | Review each test file; ensure direct property assertions replace block traversals |
+
 ---
 
 ## Acceptance Criteria
+
+### Pre-Implementation Verification
+
+- [ ] **Baseline search results captured** - Document current grep hit counts for all search patterns
+- [ ] **PRS-007 SDK reviewed** - Understand current resolution functions before simplifying
+- [ ] **All test files identified** - List every test that uses `documentation` arrays
 
 ### Grammar & Generation
 
@@ -688,6 +848,7 @@ const role = bc.role?.ref;
 
 ### Code Updates
 
+- [ ] **All search patterns return 0 matches** (see Required Search Patterns section)
 - [ ] SDK resolution functions simplified or removed
 - [ ] All validation modules use direct property access
 - [ ] All LSP providers (hover, completion) updated
@@ -738,15 +899,41 @@ const role = bc.role?.ref;
 5. **Terminology vs terms:** Use `terminology` property to match the keyword and better reflect the DDD concept of Ubiquitous Language.
 
 6. **Decisions/rules/policies:** Single `decisions` property - in DDD, these are all forms of domain constraints/governance. The grammar accepts multiple keywords (`decisions`, `constraints`, `rules`, `policies`) for natural language, but they all map to the same collection of `AbstractDecision` types (Decision, Policy, BusinessRule).
-- **ADR-002: Architectural Review** - Discusses AST ergonomics and maintainability
-- **Grammar Review 2025** - Identified documentation block complexity as technical debt
+
+---
+
+## Design Considerations
+
+### Architectural Implications
+
+- **AST structure change** - All code accessing `documentation` arrays must be updated
+- **No migration path** - This is a breaking change; existing `.dlang` files continue to work (same syntax)
+- **SDK simplification** - Resolution functions may become unnecessary (direct property access)
+- **Type guard removal** - 8+ type guards (`isDescriptionBlock`, `isRoleBlock`, etc.) can be deleted
+
+### Performance Considerations
+
+- **Parsing** - No performance impact (same tokens, different AST shape)
+- **Memory** - Slight reduction (fewer intermediate objects)
+- **Validation** - Faster (direct property access vs array iteration)
+
+### Backward Compatibility
+
+- **DSL syntax** - Fully backward compatible (same keywords and syntax)
+- **AST structure** - Breaking change (new property locations)
+- **SDK API** - Breaking change (resolution functions removed/simplified)
+
+**Related ADRs:**
+
+- [ADR-002: Architectural Review 2025](../adr/002-architectural-review-2025.md) - Discusses AST ergonomics and maintainability
+- [Grammar Review 2025](../dsl/domain-lang/docs/design-docs/GRAMMAR_REVIEW_2025.md) - Identified documentation block complexity as technical debt
 
 ---
 
 ## Timeline
 
 | Days | Phase | Deliverables |
-|------|-------|--------------|
+| ---- | ----- | ------------ |
 | 1 | Grammar & Generation | Updated `.langium` file, regenerated AST |
 | 2 | SDK & Validation | Simplified SDK, updated validators |
 | 3 | LSP & Tests | Updated providers, all tests passing |
@@ -762,6 +949,18 @@ const role = bc.role?.ref;
 - **Traversal code:** Eliminate all `documentation.find()` calls
 - **Simplicity:** Property access in 1 line instead of 5+
 - **Maintainability:** Easier to add new properties in future
+
+---
+
+## Open Questions
+
+1. **~Should resolution functions be removed entirely?~** → **Resolved:** Yes, direct property access (`bc.role?.ref`) is clearer than wrapper functions.
+
+2. **~Should we keep the `classifications` block for grouping?~** → **Resolved:** No, remove it. Direct properties (`role`, `businessModel`, `lifecycle`) are simpler and the grouping doesn't add value.
+
+3. **Property naming for terminology block** → Use `terminology` (matches keyword, reflects DDD concept of Ubiquitous Language). The grammar property `terms` in `TerminologyBlock` becomes `terminology` on `BoundedContext`.
+
+4. **Property naming for metadata block** → Use `metadata` (matches keyword). The grammar property `entries` in `MetadataBlock` becomes `metadata` on `BoundedContext`.
 
 ---
 
