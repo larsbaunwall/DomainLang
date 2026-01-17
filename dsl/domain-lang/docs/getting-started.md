@@ -1,14 +1,14 @@
 # Getting Started with DomainLang
 
-Welcome! This hands-on tutorial will guide you from zero to your first domain model in about 30 minutes.
+Build your first domain model in 30 minutes.
 
-> **📋 Audience:** Software architects, domain experts, and developers new to DomainLang. No prior DDD experience required.
+> **Who is this for?** Software architects, domain experts, and developers who want to model DDD architectures. No prior DDD experience required.
 
 ---
 
 ## What You'll Build
 
-By the end of this tutorial, you'll have created a complete domain model for an online bookstore:
+By the end of this tutorial, you'll have a complete domain model for an online bookstore with multiple bounded contexts, team ownership, and strategic classifications.
 
 ```mermaid
 graph TB
@@ -28,77 +28,51 @@ graph TB
 
 ---
 
-## What is DomainLang?
+## Why DomainLang?
 
-DomainLang is a Domain-Driven Design (DDD) modeling language that lets you describe your software architecture as executable specifications. Think of it as "architecture as code"—you write models in a clean DSL, validate them with tooling, and generate artifacts for your teams.
-
-**Why use DomainLang?**
-
-- 📝 **Executable documentation** — Your architecture stays up-to-date
-- 🔍 **Validation** — Catch design issues early
-- 🤝 **Collaboration** — Shared language between business and tech
-- 🔄 **Consistency** — Enforce patterns across teams
-
----
-
-## Who is This For?
-
-- 🏗️ **Software architects** designing domain-driven systems
-- 💼 **Domain experts** collaborating with technical teams
-- 👥 **Development teams** implementing DDD patterns
-- 📚 **Anyone** who wants to model complex business domains clearly
+| Without DomainLang | With DomainLang |
+| ------------------ | --------------- |
+| Architecture docs go stale | Living documentation in code |
+| Terminology confusion across teams | Ubiquitous language captured in one place |
+| Design decisions lost in wikis | Decisions live alongside the model |
+| Manual validation of designs | Automated validation with real-time feedback |
 
 ---
 
 ## Prerequisites
 
-Before you begin, make sure you have:
+Before you begin:
 
-- ✅ Node.js 18 or higher installed
-- ✅ A text editor (VS Code recommended for the best experience)
+- ✅ **Node.js 18+** installed
+- ✅ **VS Code** (recommended) or any text editor
 - ✅ Basic understanding of software architecture (helpful but not required)
 
 ---
 
 ## Installation
 
-Let's get DomainLang set up on your machine.
-
-Navigate to the repository root and install dependencies:
+Navigate to the repository and install dependencies:
 
 ```bash
 cd dsl/domain-lang
 npm install
-```
-
-Generate the language parser:
-
-```bash
 npm run langium:generate
-```
-
-Build all packages:
-
-```bash
 npm run build
 ```
 
-> 💡 **Tip:** For faster iteration when working on the grammar, target the language package directly:
+> 💡 **Pro tip:** For faster iteration, build only the language package:
 >
 > ```bash
 > npm run build --workspace packages/language
-> npm test --workspace packages/language
 > ```
 
 ---
 
-## Your First Model: A Bookstore
+## Step 1: Define Your First Domain
 
-Let's build a domain model for an online bookstore, step by step. Create a new file called `bookstore.dlang` and follow along.
+A **Domain** is a sphere of knowledge or business activity—the highest-level concept in DDD.
 
-### Step 1: Define Your First Domain
-
-A **Domain** represents a sphere of knowledge or business activity. It's the highest-level concept in DDD.
+Create a file called `bookstore.dlang` and add:
 
 ```dlang
 Domain Bookstore {
@@ -107,23 +81,20 @@ Domain Bookstore {
 }
 ```
 
-**What's happening here:**
-
 | Element | Purpose |
 | ------- | ------- |
-| `Domain` | Keyword that starts a domain declaration |
-| `Bookstore` | The name of your domain |
-| `{ }` | Contains the domain's documentation |
-| `description` | Brief explanation of what this domain does |
+| `Domain` | Keyword declaring a domain |
+| `Bookstore` | Your domain's name |
+| `description` | What this domain does |
 | `vision` | Long-term goal that guides decisions |
 
-> 💡 **DDD Insight:** A domain is a "sphere of knowledge." In a company, you might have domains like Sales, Marketing, Shipping, and Customer Support—each with its own rules and language.
+> **DDD Insight:** A domain is a "sphere of knowledge." In a company, domains might include Sales, Marketing, Shipping—each with its own rules and language.
 
 ---
 
-### Step 2: Add a Bounded Context
+## Step 2: Add a Bounded Context
 
-A **Bounded Context** is a boundary within which a specific model is defined and consistent. It's one of the most important patterns in DDD.
+A **Bounded Context** is a boundary within which a specific model is defined. It's one of DDD's most important patterns.
 
 ```dlang
 Domain Bookstore {
@@ -136,23 +107,26 @@ BoundedContext Catalog for Bookstore {
 }
 ```
 
-**What's happening here:**
-
 | Element | Purpose |
 | ------- | ------- |
 | `BoundedContext` | Declares a bounded context (shorthand: `bc`) |
-| `Catalog` | The context name |
-| `for Bookstore` | Links this context to the Bookstore domain |
+| `Catalog` | Context name |
+| `for Bookstore` | Links context to the Bookstore domain |
 
-> 💡 **DDD Insight:** Within a bounded context, terms like "Order" or "Customer" have precise, consistent meanings. The same term might mean something different in another context—and that's okay!
+> **DDD Insight:** Within a bounded context, terms like "Order" or "Customer" have precise, consistent meanings. The same term might mean something different in another context—and that's okay!
 
 ---
 
-### Step 3: Add Terminology
+## Step 3: Add Terminology
 
-Define the **ubiquitous language**—the common vocabulary your team uses:
+Define the **ubiquitous language**—the shared vocabulary your team uses:
 
 ```dlang
+Domain Bookstore {
+    description: "Online bookstore for selling books"
+    vision: "Make books accessible to everyone online"
+}
+
 BoundedContext Catalog for Bookstore {
     description: "Manages the book catalog and inventory"
 
@@ -166,24 +140,26 @@ BoundedContext Catalog for Bookstore {
 }
 ```
 
-**What's happening here:**
-
 | Element | Purpose |
 | ------- | ------- |
 | `terminology` | Block containing domain terms |
 | `term Name: "description"` | Defines a term with its meaning |
-| `examples` | Concrete instances of the term |
+| `examples` | Concrete instances |
 | `aka` | Synonyms (also known as) |
 
-> 💡 **DDD Insight:** The ubiquitous language is shared by everyone—developers, domain experts, and stakeholders. When everyone uses the same terms, misunderstandings decrease dramatically.
+> **DDD Insight:** The ubiquitous language is shared by everyone—developers, domain experts, and stakeholders. Same terms = fewer misunderstandings.
 
 ---
 
-### Step 4: Add Team Ownership
+## Step 4: Add Team Ownership
 
-Track who owns this context—this helps with Conway's Law alignment:
+Track who owns this context—essential for Conway's Law alignment:
 
 ```dlang
+Domain Bookstore {
+    description: "Online bookstore for selling books"
+}
+
 Team CatalogTeam
 
 BoundedContext Catalog for Bookstore by CatalogTeam {
@@ -199,20 +175,18 @@ BoundedContext Catalog for Bookstore by CatalogTeam {
 }
 ```
 
-**What's happening here:**
-
 | Element | Purpose |
 | ------- | ------- |
-| `Team` | Declares a team (usually outside the context) |
+| `Team` | Declares a team (outside the context) |
 | `by CatalogTeam` | Assigns ownership to the context |
 
-> 💡 **Why ownership matters:** Clear ownership prevents the "tragedy of the commons" where nobody takes responsibility. It also aligns with Conway's Law—your architecture tends to mirror your organization's communication structure.
+> **Why ownership matters:** Clear ownership prevents the "tragedy of the commons" and aligns architecture with team structure (Conway's Law).
 
 ---
 
-### Step 5: Add Another Context
+## Step 5: Add Another Context
 
-Let's add an order management context to make things more interesting:
+Add an order management context to model interactions:
 
 ```dlang
 Domain Bookstore {
@@ -243,11 +217,36 @@ BoundedContext OrderManagement for Bookstore by OrderTeam {
 }
 ```
 
-### Step 6: Create a Context Map
+---
 
-Now let's visualize how your bounded contexts relate to each other. A **Context Map** shows the integration landscape:
+## Step 6: Create a Context Map
+
+A **Context Map** visualizes how bounded contexts relate—think of it as the system's nervous system:
+
+```mermaid
+graph LR
+    C["📚 Catalog"] -->|"provides books"| O["📦 OrderManagement"]
+    
+    style C fill:#e3f2fd
+    style O fill:#fff3e0
+```
 
 ```dlang
+Domain Bookstore {
+    description: "Online bookstore for selling books"
+}
+
+Team CatalogTeam
+Team OrderTeam
+
+BoundedContext Catalog for Bookstore by CatalogTeam {
+    description: "Manages the book catalog and inventory"
+}
+
+BoundedContext OrderManagement for Bookstore by OrderTeam {
+    description: "Handles customer orders and fulfillment"
+}
+
 ContextMap BookstoreSystem {
     contains Catalog, OrderManagement
 
@@ -255,32 +254,41 @@ ContextMap BookstoreSystem {
 }
 ```
 
-**What's happening here:**
-
 | Element | Purpose |
 | ------- | ------- |
 | `ContextMap` | Defines relationships between contexts |
-| `contains` | Lists the contexts in this map |
-| `->` | Shows a dependency (Catalog → OrderManagement) |
+| `contains` | Lists contexts in this map |
+| `->` | Upstream → Downstream dependency |
 
-The arrow `->` indicates that Catalog is "upstream" and OrderManagement is "downstream"—meaning OrderManagement depends on data or services from Catalog.
-
-```mermaid
-graph LR
-    subgraph BookstoreSystem
-        A["📋 Catalog"] -->|"provides books"| B["📋 OrderManagement"]
-    end
-```
+The arrow shows that Catalog is "upstream" (provides data) and OrderManagement is "downstream" (consumes data).
 
 ---
 
-### Step 7: Add Strategic Patterns
+## Step 7: Add Strategic Classifications
 
-Mark contexts with DDD patterns to indicate their strategic importance:
+Mark contexts with their strategic importance. This is where DDD's investment guidance shines:
+
+```mermaid
+quadrantChart
+    title Strategic Classification Matrix
+    x-axis Low Complexity --> High Complexity
+    y-axis Generic --> Differentiating
+    quadrant-1 Core Domain - Invest heavily
+    quadrant-2 Supporting Domain - Build or buy
+    quadrant-3 Generic - Buy commodity
+    quadrant-4 Supporting - Good enough
+```
 
 ```dlang
 Classification CoreDomain
 Classification SupportingDomain
+
+Domain Bookstore {
+    description: "Online bookstore for selling books"
+}
+
+Team CatalogTeam
+Team OrderTeam
 
 BoundedContext Catalog for Bookstore as CoreDomain by CatalogTeam {
     description: "Manages the book catalog and inventory"
@@ -301,26 +309,33 @@ BoundedContext OrderManagement for Bookstore as CoreDomain by OrderTeam {
 }
 ```
 
-**What's happening here:**
-
 | Element | Purpose |
 | ------- | ------- |
-| `Classification` | Creates reusable strategic labels |
-| `as CoreDomain` | Marks this as a core business capability |
+| `Classification` | Reusable strategic labels |
+| `as CoreDomain` | Marks strategic importance |
 
-> 💡 **DDD Insight:** Strategic classification helps prioritize investment:
+> **DDD Classification Guide:**
 >
-> - **Core Domain:** Your competitive advantage—invest heavily here
-> - **Supporting Domain:** Necessary but not differentiating
-> - **Generic Domain:** Commodity functionality—consider buying
+> - **Core Domain** — Competitive advantage, invest heavily
+> - **Supporting Domain** — Necessary but not differentiating
+> - **Generic Domain** — Commodity, consider buying
 
 ---
 
-### Step 8: Organize with Namespaces
+## Step 8: Organize with Namespaces
 
-As your model grows, namespaces help keep things organized:
+As your model grows, namespaces keep things organized:
 
 ```dlang
+Classification CoreDomain
+Classification SupportingDomain
+
+Domain Bookstore { description: "Online bookstore" }
+
+Team CatalogTeam
+Team OrderTeam
+Team ShippingTeam
+
 Namespace Bookstore.Core {
     BoundedContext Catalog for Bookstore as CoreDomain by CatalogTeam { }
     BoundedContext OrderManagement for Bookstore as CoreDomain by OrderTeam { }
@@ -331,20 +346,18 @@ Namespace Bookstore.Supporting {
 }
 ```
 
-**What's happening here:**
-
 | Element | Purpose |
 | ------- | ------- |
-| `namespace` | Creates a hierarchical container |
-| Dotted name | Prefixes all contained elements (e.g., `Bookstore.Core.Catalog`) |
+| `Namespace` | Hierarchical container |
+| Dotted name | Prefixes all contained elements |
 
-> 💡 **Organization tip:** Namespaces can mirror your organizational structure, deployment units, or strategic groupings. Use whatever makes sense for your team.
+> **Organization tip:** Namespaces can mirror your org structure, deployment units, or strategic groupings.
 
 ---
 
 ## Complete Example
 
-Here's the full bookstore model:
+Here's the full bookstore model with all features:
 
 ```dlang
 // Shared Classifications
@@ -423,123 +436,105 @@ ContextMap BookstoreSystem {
 
 ## Validate Your Model
 
-Let's make sure everything is correct! Run validation:
+Run tests to ensure everything is correct:
 
 ```bash
 npm test --workspace packages/language
-```
-
-Or use the CLI (if installed):
-
-```bash
-domainlang validate bookstore.dlang
 ```
 
 ---
 
 ## 🎉 What You Learned
 
-Congratulations! You've built your first domain model. Here's what you now know:
+Congratulations—you've just built your first domain model! Here's what you now know:
+
+```mermaid
+mindmap
+  root((🎯 Your Skills))
+    Strategic Design
+      Domains
+      Classifications
+    Tactical Patterns
+      Bounded Contexts
+      Terminology
+    Team Topology
+      Ownership
+      Context Maps
+```
 
 | Concept | What It Does |
 | ------- | ------------ |
 | **Domains** | Define strategic business areas |
-| **Bounded Contexts** | Create model boundaries with clear ownership |
-| **Terminology** | Document the ubiquitous language |
-| **Teams** | Track ownership for Conway's Law alignment |
-| **Classifications** | Mark strategic importance (Core/Supporting/Generic) |
-| **Context Maps** | Show how contexts integrate |
+| **Bounded Contexts** | Create model boundaries with ownership |
+| **Terminology** | Document ubiquitous language |
+| **Teams** | Track ownership for Conway's Law |
+| **Classifications** | Mark strategic importance |
+| **Context Maps** | Show integration landscape |
 | **Decisions** | Record architectural choices |
-| **Namespaces** | Organize large models hierarchically |
+| **Namespaces** | Organize large models |
 
 ---
 
 ## Next Steps
 
-### 📖 Deepen Your Knowledge
+| When you want to... | Read this |
+| ------------------- | --------- |
+| Look up syntax quickly | [Quick Reference](./quick-reference.md) |
+| Copy-paste patterns | [Syntax Examples](./syntax-examples.md) |
+| Understand full grammar | [Language Reference](./language.md) |
 
-| Resource | What You'll Learn |
-| -------- | ----------------- |
-| [Language Reference](./language.md) | Complete syntax including imports and relationships |
-| [Syntax Examples](./syntax-examples.md) | Copy-paste patterns for common scenarios |
-| [Quick Reference](./quick-reference.md) | Keep this open while modeling |
+**Real examples to explore:**
 
-### 🔍 Explore Real Examples
-
-| Example | Domain |
-| ------- | ------ |
-| [customer-facing.dlang](../examples/customer-facing.dlang) | E-commerce platform |
-| [banking-system.dlang](../examples/banking-system.dlang) | Financial services |
-| [healthcare-system.dlang](../examples/healthcare-system.dlang) | Healthcare |
-
-### 🛠️ Set Up Your Editor
-
-Install the **DomainLang VS Code extension** for the best experience:
-
-- ✨ Syntax highlighting
-- 🔍 Auto-completion
-- 💡 Hover documentation
-- 🔗 Go-to-definition
-- ⚡ Real-time validation
-
-### 📚 Learn Strategic DDD
-
-Read the [DDD Compliance Guide](./design-docs/DDD_COMPLIANCE_AUDIT.md) to understand:
-
-- Core vs Supporting vs Generic subdomains
-- Context mapping patterns
-- Strategic design principles
-
-### 🚀 Advanced Topics
-
-Once you're comfortable with the basics:
-
-- [Git-native imports](./language.md#imports) for sharing models across repositories
-- [Governance policies](./language.md#decisions-policies-and-rules) for compliance documentation
+- [customer-facing.dlang](../examples/customer-facing.dlang) — E-commerce
+- [banking-system.dlang](../examples/banking-system.dlang) — Finance
+- [healthcare-system.dlang](../examples/healthcare-system.dlang) — Healthcare
 
 ---
 
-## ⚠️ Common Pitfalls
+## ⚠️ Common Mistakes
 
-Here are some mistakes to avoid:
+### Missing domain association
 
-### Forgetting Domain Association
+❌ **Wrong:**
+
+```text
+BoundedContext Orders { }
+```
+
+✅ **Correct:**
 
 ```dlang
-// ❌ Missing domain association
-BoundedContext Orders {
-    description: "Where does this belong?"
-}
-
-// ✅ Linked to a domain
-BoundedContext Orders for Sales {
-    description: "Now it's clear!"
-}
+Domain Sales { description: "Sales" }
+bc Orders for Sales { description: "Orders" }
 ```
 
 ### Missing Colon in Terminology
 
-```dlang
-// ❌ Missing colon
-terminology {
-    term Book "A book"
-}
+❌ **Wrong:**
 
-// ✅ Correct syntax
-terminology {
-    term Book: "A book"
-}
+```text
+term Book "A book"
+```
+
+✅ **Correct:**
+
+```dlang
+term Book: "A book"
 ```
 
 ### Forgetting `contains` in Context Maps
 
-```dlang
-// ❌ Contexts not declared
+❌ **Wrong:**
+
+```text
 ContextMap System {
     Catalog -> Orders
 }
+```
 
-// ✅ Declare contexts first
+✅ **Correct:**
+
+```dlang
 ContextMap System {
     contains Catalog, Orders
     Catalog -> Orders
@@ -550,21 +545,9 @@ ContextMap System {
 
 ## Need Help?
 
-| Resource | Link |
-| -------- | ---- |
-| 📖 Complete syntax | [Language Reference](./language.md) |
-| 📋 Quick lookup | [Quick Reference](./quick-reference.md) |
-| 📁 Examples | [examples/](../examples/) |
-| 💬 Questions | [GitHub Discussions](https://github.com/larsbaunwall/domainlang/discussions) |
-
----
-
-## We Welcome Your Feedback
-
-This tutorial is a living document. If something was unclear or you got stuck, please [open an issue](https://github.com/larsbaunwall/domainlang/issues) with:
-
-- What you were trying to do
-- What happened instead
-- What would have helped
+- [Quick Reference](./quick-reference.md) — Syntax at a glance
+- [Language Reference](./language.md) — Complete grammar
+- [Examples](../examples/) — Real-world models
+- [GitHub Discussions](https://github.com/larsbaunwall/domainlang/discussions) — Ask questions
 
 **Happy modeling!** 🎉
