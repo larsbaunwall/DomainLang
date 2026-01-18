@@ -61,7 +61,7 @@
  * @example
  * ```typescript
  * // Browser/Testing: Load from text (browser-safe)
- * import { loadModelFromText } from 'domain-lang-language/sdk';
+ * import { loadModelFromText } from '@domainlang/language/sdk';
  * 
  * const { query } = await loadModelFromText(`
  *   Domain Sales { vision: "Handle sales" }
@@ -75,7 +75,7 @@
  * @example
  * ```typescript
  * // LSP Integration: Zero-copy access to existing AST (browser-safe)
- * import { fromDocument } from 'domain-lang-language/sdk';
+ * import { fromDocument } from '@domainlang/language/sdk';
  * 
  * export class HoverProvider {
  *   getHover(document: LangiumDocument<Model>) {
@@ -93,7 +93,7 @@ export { loadModelFromText } from './loader.js';
 export { fromModel, fromDocument, fromServices, augmentModel } from './query.js';
 
 // Note: loadModel() is NOT exported here - it requires Node.js filesystem
-// For CLI/Node.js usage: import { loadModel } from 'domain-lang-language/sdk/loader-node';
+// For CLI/Node.js usage: import { loadModel } from '@domainlang/language/sdk/loader-node';
 
 // Integration patterns for type-safe pattern matching (no magic strings)
 export {
@@ -112,7 +112,7 @@ export {
 export type { IntegrationPattern } from './patterns.js';
 
 // AST augmentation - import for type declarations
-// Usage: import 'domain-lang-language/sdk/ast-augmentation';
+// Usage: import '@domainlang/language/sdk/ast-augmentation';
 // This enables native SDK properties on AST types via declaration merging
 
 // Public types

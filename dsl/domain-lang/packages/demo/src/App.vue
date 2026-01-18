@@ -46,7 +46,7 @@ import { buildWorkerDefinition } from 'monaco-editor-workers';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import { URI } from 'langium';
 import { EmptyFileSystem } from 'langium';
-import { createDomainLangServices } from 'domain-lang-language';
+import { createDomainLangServices } from '@domainlang/language';
 
 const { shared, DomainLang } = createDomainLangServices({ ...EmptyFileSystem });
 const documents = shared.workspace.LangiumDocuments;
@@ -171,7 +171,7 @@ export default defineComponent({
         aliases: metadata.languageId ? [metadata.languageId] : [languageId]
       });
 
-  const monarchModule = await import('domain-lang-language/syntaxes/domain-lang.monarch.js');
+  const monarchModule = await import('@domainlang/language/syntaxes/domain-lang.monarch.js');
       monaco.languages.setMonarchTokensProvider(languageId, monarchModule.default as monaco.languages.IMonarchLanguage);
 
       editorInstance = monaco.editor.create(contentEditor.value, {

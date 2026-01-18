@@ -41,7 +41,7 @@ import { fromModel, augmentModel } from './query.js';
  * 
  * @example
  * ```typescript
- * import { loadModel } from 'domain-lang-language/sdk/loader-node';
+ * import { loadModel } from '@domainlang/language/sdk/loader-node';
  * 
  * const { query, model } = await loadModel('./domains.dlang', {
  *   workspaceDir: process.cwd()

@@ -6,7 +6,7 @@
  * 
  * For file-based loading in Node.js CLI tools, use:
  * ```typescript
- * import { loadModel } from 'domain-lang-language/sdk/loader-node';
+ * import { loadModel } from '@domainlang/language/sdk/loader-node';
  * ```
  * 
  * For LSP/validation code that already has a linked AST, use the sync entry points:
@@ -42,7 +42,7 @@ import { augmentModel, fromModel } from './query.js';
  * 
  * @example
  * ```typescript
- * import { loadModelFromText } from 'domain-lang-language/sdk';
+ * import { loadModelFromText } from '@domainlang/language/sdk';
  * 
  * const { query } = await loadModelFromText(`
  *   Domain Sales { vision: "Handle sales" }
