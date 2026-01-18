@@ -1,11 +1,26 @@
 {
-    "name": "vscode-domain-lang",
-    "description": "The extension specific package",
-    "version": "0.0.1",
-    "displayName": "domain-lang",
+    "name": "domain-lang",
+    "version": "0.0.59",
+    "displayName": "DomainLang",
+    "description": "A DSL for Domain-Driven Design",
     "publisher": "thinkability",
-    "type": "module",
-    "license": "Apache-2.0",
+    "author": "larsbaunwall",
+    "license": "Apache License 2.0",
+    "icon": "images/icon.png",
+    "keywords": [
+        "ddd",
+        "domain-driven design",
+        "langium",
+        "dlang",
+        "domainlang"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/larsbaunwall/DomainLang"
+    },
+    "bugs": {
+        "url": "https://github.com/larsbaunwall/DomainLang/issues"
+    },
     "engines": {
         "vscode": "^1.67.0"
     },

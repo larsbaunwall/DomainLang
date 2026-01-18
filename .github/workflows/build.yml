@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -42,6 +42,18 @@ jobs:
         run: npm ci --prefer-offline --no-audit
         working-directory: ./dsl/domain-lang
 
+      - name: Bump Version
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          cd dsl/domain-lang/packages/extension
+          npm version patch --no-git-tag-version
+          cd ../../..
+          git add dsl/domain-lang/packages/extension/package.json
+          git commit -m "chore: bump version [skip ci]"
+          git push origin HEAD:main
+
       - name: Build project
         run: npm run langium:generate && npm run build
         working-directory: ./dsl/domain-lang
@@ -60,14 +72,21 @@ jobs:
       
       - name: Get version
         id: get_version
-        run: echo "version=$(node -p "require('./dsl/domain-lang/package.json').version")" >> $GITHUB_OUTPUT
+        run: echo "version=$(node -p "require('./dsl/domain-lang/packages/extension/package.json').version")" >> $GITHUB_OUTPUT
 
       - name: Build VSIX
         run: |
           mkdir -p ./dist
+          # Ensure necessary files are in the extension directory
           cp ../../LICENSE packages/extension/LICENSE
-          cd packages/extension && npx @vscode/vsce package --allow-missing-repository --no-update-package-json --no-dependencies
-          mv vscode-domain-lang-*.vsix ../../dist/domain-lang-${{ steps.get_version.outputs.version }}.vsix
+          cp README.md packages/extension/README.md
+          
+          # Package the extension
+          cd packages/extension
+          npx @vscode/vsce package --allow-missing-repository --no-update-package-json --no-dependencies
+          
+          # Move artifact
+          mv domain-lang-*.vsix ../../dist/domain-lang-${{ steps.get_version.outputs.version }}.vsix
         working-directory: ./dsl/domain-lang
         shell: bash
 

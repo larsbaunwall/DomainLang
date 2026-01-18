@@ -1,7 +1,26 @@
 {
     "name": "domain-lang-language",
-    "description": "The language specific package",
-    "version": "0.0.1",
+    "version": "0.0.9",
+    "displayName": "DomainLang",
+    "description": "A DSL for Domain-Driven Design",
+    "publisher": "thinkability",
+    "author": "larsbaunwall",
+    "license": "Apache License 2.0",
+    "icon": "images/icon.png",
+    "keywords": [
+        "ddd",
+        "domain-driven design",
+        "langium",
+        "dlang",
+        "domainlang"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/larsbaunwall/DomainLang"
+    },
+    "bugs": {
+        "url": "https://github.com/larsbaunwall/DomainLang/issues"
+    },
     "type": "module",
     "engines": {
         "node": ">=20.10.0",

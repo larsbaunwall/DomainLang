@@ -34,6 +34,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Publish to VS Code Marketplace
+        run: npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }} --packagePath ./artifacts/domain-lang-${{ steps.get_version.outputs.version }}.vsix
 
       - name: Tag version
         run: |
@@ -47,6 +56,6 @@ jobs:
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
           name: Release v${{ steps.get_version.outputs.version }}
-          draft: true
+          draft: false
           generate_release_notes: true
           files: ./artifacts/domain-lang-${{ steps.get_version.outputs.version }}.vsix 
