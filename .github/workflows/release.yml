@@ -8,18 +8,7 @@ on:
         required: true
         type: string
       dry_run:
-        description: 'Dry run (skip publishing, only validate artifacts)'
-        required: false
-        type: boolean
-        default: false
-      skip_npm:
-        description: 'Skip NPM publish'
-        required: false
-        type: boolean
-        default: false
-      skip_vsce:
-        description: 'Skip VS Code Marketplace publish'
-        required: false
+        description: 'Dry run (skip publishing, only validate)'
         type: boolean
         default: false
 
@@ -36,158 +25,70 @@ jobs:
       id-token: write
 
     steps:
-      # STEP 1: Checkout repository FIRST (before downloading artifacts)
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # STEP 2: Download artifacts INTO the checked-out repo (won't be overwritten)
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-          path: ./release-artifacts
+          path: ./artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ inputs.build_id }}
 
-      # STEP 3: Validate artifacts and extract manifest info
-      - name: Validate artifacts and get manifest info
+      - name: Get version from manifest
         id: get_info
         run: |
-          echo "::group::Checking manifest"
-          if [ ! -f ./release-artifacts/manifest.yaml ]; then
-            echo "::error::manifest.yaml not found in artifacts"
-            exit 1
-          fi
-          cat ./release-artifacts/manifest.yaml
-          echo "::endgroup::"
-          
-          version=$(grep '^version:' ./release-artifacts/manifest.yaml | cut -d' ' -f2)
-          sha=$(grep '^commit_sha:' ./release-artifacts/manifest.yaml | cut -d' ' -f2)
-          
-          if [ -z "$version" ] || [ -z "$sha" ]; then
-            echo "::error::Could not extract version or sha from manifest"
-            exit 1
-          fi
-          
-          echo "version=$version" >> $GITHUB_OUTPUT
-          echo "sha=$sha" >> $GITHUB_OUTPUT
-          echo "Version: $version"
-          echo "Commit SHA: $sha"
-          
-          echo "::group::Validating required artifacts"
-          
-          # Validate VSIX
-          VSIX_FILE="./release-artifacts/domain-lang-${version}.vsix"
-          if [ ! -f "$VSIX_FILE" ]; then
-            echo "::error::VSIX file not found: $VSIX_FILE"
-            exit 1
-          fi
-          echo "✓ Found VSIX: $VSIX_FILE"
-          
-          # Validate NPM packages
-          LANG_TGZ="./release-artifacts/npm/domainlang-language-${version}.tgz"
-          CLI_TGZ="./release-artifacts/npm/domainlang-cli-${version}.tgz"
-          
-          if [ ! -f "$LANG_TGZ" ]; then
-            echo "::error::Language package not found: $LANG_TGZ"
-            exit 1
-          fi
-          echo "✓ Found language package: $LANG_TGZ"
-          
-          if [ ! -f "$CLI_TGZ" ]; then
-            echo "::error::CLI package not found: $CLI_TGZ"
-            exit 1
-          fi
-          echo "✓ Found CLI package: $CLI_TGZ"
-          
-          # Validate extension package.json
-          if [ ! -f ./release-artifacts/extension-package.json ]; then
-            echo "::error::extension-package.json not found in artifacts"
-            exit 1
-          fi
-          echo "✓ Found extension-package.json"
-          
-          echo "::endgroup::"
-          echo "All artifacts validated successfully"
+          cat ./artifacts/manifest.yaml
+          VERSION=$(grep '^version:' ./artifacts/manifest.yaml | cut -d' ' -f2)
+          SHA=$(grep '^commit_sha:' ./artifacts/manifest.yaml | cut -d' ' -f2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION, Commit: $SHA"
 
-      # STEP 4: Verify the commit SHA exists and checkout to that ref for tagging
-      - name: Verify and checkout release commit
+      - name: Validate artifacts
         run: |
-          SHA="${{ steps.get_info.outputs.sha }}"
-          if ! git cat-file -e "${SHA}^{commit}" 2>/dev/null; then
-            echo "::error::Commit $SHA not found in repository"
-            exit 1
-          fi
-          echo "✓ Verified commit exists: $SHA"
-          git checkout "$SHA"
+          VERSION="${{ steps.get_info.outputs.version }}"
+          ls -la ./artifacts/
+          ls -la ./artifacts/npm/
+          
+          [ -f "./artifacts/domain-lang-${VERSION}.vsix" ] || { echo "VSIX not found"; exit 1; }
+          [ -f "./artifacts/npm/domainlang-language-${VERSION}.tgz" ] || { echo "Language package not found"; exit 1; }
+          [ -f "./artifacts/npm/domainlang-cli-${VERSION}.tgz" ] || { echo "CLI package not found"; exit 1; }
+          echo "All artifacts validated"
 
-      # STEP 5: Check if tag already exists
-      - name: Check if tag already exists
-        id: check_tag
-        run: |
-          TAG="v${{ steps.get_info.outputs.version }}"
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "::warning::Tag $TAG already exists"
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      # STEP 6: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      # STEP 7: Publish to VS Code Marketplace (pre-built VSIX only, no build)
       - name: Publish to VS Code Marketplace
-        if: ${{ !inputs.dry_run && !inputs.skip_vsce }}
+        if: ${{ !inputs.dry_run }}
         run: |
-          echo "Publishing to VS Code Marketplace..."
-          VSIX_FILE="domain-lang-${{ steps.get_info.outputs.version }}.vsix"
-          echo "VSIX file: $VSIX_FILE"
-          ls -la "./release-artifacts/$VSIX_FILE"
-          
-          # Create publish directory with clean package.json (no build scripts)
-          mkdir -p ./publish-temp
-          cp ./release-artifacts/extension-package.json ./publish-temp/package.json
-          cp "./release-artifacts/$VSIX_FILE" ./publish-temp/
-          
-          # Publish the pre-built VSIX from clean directory
-          cd ./publish-temp
-          npx @vscode/vsce publish --pat "${{ secrets.VSCE_PAT }}" --packagePath "./$VSIX_FILE"
+          npx @vscode/vsce publish \
+            --packagePath "./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
-      # STEP 8: Publish to NPM (pre-built tarballs only, no build)
       - name: Publish to NPM
-        if: ${{ !inputs.dry_run && !inputs.skip_npm }}
+        if: ${{ !inputs.dry_run }}
         run: |
-          echo "Publishing @domainlang/language to NPM..."
-          npm publish "./release-artifacts/npm/domainlang-language-${{ steps.get_info.outputs.version }}.tgz" \
-            --access public \
-            --provenance
-          
-          echo "Publishing @domainlang/cli to NPM..."
-          npm publish "./release-artifacts/npm/domainlang-cli-${{ steps.get_info.outputs.version }}.tgz" \
-            --access public \
-            --provenance
+          npm publish "./artifacts/npm/domainlang-language-${{ steps.get_info.outputs.version }}.tgz" --access public --provenance
+          npm publish "./artifacts/npm/domainlang-cli-${{ steps.get_info.outputs.version }}.tgz" --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # STEP 9: Create and push tag
-      - name: Create and push tag
-        if: ${{ !inputs.dry_run && steps.check_tag.outputs.exists != 'true' }}
+      - name: Create tag and release
+        if: ${{ !inputs.dry_run }}
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git tag -a "v${{ steps.get_info.outputs.version }}" -m "Release v${{ steps.get_info.outputs.version }}"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git tag -a "v${{ steps.get_info.outputs.version }}" -m "Release v${{ steps.get_info.outputs.version }}" "${{ steps.get_info.outputs.sha }}"
           git push origin "v${{ steps.get_info.outputs.version }}"
 
-      # STEP 10: Create GitHub Release
       - name: Create GitHub Release
         if: ${{ !inputs.dry_run }}
         uses: softprops/action-gh-release@v2
@@ -195,32 +96,13 @@ jobs:
           tag_name: v${{ steps.get_info.outputs.version }}
           name: Release v${{ steps.get_info.outputs.version }}
           target_commitish: ${{ steps.get_info.outputs.sha }}
-          draft: false
           generate_release_notes: true
           files: |
-            ./release-artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
-            ./release-artifacts/npm/*.tgz
+            ./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
+            ./artifacts/npm/*.tgz
 
-      # STEP 11: Summary
-      - name: Release summary
+      - name: Summary
         run: |
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "## 🧪 Dry Run Summary" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Would have released:**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "## 🚀 Release Complete" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Released:**" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Version | \`v${{ steps.get_info.outputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commit | \`${{ steps.get_info.outputs.sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build Run ID | \`${{ inputs.build_id }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
-          echo "- ✓ domain-lang-${{ steps.get_info.outputs.version }}.vsix" >> $GITHUB_STEP_SUMMARY
-          echo "- ✓ domainlang-language-${{ steps.get_info.outputs.version }}.tgz" >> $GITHUB_STEP_SUMMARY
-          echo "- ✓ domainlang-cli-${{ steps.get_info.outputs.version }}.tgz" >> $GITHUB_STEP_SUMMARY
+          echo "## ${{ inputs.dry_run && '🧪 Dry Run' || '🚀 Released' }} v${{ steps.get_info.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build: ${{ inputs.build_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ steps.get_info.outputs.sha }}" >> $GITHUB_STEP_SUMMARY

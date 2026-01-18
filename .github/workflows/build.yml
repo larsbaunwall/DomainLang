@@ -125,24 +125,10 @@ jobs:
           mkdir -p ./dsl/domain-lang/dist
           cp -r ./dsl/domain-lang/packages/demo/dist ./dsl/domain-lang/dist/demo
           
-          # Include extension package.json for vsce publishing (without build scripts)
-          # This prevents vsce from trying to rebuild when publishing
-          node -e "
-            const pkg = require('./dsl/domain-lang/packages/extension/package.json');
-            delete pkg.scripts;
-            delete pkg.devDependencies;
-            require('fs').writeFileSync('./dsl/domain-lang/dist/extension-package.json', JSON.stringify(pkg, null, 2));
-          "
-          
           cat > ./dsl/domain-lang/dist/manifest.yaml << EOF
           version: ${{ steps.get_version.outputs.version }}
           commit_sha: ${{ steps.get_commit.outputs.sha }}
           build_date: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          artifacts:
-            vsix: domain-lang-${{ steps.get_version.outputs.version }}.vsix
-            npm_language: npm/domainlang-language-${{ steps.get_version.outputs.version }}.tgz
-            npm_cli: npm/domainlang-cli-${{ steps.get_version.outputs.version }}.tgz
-            demo: demo/
           EOF
 
       - name: Upload artifacts
@@ -150,7 +136,7 @@ jobs:
         with:
           name: build-artifacts
           path: ./dsl/domain-lang/dist
-          retention-days: 90  # Keep artifacts for 90 days to allow time for manual releases
+          retention-days: 90
           if-no-files-found: error
 
       - name: Build summary
