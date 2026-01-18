@@ -90,9 +90,8 @@ jobs:
           # Package the extension
           cd packages/extension
           
-          # Use --no-prepublish to avoid rebuilding (already built)
           # Use --no-dependencies to avoid npm install (already installed)
-          npx @vscode/vsce package --allow-missing-repository --no-update-package-json --no-dependencies --no-prepublish
+          npx @vscode/vsce package --allow-missing-repository --no-update-package-json --no-dependencies
           
           # Move artifact
           mv domain-lang-*.vsix ../../dist/domain-lang-${{ steps.get_version.outputs.version }}.vsix
