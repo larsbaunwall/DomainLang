@@ -42,9 +42,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Publish to VS Code Marketplace
         run: npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }} --packagePath ./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
+
+      - name: Publish to NPM
+        run: |
+          npm publish ./artifacts/npm/domain-lang-language-${{ steps.get_info.outputs.version }}.tgz --access public
+          npm publish ./artifacts/npm/domain-lang-cli-${{ steps.get_info.outputs.version }}.tgz --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Tag version
         run: |
@@ -60,4 +68,6 @@ jobs:
           name: Release v${{ steps.get_info.outputs.version }}
           draft: false
           generate_release_notes: true
-          files: ./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix 
+          files: |
+            ./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
+            ./artifacts/npm/*.tgz 

@@ -74,10 +74,16 @@ jobs:
       - name: Version All Packages
         run: |
            cd dsl/domain-lang
-           # Manually update package.json versions to avoid npm workspace registry lookup issues
-           # We only update the 'version' field, not the dependency links, which is fine for post-build packaging
-           npm pkg set version=${{ steps.get_version.outputs.version }} --workspace=packages/extension
-           npm pkg set version=${{ steps.get_version.outputs.version }} --workspace=packages/language
+           VERS=${{ steps.get_version.outputs.version }}
+           
+           # Manually update versions (pkg set is fast and local)
+           npm pkg set version=$VERS --workspace=packages/extension
+           npm pkg set version=$VERS --workspace=packages/language
+           npm pkg set version=$VERS --workspace=packages/cli
+           
+           # Manually update internal dependencies so published packages point to the correct matching version
+           npm pkg set "dependencies.domain-lang-language=$VERS" --workspace=packages/extension
+           npm pkg set "dependencies.domain-lang-language=$VERS" --workspace=packages/cli
         shell: bash
 
       - name: Build VSIX
@@ -98,6 +104,22 @@ jobs:
         working-directory: ./dsl/domain-lang
         shell: bash
 
+      - name: Build NPM Packages
+        run: |
+           cd dsl/domain-lang
+           mkdir -p dist/npm
+           
+           # Pack Language
+           cd packages/language
+           npm pack --pack-destination ../../dist/npm
+           cd ../..
+           
+           # Pack CLI
+           cd packages/cli
+           npm pack --pack-destination ../../dist/npm
+           cd ../..
+        shell: bash
+
       - name: Prepare artifacts
         run: |
           mkdir -p ./dsl/domain-lang/dist
@@ -108,6 +130,8 @@ jobs:
           build_date: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
           artifacts:
             vsix: domain-lang-${{ steps.get_version.outputs.version }}.vsix
+            npm_language: npm/domain-lang-language-${{ steps.get_version.outputs.version }}.tgz
+            npm_cli: npm/domain-lang-cli-${{ steps.get_version.outputs.version }}.tgz
             demo: demo/
           EOF
 
