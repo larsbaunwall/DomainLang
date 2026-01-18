@@ -25,7 +25,7 @@ on:
 
 permissions:
   contents: write
-  actions: read  # Required to download artifacts from other workflow runs
+  actions: read
 
 jobs:
   release:
@@ -33,30 +33,38 @@ jobs:
     permissions:
       contents: write
       actions: read
-      id-token: write # Required for NPM OIDC Trusted Publishing
+      id-token: write
 
     steps:
+      # STEP 1: Checkout repository FIRST (before downloading artifacts)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # STEP 2: Download artifacts INTO the checked-out repo (won't be overwritten)
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-          path: ./artifacts
+          path: ./release-artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ inputs.build_id }}
 
+      # STEP 3: Validate artifacts and extract manifest info
       - name: Validate artifacts and get manifest info
         id: get_info
         run: |
           echo "::group::Checking manifest"
-          if [ ! -f ./artifacts/manifest.yaml ]; then
+          if [ ! -f ./release-artifacts/manifest.yaml ]; then
             echo "::error::manifest.yaml not found in artifacts"
             exit 1
           fi
-          cat ./artifacts/manifest.yaml
+          cat ./release-artifacts/manifest.yaml
           echo "::endgroup::"
           
-          version=$(grep '^version:' ./artifacts/manifest.yaml | cut -d' ' -f2)
-          sha=$(grep '^commit_sha:' ./artifacts/manifest.yaml | cut -d' ' -f2)
+          version=$(grep '^version:' ./release-artifacts/manifest.yaml | cut -d' ' -f2)
+          sha=$(grep '^commit_sha:' ./release-artifacts/manifest.yaml | cut -d' ' -f2)
           
           if [ -z "$version" ] || [ -z "$sha" ]; then
             echo "::error::Could not extract version or sha from manifest"
@@ -71,7 +79,7 @@ jobs:
           echo "::group::Validating required artifacts"
           
           # Validate VSIX
-          VSIX_FILE="./artifacts/domain-lang-${version}.vsix"
+          VSIX_FILE="./release-artifacts/domain-lang-${version}.vsix"
           if [ ! -f "$VSIX_FILE" ]; then
             echo "::error::VSIX file not found: $VSIX_FILE"
             exit 1
@@ -79,8 +87,8 @@ jobs:
           echo "✓ Found VSIX: $VSIX_FILE"
           
           # Validate NPM packages
-          LANG_TGZ="./artifacts/npm/domainlang-language-${version}.tgz"
-          CLI_TGZ="./artifacts/npm/domainlang-cli-${version}.tgz"
+          LANG_TGZ="./release-artifacts/npm/domainlang-language-${version}.tgz"
+          CLI_TGZ="./release-artifacts/npm/domainlang-cli-${version}.tgz"
           
           if [ ! -f "$LANG_TGZ" ]; then
             echo "::error::Language package not found: $LANG_TGZ"
@@ -94,30 +102,34 @@ jobs:
           fi
           echo "✓ Found CLI package: $CLI_TGZ"
           
+          # Validate extension package.json
+          if [ ! -f ./release-artifacts/extension-package.json ]; then
+            echo "::error::extension-package.json not found in artifacts"
+            exit 1
+          fi
+          echo "✓ Found extension-package.json"
+          
           echo "::endgroup::"
           echo "All artifacts validated successfully"
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ steps.get_info.outputs.sha }}
-
-      - name: Restore extension package.json from artifacts
+      # STEP 4: Verify the commit SHA exists and checkout to that ref for tagging
+      - name: Verify and checkout release commit
         run: |
-          if [ -f ./artifacts/extension-package.json ]; then
-            cp ./artifacts/extension-package.json dsl/domain-lang/packages/extension/package.json
-            echo "Restored extension package.json from artifacts"
-          fi
-
-      - name: Verify commit exists
-        run: |
-          if ! git cat-file -e ${{ steps.get_info.outputs.sha }}^{commit} 2>/dev/null; then
-            echo "::error::Commit ${{ steps.get_info.outputs.sha }} not found in repository"
+          SHA="${{ steps.get_info.outputs.sha }}"
+          if ! git cat-file -e "${SHA}^{commit}" 2>/dev/null; then
+            echo "::error::Commit $SHA not found in repository"
             exit 1
           fi
-          echo "✓ Verified commit exists: ${{ steps.get_info.outputs.sha }}"
+          echo "✓ Verified commit exists: $SHA"
+          git checkout "$SHA"
 
+      # STEP 5: Restore extension package.json (with correct version) for vsce
+      - name: Restore extension package.json
+        run: |
+          cp ./release-artifacts/extension-package.json dsl/domain-lang/packages/extension/package.json
+          echo "Restored extension package.json with version ${{ steps.get_info.outputs.version }}"
+
+      # STEP 6: Check if tag already exists
       - name: Check if tag already exists
         id: check_tag
         run: |
@@ -129,41 +141,42 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
+      # STEP 7: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
+      # STEP 8: Publish to VS Code Marketplace
       - name: Publish to VS Code Marketplace
         if: ${{ !inputs.dry_run && !inputs.skip_vsce }}
+        working-directory: dsl/domain-lang/packages/extension
         run: |
           echo "Publishing to VS Code Marketplace..."
-          # vsce needs to read package.json from the extension directory
-          # Use absolute path to pre-built VSIX
-          VSIX_PATH="$(cd ./artifacts && pwd)/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
-          cd dsl/domain-lang/packages/extension
-          npx @vscode/vsce publish \
-            --pat "${{ secrets.VSCE_PAT }}" \
-            "$VSIX_PATH"
+          VSIX_PATH="${GITHUB_WORKSPACE}/release-artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
+          echo "VSIX path: $VSIX_PATH"
+          npx @vscode/vsce publish --pat "${{ secrets.VSCE_PAT }}" "$VSIX_PATH"
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
+      # STEP 9: Publish to NPM
       - name: Publish to NPM
         if: ${{ !inputs.dry_run && !inputs.skip_npm }}
         run: |
           echo "Publishing @domainlang/language to NPM..."
-          npm publish "./artifacts/npm/domainlang-language-${{ steps.get_info.outputs.version }}.tgz" \
+          npm publish "./release-artifacts/npm/domainlang-language-${{ steps.get_info.outputs.version }}.tgz" \
             --access public \
             --provenance
           
           echo "Publishing @domainlang/cli to NPM..."
-          npm publish "./artifacts/npm/domainlang-cli-${{ steps.get_info.outputs.version }}.tgz" \
+          npm publish "./release-artifacts/npm/domainlang-cli-${{ steps.get_info.outputs.version }}.tgz" \
             --access public \
             --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # STEP 10: Create and push tag
       - name: Create and push tag
         if: ${{ !inputs.dry_run && steps.check_tag.outputs.exists != 'true' }}
         run: |
@@ -172,6 +185,7 @@ jobs:
           git tag -a "v${{ steps.get_info.outputs.version }}" -m "Release v${{ steps.get_info.outputs.version }}"
           git push origin "v${{ steps.get_info.outputs.version }}"
 
+      # STEP 11: Create GitHub Release
       - name: Create GitHub Release
         if: ${{ !inputs.dry_run }}
         uses: softprops/action-gh-release@v2
@@ -182,20 +196,29 @@ jobs:
           draft: false
           generate_release_notes: true
           files: |
-            ./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
-            ./artifacts/npm/*.tgz
+            ./release-artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
+            ./release-artifacts/npm/*.tgz
 
-      - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+      # STEP 12: Summary
+      - name: Release summary
         run: |
-          echo "## Dry Run Summary" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "## 🧪 Dry Run Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Would have released:**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## 🚀 Release Complete" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Released:**" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Would have released:" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** v${{ steps.get_info.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit:** ${{ steps.get_info.outputs.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Run ID:** ${{ inputs.build_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | \`v${{ steps.get_info.outputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ steps.get_info.outputs.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Run ID | \`${{ inputs.build_id }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Artifacts validated:**" >> $GITHUB_STEP_SUMMARY
-          echo "- domain-lang-${{ steps.get_info.outputs.version }}.vsix" >> $GITHUB_STEP_SUMMARY
-          echo "- domainlang-language-${{ steps.get_info.outputs.version }}.tgz" >> $GITHUB_STEP_SUMMARY
-          echo "- domainlang-cli-${{ steps.get_info.outputs.version }}.tgz" >> $GITHUB_STEP_SUMMARY 
+          echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
+          echo "- ✓ domain-lang-${{ steps.get_info.outputs.version }}.vsix" >> $GITHUB_STEP_SUMMARY
+          echo "- ✓ domainlang-language-${{ steps.get_info.outputs.version }}.tgz" >> $GITHUB_STEP_SUMMARY
+          echo "- ✓ domainlang-cli-${{ steps.get_info.outputs.version }}.tgz" >> $GITHUB_STEP_SUMMARY
