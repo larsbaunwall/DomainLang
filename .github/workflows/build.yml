@@ -125,8 +125,14 @@ jobs:
           mkdir -p ./dsl/domain-lang/dist
           cp -r ./dsl/domain-lang/packages/demo/dist ./dsl/domain-lang/dist/demo
           
-          # Include extension package.json for vsce publishing
-          cp ./dsl/domain-lang/packages/extension/package.json ./dsl/domain-lang/dist/extension-package.json
+          # Include extension package.json for vsce publishing (without build scripts)
+          # This prevents vsce from trying to rebuild when publishing
+          node -e "
+            const pkg = require('./dsl/domain-lang/packages/extension/package.json');
+            delete pkg.scripts;
+            delete pkg.devDependencies;
+            require('fs').writeFileSync('./dsl/domain-lang/dist/extension-package.json', JSON.stringify(pkg, null, 2));
+          "
           
           cat > ./dsl/domain-lang/dist/manifest.yaml << EOF
           version: ${{ steps.get_version.outputs.version }}

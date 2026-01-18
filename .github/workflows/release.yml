@@ -151,12 +151,20 @@ jobs:
       # STEP 8: Publish to VS Code Marketplace
       - name: Publish to VS Code Marketplace
         if: ${{ !inputs.dry_run && !inputs.skip_vsce }}
-        working-directory: dsl/domain-lang/packages/extension
         run: |
           echo "Publishing to VS Code Marketplace..."
-          VSIX_PATH="${GITHUB_WORKSPACE}/release-artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
-          echo "VSIX path: $VSIX_PATH"
-          npx @vscode/vsce publish --pat "${{ secrets.VSCE_PAT }}" "$VSIX_PATH"
+          VSIX_FILE="domain-lang-${{ steps.get_info.outputs.version }}.vsix"
+          echo "VSIX file: $VSIX_FILE"
+          ls -la "./release-artifacts/$VSIX_FILE"
+          
+          # Create publish directory with clean package.json (no build scripts)
+          mkdir -p ./publish-temp
+          cp ./release-artifacts/extension-package.json ./publish-temp/package.json
+          cp "./release-artifacts/$VSIX_FILE" ./publish-temp/
+          
+          # Publish the pre-built VSIX from clean directory
+          cd ./publish-temp
+          npx @vscode/vsce publish --pat "${{ secrets.VSCE_PAT }}" --packagePath "./$VSIX_FILE"
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
