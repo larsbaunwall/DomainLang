@@ -11,7 +11,7 @@ Namespace CustomerFacing {
 
     Domain Inventory in Enterprise {
         description: "Catalog definitions, availability, and channel policies"
-        classification: SupportingDomain
+        type: SupportingDomain
     }
 
     BoundedContext ApplicationFramework for Enterprise as SupportingDomain by PlatformGuild {

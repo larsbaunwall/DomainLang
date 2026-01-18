@@ -91,9 +91,8 @@ jobs:
           mkdir -p ./dist
           # Ensure necessary files are in the extension directory
           cp ../../LICENSE packages/extension/LICENSE
-          cp README.md packages/extension/README.md
           
-          # Package the extension
+          # Package the extension (uses packages/extension/README.md)
           cd packages/extension
           
           # Use --no-dependencies to avoid npm install (already installed)

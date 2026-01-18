@@ -89,5 +89,9 @@
     "volta": {
         "node": "20.19.2",
         "npm": "10.8.2"
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
     }
 }

@@ -64,6 +64,14 @@ jobs:
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
+          scope: '@domainlang'
+
+      - name: Verify npm authentication
+        run: |
+          npm whoami
+          echo "Publishing to @domainlang organization"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to VS Code Marketplace
         if: ${{ !inputs.dry_run }}
