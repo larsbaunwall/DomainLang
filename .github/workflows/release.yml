@@ -123,13 +123,7 @@ jobs:
           echo "✓ Verified commit exists: $SHA"
           git checkout "$SHA"
 
-      # STEP 5: Restore extension package.json (with correct version) for vsce
-      - name: Restore extension package.json
-        run: |
-          cp ./release-artifacts/extension-package.json dsl/domain-lang/packages/extension/package.json
-          echo "Restored extension package.json with version ${{ steps.get_info.outputs.version }}"
-
-      # STEP 6: Check if tag already exists
+      # STEP 5: Check if tag already exists
       - name: Check if tag already exists
         id: check_tag
         run: |
@@ -141,14 +135,14 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      # STEP 7: Setup Node.js
+      # STEP 6: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      # STEP 8: Publish to VS Code Marketplace
+      # STEP 7: Publish to VS Code Marketplace (pre-built VSIX only, no build)
       - name: Publish to VS Code Marketplace
         if: ${{ !inputs.dry_run && !inputs.skip_vsce }}
         run: |
@@ -168,7 +162,7 @@ jobs:
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
-      # STEP 9: Publish to NPM
+      # STEP 8: Publish to NPM (pre-built tarballs only, no build)
       - name: Publish to NPM
         if: ${{ !inputs.dry_run && !inputs.skip_npm }}
         run: |
@@ -184,7 +178,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # STEP 10: Create and push tag
+      # STEP 9: Create and push tag
       - name: Create and push tag
         if: ${{ !inputs.dry_run && steps.check_tag.outputs.exists != 'true' }}
         run: |
@@ -193,7 +187,7 @@ jobs:
           git tag -a "v${{ steps.get_info.outputs.version }}" -m "Release v${{ steps.get_info.outputs.version }}"
           git push origin "v${{ steps.get_info.outputs.version }}"
 
-      # STEP 11: Create GitHub Release
+      # STEP 10: Create GitHub Release
       - name: Create GitHub Release
         if: ${{ !inputs.dry_run }}
         uses: softprops/action-gh-release@v2
@@ -207,7 +201,7 @@ jobs:
             ./release-artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
             ./release-artifacts/npm/*.tgz
 
-      # STEP 12: Summary
+      # STEP 11: Summary
       - name: Release summary
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
