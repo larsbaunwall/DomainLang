@@ -1,6 +1,6 @@
 {
     "name": "domain-lang",
-    "version": "0.0.59",
+    "version": "0.1.0",
     "displayName": "DomainLang",
     "description": "A DSL for Domain-Driven Design",
     "publisher": "thinkability",
@@ -53,7 +53,7 @@
         "watch": "npm run build:prepare && concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.json --watch\" \"node esbuild.mjs --watch\""
     },
     "dependencies": {
-        "domain-lang-language": "0.0.9",
+        "domain-lang-language": "0.1.0",
         "vscode-languageclient": "~9.0.1",
         "vscode-languageserver": "~9.0.1"
     },

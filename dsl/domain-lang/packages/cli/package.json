@@ -1,7 +1,7 @@
 {
     "name": "domain-lang-cli",
     "description": "The cli specific package",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "type": "module",
     "engines": {
         "node": ">=20.10.0",
@@ -21,7 +21,7 @@
         "build:clean": "npm run clean && npm run build"
     },
     "dependencies": {
-        "domain-lang-language": "0.0.9",
+        "domain-lang-language": "0.1.0",
         "chalk": "~5.3.0",
         "commander": "~11.1.0"
     },

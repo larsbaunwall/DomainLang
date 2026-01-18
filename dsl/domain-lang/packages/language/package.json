@@ -1,6 +1,6 @@
 {
     "name": "domain-lang-language",
-    "version": "0.0.9",
+    "version": "0.1.0",
     "displayName": "DomainLang",
     "description": "A DSL for Domain-Driven Design",
     "publisher": "thinkability",
