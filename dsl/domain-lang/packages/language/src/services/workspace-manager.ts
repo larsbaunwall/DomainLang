@@ -23,16 +23,19 @@ export interface WorkspaceManagerOptions {
 }
 
 interface ManifestDependency {
-    readonly source?: string;
-    readonly version?: string;
-    readonly description?: string;
+    readonly source?: string;      // Git coordinates (owner/repo) - mutually exclusive with path
+    readonly version?: string;     // Pinned version (tag, branch, or commit SHA)
+    readonly path?: string;        // Local path for monorepo/workspace dependencies - mutually exclusive with source
+    readonly integrity?: string;   // Optional SHA-256 hash for verification
+    readonly description?: string; // Optional human-readable description
 }
 
 interface ModelManifest {
     readonly model?: {
-        readonly name?: string;
-        readonly version?: string;
-        readonly entry?: string;
+        readonly name?: string;      // Package name (required for publishable packages)
+        readonly version?: string;   // SemVer (required for publishable packages)
+        readonly namespace?: string; // Root namespace this package exports (optional)
+        readonly entry?: string;     // Entry point file (default: index.dlang)
     };
     readonly dependencies?: Record<string, ManifestDependency>;
 }
@@ -333,6 +336,10 @@ export class WorkspaceManager {
 
             const content = await fs.readFile(manifestPath, 'utf-8');
             const manifest = (YAML.parse(content) ?? {}) as ModelManifest;
+            
+            // Validate manifest structure
+            this.validateManifest(manifest, manifestPath);
+            
             this.manifestCache = {
                 manifest,
                 path: manifestPath,
@@ -345,6 +352,74 @@ export class WorkspaceManager {
                 return undefined;
             }
             throw error;
+        }
+    }
+
+    /**
+     * Validates manifest structure and dependency configurations.
+     * Throws detailed errors for invalid manifests.
+     */
+    private validateManifest(manifest: ModelManifest, manifestPath: string): void {
+        if (!manifest.dependencies) {
+            return; // No dependencies to validate
+        }
+
+        for (const [alias, dep] of Object.entries(manifest.dependencies)) {
+            // Validate mutually exclusive source and path
+            if (dep.source && dep.path) {
+                throw new Error(
+                    `Invalid manifest at ${manifestPath}: Dependency '${alias}' cannot have both 'source' and 'path'. ` +
+                    `Use 'source' for git dependencies or 'path' for local dependencies, not both.`
+                );
+            }
+
+            // Validate at least one of source or path is specified
+            if (!dep.source && !dep.path) {
+                throw new Error(
+                    `Invalid manifest at ${manifestPath}: Dependency '${alias}' must have either 'source' (for git dependencies) or 'path' (for local dependencies).`
+                );
+            }
+
+            // Validate path is relative and within workspace
+            if (dep.path) {
+                this.validateLocalPath(dep.path, alias, manifestPath);
+            }
+
+            // Validate source has version when specified
+            if (dep.source && !dep.version) {
+                throw new Error(
+                    `Invalid manifest at ${manifestPath}: Git dependency '${alias}' must specify a 'version' (tag, branch, or commit SHA).`
+                );
+            }
+        }
+    }
+
+    /**
+     * Validates local path dependencies for security.
+     * Ensures paths don't escape workspace boundary.
+     */
+    private validateLocalPath(localPath: string, alias: string, manifestPath: string): void {
+        // Reject absolute paths
+        if (path.isAbsolute(localPath)) {
+            throw new Error(
+                `Invalid manifest at ${manifestPath}: Local path dependency '${alias}' cannot use absolute path '${localPath}'. ` +
+                `Use relative paths (e.g., '../shared', './lib') for local dependencies.`
+            );
+        }
+
+        // Resolve path relative to manifest directory
+        const manifestDir = path.dirname(manifestPath);
+        const resolvedPath = path.resolve(manifestDir, localPath);
+        const workspaceRoot = this.workspaceRoot || manifestDir;
+
+        // Check if resolved path is within workspace
+        const relativePath = path.relative(workspaceRoot, resolvedPath);
+        if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+            throw new Error(
+                `Invalid manifest at ${manifestPath}: Local path dependency '${alias}' escapes workspace boundary. ` +
+                `Path '${localPath}' resolves to '${resolvedPath}' which is outside workspace '${workspaceRoot}'. ` +
+                `Local dependencies must remain within the workspace.`
+            );
         }
     }
 
