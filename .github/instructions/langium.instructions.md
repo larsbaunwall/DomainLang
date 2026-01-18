@@ -426,6 +426,18 @@ npm test
 | Export symbols globally | Override ScopeComputation (phase 3) |
 | Validate semantic rules | Add `@Check` methods in Validator |
 
+## Known Generator Warnings
+
+**"Found multiple assignments to 'X' with the '=' assignment operator"**
+
+- **Context:** Occurs during `npm run langium:generate` for properties inside unordered groups or loops (e.g., `(prop=Value | ...)*`).
+- **Cause:** We use the `*` cardinality to allow properties to appear in any order within a block, but use `=` assignment to map them to a single scalar property in the AST.
+- **Behavior:** Langium warns that data might be lost if the user defines the property multiple times (last assignment wins).
+- **Resolution:** **IGNORE THIS WARNING.** Do NOT change `=` to `+=` unless you intend to change the AST property to an array.
+  - We strictly want scalar properties (e.g., one `description`).
+  - "Last one wins" is acceptable parser behavior.
+  - We add specific validators (like `validateBoundedContextClassificationConflict`) to warn users about duplicates if "last one wins" is not desired.
+
 ## Troubleshooting
 
 | Problem | Cause | Solution |
