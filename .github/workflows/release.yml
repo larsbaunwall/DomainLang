@@ -1,19 +1,18 @@
 name: Create Release
 
 on:
-  workflow_run:
-    workflows: ["Build and Test"]
-    types:
-      - completed
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      build_id:
+        description: 'Build run ID to release (from Build and Test workflow)'
+        required: true
+        type: number
 
 permissions:
   contents: write
 
 jobs:
   release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,7 +24,8 @@ jobs:
         with:
           name: build-artifacts
           path: ./artifacts
-          run_id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.build_id }}
 
       - name: Get version and sha from manifest
         id: get_info
