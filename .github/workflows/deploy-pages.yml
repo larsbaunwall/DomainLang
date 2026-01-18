@@ -8,26 +8,48 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      build_id:
+        description: 'Build run ID to deploy (from Build and Test workflow). Leave empty to use latest successful build.'
+        required: false
+        type: string
 
 permissions:
   pages: write
   id-token: write
+  actions: read  # Required to download artifacts from other workflow runs
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Run if: workflow_run succeeded OR manual dispatch
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
+      - name: Determine run ID
+        id: run_id
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ -n "${{ inputs.build_id }}" ]; then
+              echo "id=${{ inputs.build_id }}" >> $GITHUB_OUTPUT
+            else
+              echo "::error::Build ID is required for manual dispatch"
+              exit 1
+            fi
+          else
+            echo "id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
           path: ./dist
-          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ steps.run_id.outputs.id }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
