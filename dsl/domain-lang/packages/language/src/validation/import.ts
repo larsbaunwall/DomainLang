@@ -9,14 +9,13 @@ import type { LangiumDocument } from 'langium';
  * 
  * Checks:
  * - Import paths are resolvable
- * - Named imports exist in target document
  * - Import aliases don't conflict with local names
+ * 
+ * NOTE: Named imports and integrity checks removed in PRS-010.
  */
 export class ImportValidator {
-    private readonly documents: DomainLangServices['shared']['workspace']['LangiumDocuments'];
-
-    constructor(services: DomainLangServices) {
-        this.documents = services.shared.workspace.LangiumDocuments;
+    constructor(_services: DomainLangServices) {
+        // Services parameter kept for backward compatibility
     }
 
     /**
@@ -48,97 +47,36 @@ export class ImportValidator {
 
     /**
      * Validates that named imports exist in the target document.
+     * 
+     * NOTE: Named imports have been removed in PRS-010. This method is kept
+     * for backward compatibility but does nothing since symbols property
+     * no longer exists on ImportStatement.
      */
     async checkNamedImports(
-        imp: ImportStatement,
-        accept: ValidationAcceptor,
-        document: LangiumDocument
+        _imp: ImportStatement,
+        _accept: ValidationAcceptor,
+        _document: LangiumDocument
     ): Promise<void> {
-        // Only check if we have named imports
-        if (!imp.symbols || imp.symbols.length === 0) {
-            return;
-        }
-
-        if (!imp.uri) {
-            return; // Already reported by checkImportPath
-        }
-
-        try {
-            // Resolve the target document
-            const targetUri = await resolveImportPath(document, imp.uri);
-            const targetDoc = await this.documents.getOrCreateDocument(targetUri);
-            
-            if (!targetDoc.parseResult?.value) {
-                accept('error', `Cannot load imported document: ${imp.uri}`, {
-                    node: imp,
-                    property: 'uri'
-                });
-                return;
-            }
-
-            // Get all exported symbols from target document
-            const targetModel = targetDoc.parseResult.value as Model;
-            const exportedSymbols = this.getExportedSymbols(targetModel);
-
-            // Check each imported symbol
-            for (const symbol of imp.symbols) {
-                if (!exportedSymbols.has(symbol)) {
-                    accept('error', 
-                        `Symbol '${symbol}' not found in ${imp.uri}`,
-                        {
-                            node: imp,
-                            property: 'symbols'
-                        }
-                    );
-                }
-            }
-        } catch {
-            // Import path error already reported by checkImportPath
-            return;
-        }
-    }
-
-    /**
-     * Gets all exportable symbols from a model.
-     * 
-     * In DomainLang, top-level declarations are implicitly exported:
-     * - Domains
-     * - BoundedContexts
-     * - Classifications
-     * - Groups
-     */
-    private getExportedSymbols(model: Model): Set<string> {
-        const symbols = new Set<string>();
-
-        // Iterate through all structure elements
-        for (const element of model.children ?? []) {
-            // Check if element has a name and add it
-            if ('name' in element && typeof element.name === 'string') {
-                symbols.add(element.name);
-            }
-        }
-
-        return symbols;
+        // Named imports removed in PRS-010 - this method is now a no-op
+        return;
     }
 
     /**
      * Checks for unused imports.
      * 
      * This is a warning, not an error, to avoid being too strict.
+     * 
+     * NOTE: Named imports have been removed in PRS-010. This method is kept
+     * for backward compatibility but does nothing since symbols property
+     * no longer exists on ImportStatement.
      */
     checkUnusedImports(
-        imp: ImportStatement,
+        _imp: ImportStatement,
         _accept: ValidationAcceptor,
         _model: Model
     ): void {
-        // Skip check for wildcard imports (no named imports)
-        if (!imp.symbols || imp.symbols.length === 0) {
-            return;
-        }
-
-        // For now, just a placeholder - would require tracking symbol usage
-        // across the entire document, which is complex
-        // TODO: Implement symbol usage tracking
+        // Named imports removed in PRS-010 - this method is now a no-op
+        return;
     }
 }
 

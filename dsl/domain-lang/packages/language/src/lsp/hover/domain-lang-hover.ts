@@ -276,9 +276,7 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
             if (ast.isImportStatement && ast.isImportStatement(node)) {
                 const fields: string[] = [];
                 fields.push(`**URI:** \`${node.uri}\``);
-                if (node.symbols.length) fields.push(`**Imports:** ${node.symbols.map(s => `\`${s}\``).join(', ')}`);
                 if (node.alias) fields.push(`**Alias:** \`${node.alias}\``);
-                if (node.integrity) fields.push(`**Integrity:** \`${node.integrity}\``);
                 return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') +
                     `📦 **\`(import)\`**\n\n` +
                     fields.join('\n\n');

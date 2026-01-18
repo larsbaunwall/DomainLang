@@ -104,14 +104,14 @@ describe('Local File Imports', () => {
 });
 
 // ============================================================================
-// GIT URL IMPORTS
+// MANIFEST DEPENDENCY IMPORTS (PRS-010)
 // ============================================================================
 
-describe('Git URL Imports', () => {
-    test('should parse GitHub-style import', async () => {
+describe('Manifest Dependency Imports', () => {
+    test('should parse simple dependency import', async () => {
         // Arrange
         const input = s`
-            import "owner/repo@v1.0.0"
+            import "core"
             
             Domain Sales {}
         `;
@@ -122,13 +122,13 @@ describe('Git URL Imports', () => {
         // Assert
         expectValidDocument(document);
         const imports = getImports(document);
-        expect(imports[0].uri).toBe('owner/repo@v1.0.0');
+        expect(imports[0].uri).toBe('core');
     });
 
-    test('should parse GitHub-style import with branch', async () => {
+    test('should parse dependency import with alias', async () => {
         // Arrange
         const input = s`
-            import "ddd-patterns/core@main"
+            import "core" as Core
             
             Domain Sales {}
         `;
@@ -139,13 +139,14 @@ describe('Git URL Imports', () => {
         // Assert
         expectValidDocument(document);
         const imports = getImports(document);
-        expect(imports[0].uri).toBe('ddd-patterns/core@main');
+        expect(imports[0].uri).toBe('core');
+        expect(imports[0].alias).toBe('Core');
     });
 
-    test('should parse full HTTPS URL import', async () => {
+    test('should parse dependency with path notation', async () => {
         // Arrange
         const input = s`
-            import "https://github.com/owner/repo@v1.0.0"
+            import "patterns/strategic"
             
             Domain Sales {}
         `;
@@ -156,24 +157,7 @@ describe('Git URL Imports', () => {
         // Assert
         expectValidDocument(document);
         const imports = getImports(document);
-        expect(imports[0].uri).toBe('https://github.com/owner/repo@v1.0.0');
-    });
-
-    test('should parse GitLab URL import', async () => {
-        // Arrange
-        const input = s`
-            import "https://gitlab.com/company/patterns@v2.0.0"
-            
-            Domain Sales {}
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const imports = getImports(document);
-        expect(imports[0].uri).toBe('https://gitlab.com/company/patterns@v2.0.0');
+        expect(imports[0].uri).toBe('patterns/strategic');
     });
 });
 
@@ -218,91 +202,6 @@ describe('Import Aliases', () => {
 });
 
 // ============================================================================
-// NAMED IMPORTS
-// ============================================================================
-
-describe('Named Imports', () => {
-    test('should parse single named import', async () => {
-        // Arrange
-        const input = s`
-            import { OrderContext } from "./contexts.dlang"
-            
-            Domain Sales {}
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const imports = getImports(document);
-        expect(imports[0].symbols).toHaveLength(1);
-        expect(imports[0].symbols[0]).toBe('OrderContext');
-    });
-
-    test('should parse multiple named imports', async () => {
-        // Arrange
-        const input = s`
-            import { OrderContext, PaymentContext, InventoryContext } from "./contexts.dlang"
-            
-            Domain Sales {}
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const imports = getImports(document);
-        expect(imports[0].symbols).toHaveLength(3);
-        expect(imports[0].symbols).toContain('OrderContext');
-        expect(imports[0].symbols).toContain('PaymentContext');
-        expect(imports[0].symbols).toContain('InventoryContext');
-    });
-});
-
-// ============================================================================
-// INTEGRITY CHECKS
-// ============================================================================
-
-describe('Import Integrity', () => {
-    test('should parse import with integrity hash', async () => {
-        // Arrange
-        const input = s`
-            import "owner/repo@v1.0.0" integrity "sha256-abc123def456"
-            
-            Domain Sales {}
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const imports = getImports(document);
-        expect(imports[0].integrity).toBe('sha256-abc123def456');
-    });
-
-    test('should parse import with alias and integrity', async () => {
-        // Arrange
-        const input = s`
-            import "owner/repo@v1.0.0" integrity "sha512-xyz789" as Patterns
-            
-            Domain Sales {}
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const imports = getImports(document);
-        expect(imports[0].alias).toBe('Patterns');
-        expect(imports[0].integrity).toBe('sha512-xyz789');
-    });
-});
-
-// ============================================================================
 // MULTIPLE IMPORTS
 // ============================================================================
 
@@ -312,7 +211,7 @@ describe('Multiple Imports', () => {
         const input = s`
             import "./types.dlang"
             import "./shared/base.dlang"
-            import "owner/repo@v1.0.0" as DDD
+            import "core" as Core
             
             Domain Sales {}
         `;
@@ -330,9 +229,8 @@ describe('Multiple Imports', () => {
         // Arrange
         const input = s`
             import "./local.dlang"
-            import { Context1 } from "./contexts.dlang"
-            import "github/patterns@v1.0.0" as Patterns
-            import "secure/module@v2.0.0" integrity "sha256-secure"
+            import "~/workspace.dlang"
+            import "patterns" as Patterns
             
             Domain Sales {}
         `;
@@ -343,7 +241,7 @@ describe('Multiple Imports', () => {
         // Assert
         expectValidDocument(document);
         const imports = getImports(document);
-        expect(imports).toHaveLength(4);
+        expect(imports).toHaveLength(3);
     });
 });
 
@@ -375,7 +273,7 @@ describe('Import Position', () => {
         const input = s`
             import "./types.dlang"
             import "./teams.dlang"
-            import "patterns/ddd@v1.0.0"
+            import "patterns" as Patterns
             
             Domain Sales {
                 vision: "Sales domain"
@@ -435,7 +333,7 @@ describe('Import Edge Cases', () => {
         // Arrange
         const input = s`
             import "./types.dlang"
-            import "owner/repo@v1.0.0"
+            import "core"
         `;
 
         // Act

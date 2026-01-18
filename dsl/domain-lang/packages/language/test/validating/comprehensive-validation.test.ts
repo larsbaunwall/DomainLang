@@ -308,10 +308,10 @@ describe('Validation Tests', () => {
             expectValidDocument(document); // Remove when import validation works properly
         });
 
-        test('should validate named import symbols exist', async () => {
+        test('should validate manifest dependency references', async () => {
             // Arrange
             const input = s`
-                import { NonExistentSymbol } from "./some-file.dlang"
+                import "nonexistent-dependency"
                 Domain Test {}
             `;
 
@@ -319,8 +319,8 @@ describe('Validation Tests', () => {
             const document = await testServices.parse(input);
 
             // Assert
-            // Should generate validation error for missing symbols
-            expectValidDocument(document); // Remove when import validation works properly
+            // Should generate validation error for missing dependency in manifest
+            expectValidDocument(document); // Remove when manifest validation works properly
         });
 
         test('should validate import URIs are well-formed', async () => {
