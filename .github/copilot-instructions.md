@@ -13,12 +13,29 @@
 
 - Use the perplexity tools to do research on unfamiliar topics and search the web for relevant information 
 
+## Skill Activation (Mandatory)
+
+When a user request clearly matches one of the skill areas below, you MUST consult and follow the corresponding skill file before making changes.
+
+- Documentation work (docs, READMEs, examples-as-docs, JSDoc, grammar hover text) → `.github/skills/technical-writer/SKILL.md`
+- Language design work (syntax/semantics decisions, grammar authoring strategy, notations/aliases, DDD expressiveness trade-offs) → `.github/skills/language-expert/SKILL.md`
+- Implementation work (TypeScript/Langium code, LSP features, validators, services, SDK, performance) → `.github/skills/lead-engineer/SKILL.md`
+- Testing work (Vitest tests, test strategy, coverage, edge cases) → `.github/skills/tester/SKILL.md`
+- Architecture/requirements work (ADRs, PRSs in `requirements/`, strategic trade-offs, scope decisions) → `.github/skills/software-architect/SKILL.md`
+
+If a request spans multiple areas, apply the primary skill first, then the secondary one(s).
+
 ## Project Context
 
 - **What:** Compilable DSL for DDD specification with LSP tooling
 - **Stack:** TypeScript 5.x, Langium 4.x, Node.js 20+, Vite, Vitest
 - **Working Directory:** All commands run from `dsl/domain-lang/`
 - **Language-specific rules:** See `.github/instructions/` for TypeScript, testing, docs, and Langium guidelines
+
+## Canonical Docs (Start Here)
+
+- User documentation hub: `dsl/domain-lang/docs/README.md`
+- Examples: `dsl/domain-lang/examples/`
 
 ## Essential Commands
 
@@ -40,7 +57,9 @@ npm test                  # Run tests
 | Generated AST | `packages/language/src/generated/**` | **🔴 NEVER EDIT** - auto-generated |
 | LSP Features | `packages/language/src/lsp/` | Hover, completion, formatting |
 | Validation | `packages/language/src/validation/` | Domain rules, BC checks |
-| Services | `packages/language/src/services/` | Import resolution, workspace || **Model Query SDK** | `packages/language/src/sdk/` | **Programmatic model queries** || Tests | `packages/language/test/` | Parsing, linking, validation tests |
+| Services | `packages/language/src/services/` | Import resolution, workspace |
+| Model Query SDK | `packages/language/src/sdk/` | Programmatic model queries |
+| Tests | `packages/language/test/` | Parsing, linking, validation tests |
 
 ## Critical Rules
 
@@ -62,10 +81,9 @@ npm test                  # Run tests
 ### 📚 Documentation Requirements
 
 **For new grammar features, keywords, or DSL constructs:**
-- **language.md** - Full explanation, syntax, semantics, and usage examples
-- **quick-reference.md** - Concise example suitable for quick lookup
-- **Example files** - Create or extend `.dlang` example files demonstrating real-world usage
-- **JSDoc** - Comment grammar rules and validation functions
+- Update the user docs (start from `dsl/domain-lang/docs/README.md`)
+- Create or extend `.dlang` examples under `dsl/domain-lang/examples/`
+- Add/adjust JSDoc on grammar rules and validation functions
 
 ### Code Quality & Linting
 
@@ -100,7 +118,7 @@ npm test                  # Must pass
 ```typescript
 // ✅ Correct: Use type guards
 if (isDomain(node)) {
-    console.log(node.name);
+  const _name = node.name;
 }
 
 // ❌ Avoid: Type assertions
@@ -115,10 +133,14 @@ Always add tests for new behavior:
 - Error scenarios (invalid input)
 
 ```typescript
-import { setupTestSuite, expectValidDocument, s } from '../test-helpers.js';
+import { beforeAll, test } from 'vitest';
+import type { TestServices } from '../test-helpers.js';
+import { expectValidDocument, s, setupTestSuite } from '../test-helpers.js';
 
 let testServices: TestServices;
-beforeAll(() => { testServices = setupTestSuite(); });
+beforeAll(() => {
+  testServices = setupTestSuite();
+});
 
 test('should parse domain with vision', async () => {
     const doc = await testServices.parse(s`Domain Sales { vision: "Test" }`);
@@ -146,6 +168,7 @@ npm test                  # Must pass
 | Domain | `Domain Sales { vision: "..." }` |
 | Subdomain | `Domain Orders in Sales {}` |
 | BoundedContext | `bc OrderContext for Sales as Core by SalesTeam` |
+
 ## Model Query SDK
 
 The SDK provides programmatic access to DomainLang models:
@@ -191,7 +214,9 @@ const coreContexts = query.boundedContexts()
   .toArray();
 ```
 
-**Documentation:** See `packages/language/src/sdk/README.md` for complete API reference.| ContextMap | `ContextMap Sales { contains OrderContext, BillingContext }` |
+| Construct | Example |
+|-----------|---------|
+| ContextMap | `ContextMap Sales { contains OrderContext, BillingContext }` |
 | Relationships | `[OHS] this -> [CF] PaymentContext` |
 | Namespace | `namespace acme.sales { ... }` |
 | Import | `import "owner/repo@v1.0.0"` |
