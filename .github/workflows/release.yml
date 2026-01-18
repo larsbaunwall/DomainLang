@@ -103,6 +103,13 @@ jobs:
           fetch-depth: 0
           ref: ${{ steps.get_info.outputs.sha }}
 
+      - name: Restore extension package.json from artifacts
+        run: |
+          if [ -f ./artifacts/extension-package.json ]; then
+            cp ./artifacts/extension-package.json dsl/domain-lang/packages/extension/package.json
+            echo "Restored extension package.json from artifacts"
+          fi
+
       - name: Verify commit exists
         run: |
           if ! git cat-file -e ${{ steps.get_info.outputs.sha }}^{commit} 2>/dev/null; then

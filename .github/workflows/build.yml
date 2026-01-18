@@ -124,6 +124,10 @@ jobs:
         run: |
           mkdir -p ./dsl/domain-lang/dist
           cp -r ./dsl/domain-lang/packages/demo/dist ./dsl/domain-lang/dist/demo
+          
+          # Include extension package.json for vsce publishing
+          cp ./dsl/domain-lang/packages/extension/package.json ./dsl/domain-lang/dist/extension-package.json
+          
           cat > ./dsl/domain-lang/dist/manifest.yaml << EOF
           version: ${{ steps.get_version.outputs.version }}
           commit_sha: ${{ steps.get_commit.outputs.sha }}
