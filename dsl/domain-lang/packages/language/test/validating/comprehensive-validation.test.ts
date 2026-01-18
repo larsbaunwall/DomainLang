@@ -408,7 +408,7 @@ describe('Validation Tests', () => {
             const input = s`
                 Domain Sales {}
                 BoundedContext TestBC for Sales {
-                    role: NonExistentClassification
+                    classification: NonExistentClassification
                 }
             `;
 
@@ -428,7 +428,7 @@ describe('Validation Tests', () => {
                 Classification Core
                 
                 BoundedContext TestBC for Sales {
-                    role: Core
+                    classification: Core
                     team: SalesTeam
                 }
             `;

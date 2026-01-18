@@ -3,7 +3,7 @@
  * 
  * Tests for property resolution functions that provide value beyond direct AST access.
  * Only tests functions with precedence logic or data transformation:
- * - effectiveRole: Array-based precedence (header inline → body)
+ * - effectiveClassification: Array-based precedence (header inline → body)
  * - effectiveTeam: Array-based precedence (header inline → body)
  * - metadataAsMap: Array to Map conversion
  * 
@@ -13,7 +13,7 @@
 import { describe, test, expect } from 'vitest';
 import { loadModelFromText } from '../../src/sdk/loader.js';
 import {
-    effectiveRole,
+    effectiveClassification,
     effectiveTeam,
     metadataAsMap,
 } from '../../src/sdk/resolution.js';
@@ -56,13 +56,13 @@ describe('SDK Resolution Functions', () => {
             expect(bc.businessModel?.ref?.name).toBe('Commercial');
         });
         
-        test('bc.lifecycle is a direct reference', async () => {
+        test('bc.evolution is a direct reference', async () => {
             // Arrange
             const { query } = await loadModelFromText(`
-                Classification Active
+                Classification Product
                 Domain Sales { vision: "v" }
                 bc OrderContext for Sales {
-                    lifecycle: Active
+                    evolution: Product
                 }
             `);
             
@@ -70,7 +70,7 @@ describe('SDK Resolution Functions', () => {
             const bc = query.bc('OrderContext') as BoundedContext;
             
             // Assert - direct reference access
-            expect(bc.lifecycle?.ref?.name).toBe('Active');
+            expect(bc.evolution?.ref?.name).toBe('Product');
         });
         
         test('domain.description is a direct property', async () => {
@@ -102,13 +102,13 @@ describe('SDK Resolution Functions', () => {
             expect(domain.vision).toBe('Handle sales');
         });
         
-        test('domain.classification is a direct reference', async () => {
+        test('domain.type is a direct reference', async () => {
             // Arrange
             const { query } = await loadModelFromText(`
                 Classification Core
                 Domain Sales {
                     vision: "v"
-                    classification: Core
+                    type: Core
                 }
             `);
             
@@ -116,13 +116,13 @@ describe('SDK Resolution Functions', () => {
             const domain = query.domain('Sales') as Domain;
             
             // Assert - direct reference access
-            expect(domain.classification?.ref?.name).toBe('Core');
+            expect(domain.type?.ref?.name).toBe('Core');
         });
     });
     
-    describe('effectiveRole()', () => {
+    describe('effectiveClassification()', () => {
         
-        test('resolves bounded context role from header', async () => {
+        test('resolves bounded context classification from header', async () => {
             // Arrange
             const { query } = await loadModelFromText(`
                 Classification Core
@@ -137,11 +137,11 @@ describe('SDK Resolution Functions', () => {
             const shippingBc = query.bc('ShippingContext') as BoundedContext;
             
             // Assert
-            expect(effectiveRole(orderBc)?.name).toBe('Core');
-            expect(effectiveRole(shippingBc)?.name).toBe('Supporting');
+            expect(effectiveClassification(orderBc)?.name).toBe('Core');
+            expect(effectiveClassification(shippingBc)?.name).toBe('Supporting');
         });
         
-        test('returns undefined when role not specified', async () => {
+        test('returns undefined when classification not specified', async () => {
             // Arrange
             const { query } = await loadModelFromText(`
                 Domain Sales { vision: "v" }
@@ -150,7 +150,7 @@ describe('SDK Resolution Functions', () => {
             
             // Act
             const bc = query.bc('OrderContext') as BoundedContext;
-            const resolved = effectiveRole(bc);
+            const resolved = effectiveClassification(bc);
             
             // Assert
             expect(resolved).toBeUndefined();

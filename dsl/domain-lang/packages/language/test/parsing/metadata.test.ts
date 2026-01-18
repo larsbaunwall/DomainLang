@@ -277,7 +277,7 @@ describe('Metadata with Documentation Blocks', () => {
             Domain Sales {}
             bc ComplexContext for Sales {
                 description: "Complex bounded context"
-                role: Core
+                classification: Core
                 team: DevTeam
                 metadata {
                     Language: "TypeScript"
@@ -299,7 +299,7 @@ describe('Metadata with Documentation Blocks', () => {
         expect(bc).toBeDefined();
         expect(bc!.description).toBe('Complex bounded context');
         expect((bc!.team?.[0])?.ref?.name).toBe('DevTeam');
-        expect((bc!.role?.[0])?.ref?.name).toBe('Core');
+        expect((bc!.classification?.[0])?.ref?.name).toBe('Core');
 
         const metadata = bc!.metadata ?? [];
         const terms = bc!.terminology ?? [];

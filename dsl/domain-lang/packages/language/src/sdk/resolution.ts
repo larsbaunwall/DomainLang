@@ -3,20 +3,21 @@
  * 
  * This module provides resolution functions ONLY for properties that require
  * precedence logic or transformation. Direct properties (description, vision,
- * businessModel, lifecycle) should be accessed directly on the AST node.
+ * businessModel, evolution, archetype) should be accessed directly on the AST node.
  * 
  * **Functions provided:**
- * - `effectiveRole` - Array precedence: inline `as` → body `role:`
+ * - `effectiveClassification` - Array precedence: inline `as` → body `classification:`
  * - `effectiveTeam` - Array precedence: inline `by` → body `team:`
  * - `metadataAsMap` - Array to Map conversion
  * 
  * **Direct access (no resolution needed):**
  * - `bc.description` - Direct string property
  * - `bc.businessModel?.ref` - Direct reference
- * - `bc.lifecycle?.ref` - Direct reference
+ * - `bc.evolution?.ref` - Direct reference
+ * - `bc.archetype?.ref` - Direct reference
  * - `domain.description` - Direct string property
  * - `domain.vision` - Direct string property
- * - `domain.classification?.ref` - Direct reference
+ * - `domain.type?.ref` - Direct reference
  */
 
 import type {
@@ -26,18 +27,18 @@ import type {
 } from '../generated/ast.js';
 
 /**
- * Returns the effective role for a BoundedContext.
+ * Returns the effective classification for a BoundedContext.
  * 
  * Precedence:
  * 1. Header inline (`as` keyword) - highest priority
- * 2. Block property (`role:`)
+ * 2. Block property (`classification:`)
  * 
  * @param bc - BoundedContext AST node
  * @returns Classification reference or undefined
  */
-export function effectiveRole(bc: BoundedContext): Classification | undefined {
-    // Return the first resolved role (inline takes precedence due to grammar order)
-    return bc.role?.[0]?.ref;
+export function effectiveClassification(bc: BoundedContext): Classification | undefined {
+    // Return the first resolved classification (inline takes precedence due to grammar order)
+    return bc.classification?.[0]?.ref;
 }
 
 /**

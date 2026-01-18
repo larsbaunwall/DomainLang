@@ -130,28 +130,6 @@ describe('Term Keyword Variants', () => {
 // ============================================================================
 
 describe('Terminology Block Keyword Variants', () => {
-    test('should parse language keyword', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            
-            BoundedContext OrderContext for Sales {
-                language {
-                    term Order: "A customer purchase request"
-                }
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const bc = getFirstBoundedContext(document);
-        const terms = bc.terminology ?? [];
-        expect(terms).toBeDefined();
-    });
-
     test('should parse glossary keyword', async () => {
         // Arrange
         const input = s`
@@ -159,28 +137,6 @@ describe('Terminology Block Keyword Variants', () => {
             
             BoundedContext OrderContext for Sales {
                 glossary {
-                    term Order: "A customer purchase request"
-                }
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-        const bc = getFirstBoundedContext(document);
-        const terms = bc.terminology ?? [];
-        expect(terms).toBeDefined();
-    });
-
-    test('should parse ubiquitous language keyword', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            
-            BoundedContext OrderContext for Sales {
-                ubiquitous language {
                     term Order: "A customer purchase request"
                 }
             }

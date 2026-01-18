@@ -50,11 +50,11 @@
  * });
  * 
  * const coreContexts = query.boundedContexts()
- *   .withRole('Core')
+ *   .withClassification('Core')
  *   .withTeam('PaymentTeam');
  * 
  * for (const bc of coreContexts) {
- *   console.log(`${bc.name}: ${bc.resolvedDescription}`);
+ *   console.log(`${bc.name}: ${bc.description ?? 'n/a'}`);
  * }
  * ```
  * 
@@ -69,7 +69,7 @@
  * `);
  * 
  * const sales = query.domain('Sales');
- * console.log(sales?.resolvedVision);
+ * console.log(sales?.vision);
  * ```
  * 
  * @example
@@ -82,7 +82,7 @@
  *     // SDK wraps existing AST - no reloading, no file I/O
  *     const query = fromDocument(document);
  *     const bc = query.boundedContext('OrderContext');
- *     return bc?.resolvedDescription;
+ *     return bc?.description;
  *   }
  * }
  * ```

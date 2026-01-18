@@ -244,7 +244,7 @@ describe('Namespace Keyword Variants', () => {
 // ============================================================================
 
 describe('bc Inline Assignment Variants', () => {
-    test('should parse as keyword for role', async () => {
+    test('should parse as keyword for classification', async () => {
         // Arrange
         const input = s`
             Domain Sales {}
@@ -258,7 +258,7 @@ describe('bc Inline Assignment Variants', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        expect(bc.role?.[0]?.ref?.name).toBe('Core');
+        expect(bc.classification?.[0]?.ref?.name).toBe('Core');
     });
 
     test('should parse by keyword for team', async () => {
@@ -301,13 +301,13 @@ describe('bc Documentation Block Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse role keyword', async () => {
+    test('should parse classification keyword', async () => {
         // Arrange
         const input = s`
             Classification Core
             Domain Sales {}
             bc OrderContext for Sales {
-                role: Core
+                classification: Core
             }
         `;
 
@@ -335,13 +335,13 @@ describe('bc Documentation Block Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse business model keywords', async () => {
+    test('should parse businessModel keyword', async () => {
         // Arrange
         const input = s`
             Classification SaaS
             Domain Sales {}
             bc OrderContext for Sales {
-                business model: SaaS
+                businessModel: SaaS
             }
         `;
 
@@ -352,13 +352,13 @@ describe('bc Documentation Block Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse lifecycle keyword', async () => {
+    test('should parse evolution keyword', async () => {
         // Arrange
         const input = s`
             Classification Mature
             Domain Sales {}
             bc OrderContext for Sales {
-                lifecycle: Mature
+                evolution: Mature
             }
         `;
 
@@ -369,13 +369,13 @@ describe('bc Documentation Block Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse lifecycle keyword (alias)', async () => {
+    test('should parse evolution keyword (Wardley stages)', async () => {
         // Arrange
         const input = s`
-            Classification Mature
+            Classification Product
             Domain Sales {}
             bc OrderContext for Sales {
-                lifecycle: Mature
+                evolution: Product
             }
         `;
 
@@ -431,26 +431,6 @@ describe('Relationships Block Variants', () => {
         // Assert
         expectValidDocument(document);
     });
-
-    test('should parse connections keyword', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            bc OrderContext for Sales
-            bc PaymentContext for Sales
-            bc InventoryContext for Sales {
-                connections {
-                    this -> OrderContext
-                }
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
 });
 
 // ============================================================================
@@ -476,48 +456,12 @@ describe('Decisions Block Variants', () => {
         expectValidDocument(document);
     });
 
-    test('should parse constraints keyword', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            bc OrderContext for Sales {
-                constraints {
-                    decision EventSourcing: "Use event sourcing"
-                }
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
-
     test('should parse rules keyword', async () => {
         // Arrange
         const input = s`
             Domain Sales {}
             bc OrderContext for Sales {
                 rules {
-                    decision EventSourcing: "Use event sourcing"
-                }
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
-    });
-
-    test('should parse policies keyword', async () => {
-        // Arrange
-        const input = s`
-            Domain Sales {}
-            bc OrderContext for Sales {
-                policies {
                     decision EventSourcing: "Use event sourcing"
                 }
             }

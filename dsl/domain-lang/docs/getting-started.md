@@ -35,7 +35,10 @@ Team OrderTeam
 
 ## Step 3: Add bounded contexts
 
-Use `as` for role and `by` for ownership.
+Use `as` for strategic classification and `by` for ownership.
+
+> [!NOTE]
+> `as` sets the bounded context **classification** (Core/Supporting/Generic). Use `classification:` in the body when you want the longer form.
 
 ```dlang
 Domain Bookstore { description: "Online bookstore" }
@@ -53,7 +56,10 @@ bc Orders for Bookstore as CoreDomain by OrderTeam {
 }
 ```
 
-## Step 4: Capture ubiquitous language
+## Step 4: Capture terminology (ubiquitous language)
+
+> [!TIP]
+> "Ubiquitous language" is the DDD concept. The DomainLang keyword is `terminology { ... }`.
 
 ```dlang
 bc Orders for Bookstore {

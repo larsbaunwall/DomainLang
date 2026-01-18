@@ -64,14 +64,14 @@ export const ValidationMessages = {
         `Bounded Context '${name}' must belong to a domain. Use 'for DomainName'.`,
     
     /**
-     * Warning when role is specified both inline and in a block.
+     * Warning when classification is specified both inline and in a block.
      * Inline value takes precedence.
      * @param bcName - The name of the bounded context
-     * @param inlineRole - The inline role name (from 'as')
-     * @param blockRole - The block role name (from 'role:' or classifications block)
+     * @param inlineClassification - The inline classification name (from 'as')
+     * @param blockClassification - The block classification name (from 'classification:')
      */
-    BOUNDED_CONTEXT_ROLE_CONFLICT: (bcName: string, inlineRole?: string, blockRole?: string) =>
-        `Role specified both inline${inlineRole ? ` ('as ${inlineRole}')` : ''} and in block${blockRole ? ` ('role: ${blockRole}')` : ''}. Inline value takes precedence.`,
+    BOUNDED_CONTEXT_CLASSIFICATION_CONFLICT: (bcName: string, inlineClassification?: string, blockClassification?: string) =>
+        `Classification specified both inline${inlineClassification ? ` ('as ${inlineClassification}')` : ''} and in block${blockClassification ? ` ('classification: ${blockClassification}')` : ''}. Inline value takes precedence.`,
     
     /**
      * Warning when team is specified both inline and in a block.
@@ -82,13 +82,6 @@ export const ValidationMessages = {
      */
     BOUNDED_CONTEXT_TEAM_CONFLICT: (bcName: string, inlineTeam?: string, blockTeam?: string) =>
         `Team specified both inline${inlineTeam ? ` ('by ${inlineTeam}')` : ''} and in block${blockTeam ? ` ('team: ${blockTeam}')` : ''}. Inline value takes precedence.`,
-
-    /**
-     * Warning when inline and block roles do not match.
-     * Highlights conflicting strategic classifications such as `as Core` with `role: Generic`.
-     */
-    BOUNDED_CONTEXT_ROLE_MISMATCH: (bcName: string, inlineRole?: string, blockRole?: string) =>
-        `Bounded Context '${bcName}' defines conflicting roles: inline${inlineRole ? ` ('as ${inlineRole}')` : ''} vs block${blockRole ? ` ('role: ${blockRole}')` : ''}. Inline value takes precedence.`,
     
     /**
      * Error message when an element is defined multiple times.

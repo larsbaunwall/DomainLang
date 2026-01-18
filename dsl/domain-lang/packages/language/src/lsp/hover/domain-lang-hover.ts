@@ -14,7 +14,7 @@ import * as ast from '../../generated/ast.js';
 import type { DomainLangServices } from '../../domain-lang-module.js';
 import { QualifiedNameProvider } from '../domain-lang-naming.js';
 import { keywordExplanations } from './domain-lang-keywords.js';
-import { effectiveRole, effectiveTeam } from '../../sdk/resolution.js';
+import { effectiveClassification, effectiveTeam } from '../../sdk/resolution.js';
 
 /**
  * Provides hover information for DomainLang elements.
@@ -87,8 +87,8 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
             if (ast.isDomain(node)) {
                 const description = node.description ?? '';
                 const vision = node.vision ?? '';
-                const classificationRef = node.classification;
-                const classification = this.getRefName(classificationRef);
+                const typeRef = node.type?.ref;
+                const type = this.getRefName(typeRef);
 
                 const signatureParts = ['Domain', node.name];
                 if (node.parent?.ref?.name) signatureParts.push('in', node.parent.ref.name);
@@ -96,9 +96,9 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
 
                 const fields: string[] = [signature];
                 if (description) fields.push(description);
-                if (vision || classification || node.parent) fields.push('---');
+                if (vision || type || node.parent) fields.push('---');
                 if (vision) fields.push(`**Vision:** ${vision}`);
-                if (classification) fields.push(`**Classification:** ${this.refLink(classificationRef, classification)}`);
+                if (type) fields.push(`**Type:** ${this.refLink(typeRef, type)}`);
                 if (node.parent) fields.push(`**Parent:** ${this.refLink(node.parent)}`);
 
                 return (commentBlock ? `${commentBlock}\n\n---\n\n` : '') +
@@ -126,30 +126,30 @@ export class DomainLangHoverProvider extends AstNodeHoverProvider {
             }
 
             if (ast.isBoundedContext(node)) {
-                const description = node.description;
-                const role = effectiveRole(node);
+                const description = node.description ?? '';
+                const classification = effectiveClassification(node);
                 const team = effectiveTeam(node);
                 const businessModel = node.businessModel?.ref;
-                const lifecycle = node.lifecycle?.ref;
+                const evolution = node.evolution?.ref;
                 const relationships = node.relationships ?? [];
                 const terminology = node.terminology ?? [];
                 const decisions = node.decisions ?? [];
-                const roleName = role?.name;
+                const classificationName = classification?.name;
                 const teamName = team?.name;
 
                 const signatureParts = ['boundedcontext', node.name];
                 if (node.domain?.ref?.name) signatureParts.push('for', node.domain.ref.name);
-                if (roleName) signatureParts.push('as', roleName);
+                if (classificationName) signatureParts.push('as', classificationName);
                 if (teamName) signatureParts.push('by', teamName);
                 const signature = `\`\`\`domain-lang\n${signatureParts.join(' ')}\n\`\`\``;
 
                 const fields: string[] = [signature];
                 if (description) fields.push(description);
-                if (role || team || businessModel || lifecycle) fields.push('---');
-                if (role) fields.push(`🔖 **Role:** ${this.refLink(role)}`);
+                if (classification || team || businessModel || evolution) fields.push('---');
+                if (classification) fields.push(`🔖 **Classification:** ${this.refLink(classification)}`);
                 if (team) fields.push(`👥 **Team:** ${this.refLink(team)}`);
                 if (businessModel) fields.push(`💼 **Business Model:** ${this.refLink(businessModel)}`);
-                if (lifecycle) fields.push(`🔄 **Lifecycle:** ${this.refLink(lifecycle)}`);
+                if (evolution) fields.push(`🔄 **Evolution:** ${this.refLink(evolution)}`);
                 if (relationships.length) {
                     const relationshipLines = relationships.map(rel => `- ${this.refLink(rel.left?.link)} ${rel.arrow} ${this.refLink(rel.right?.link)}${rel.type ? ` \`${rel.type}\`` : ''}`);
                     fields.push(`**Relationships:**\n${relationshipLines.join('\n')}`);

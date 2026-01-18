@@ -6,18 +6,19 @@
  * Domain, and Relationship instances expose convenience getters.
  *
  * **Only properties that add value beyond direct AST access are augmented:**
- * - Precedence resolution: `effectiveRole`, `effectiveTeam` (for array-based properties)
+ * - Precedence resolution: `effectiveClassification`, `effectiveTeam` (for array-based properties)
  * - Data transformation: `metadataMap` (array to Map)
  * - Computed values: `fqn` (fully qualified name)
- * - Helper methods: `hasRole()`, `hasTeam()`, `hasMetadata()`, `hasClassification()`
+ * - Helper methods: `hasClassification()`, `hasTeam()`, `hasMetadata()`, `hasType()`
  *
  * **Direct AST access (no augmentation needed):**
  * - `bc.description` - Direct string property
  * - `bc.businessModel?.ref` - Direct reference
- * - `bc.lifecycle?.ref` - Direct reference
+ * - `bc.evolution?.ref` - Direct reference
+ * - `bc.archetype?.ref` - Direct reference
  * - `domain.description` - Direct string property
  * - `domain.vision` - Direct string property
- * - `domain.classification?.ref` - Direct reference
+ * - `domain.type?.ref` - Direct reference
  *
  * **Usage:**
  * ```typescript
@@ -26,24 +27,24 @@
  *
  * fromDocument(document); // Ensures augmentation
  * const bc: BoundedContext = ...;
- * console.log(bc.effectiveRole?.name);
+ * console.log(bc.effectiveClassification?.name);
  * console.log(bc.metadataMap.get('Language'));
  * // Direct access for simple properties:
  * console.log(bc.businessModel?.ref?.name);
  * ```
  *
  * **Properties added to BoundedContext:**
- * - `effectiveRole` - Inline `role` header → body `role:`
+ * - `effectiveClassification` - Inline `as` header → body `classification:`
  * - `effectiveTeam` - Inline `team` header → body `team:`
  * - `metadataMap` - Metadata entries exposed as a ReadonlyMap
  * - `fqn` - Computed fully qualified name
- * - `hasRole(name)` - Check if role matches
+ * - `hasClassification(name)` - Check if classification matches
  * - `hasTeam(name)` - Check if team matches
  * - `hasMetadata(key, value?)` - Check metadata
  *
  * **Properties added to Domain:**
  * - `fqn` - Computed fully qualified name
- * - `hasClassification(name)` - Check classification matches
+ * - `hasType(name)` - Check type matches
  *
  * **Properties added to Relationship:**
  * - `hasPattern(pattern)` - Check if pattern exists on either side
@@ -68,12 +69,12 @@ declare module '../generated/ast.js' {
     /**
      * Augmented BoundedContext with SDK-computed properties.
      * 
-     * Note: description, businessModel, lifecycle, metadata, relationships,
+    * Note: description, businessModel, evolution, archetype, metadata, relationships,
      * terminology, and decisions are direct AST properties - use them directly.
      */
     interface BoundedContext {
-        /** Effective role/classification with inline precedence (header `as` > body `role:`) */
-        readonly effectiveRole: import('../generated/ast.js').Classification | undefined;
+        /** Effective classification with inline precedence (header `as` > body `classification:`) */
+        readonly effectiveClassification: import('../generated/ast.js').Classification | undefined;
 
         /** Effective team with inline precedence (header `by` > body `team:`) */
         readonly effectiveTeam: import('../generated/ast.js').Team | undefined;
@@ -84,8 +85,8 @@ declare module '../generated/ast.js' {
         /** SDK-computed fully qualified name */
         readonly fqn: string;
 
-        /** Checks if this bounded context has the specified role. */
-        hasRole(name: string | import('../generated/ast.js').Classification): boolean;
+        /** Checks if this bounded context has the specified classification. */
+        hasClassification(name: string | import('../generated/ast.js').Classification): boolean;
 
         /** Checks if this bounded context is owned by the specified team. */
         hasTeam(name: string | import('../generated/ast.js').Team): boolean;
@@ -97,14 +98,14 @@ declare module '../generated/ast.js' {
     /**
      * Augmented Domain with SDK-computed properties.
      * 
-     * Note: description, vision, and classification are direct AST properties - use them directly.
+     * Note: description, vision, and type are direct AST properties - use them directly.
      */
     interface Domain {
         /** SDK-computed fully qualified name */
         readonly fqn: string;
 
-        /** Checks if this domain has the specified classification. */
-        hasClassification(name: string | import('../generated/ast.js').Classification): boolean;
+        /** Checks if this domain has the specified type. */
+        hasType(name: string | import('../generated/ast.js').Classification): boolean;
     }
 
     /**

@@ -3,7 +3,7 @@
  * 
  * This test suite validates modern syntax features:
  * - bc shorthand syntax
- * - Inline role/team/domain assignments
+ * - Inline classification/team/domain assignments
  * - Flattened classifiers
  * - Categorized decisions
  * - Namespace declaration
@@ -47,7 +47,7 @@ describe('Advanced Syntax Features', () => {
         expect(bc!.domain?.ref?.name).toBe('Sales');
     });
 
-    test('should parse multiple role assignments', async () => {
+    test('should parse multiple classification assignments', async () => {
         // Arrange
         const input = s`
             Domain Sales {}

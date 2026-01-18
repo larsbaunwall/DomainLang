@@ -118,7 +118,7 @@ describe('Grammar Completeness Tests', () => {
                     Domain Test {
                         description: "Test domain"
                         vision: "Test vision"
-                        classification: Core
+                        type: Core
                     }
                 `,
                 'Domain with documentation'
@@ -147,7 +147,7 @@ describe('Grammar Completeness Tests', () => {
             );
         });
 
-        test('BoundedContext - with inline role and team', async () => {
+        test('BoundedContext - with inline classification and team', async () => {
             await expectGrammarRuleParsesSuccessfully(
                 testServices.parse,
                 s`
@@ -176,10 +176,10 @@ describe('Grammar Completeness Tests', () => {
                     
                     BoundedContext TestBC for Test {
                         description: "Test context"
-                        role: Core
+                        classification: Core
                         team: TestTeam
                         businessModel: SaaS
-                        lifecycle: Mature
+                        evolution: Mature
                         
                         relationships {
                             [OHS] this -> [CF] TestBC : CustomerSupplier
@@ -589,7 +589,7 @@ describe('Grammar Completeness Tests', () => {
                     Domain Test {
                         description: "Using colon"
                         vision is "Using is keyword"  
-                        classification = Core
+                        type = Core
                     }
                 `,
                 'Assignment operators'

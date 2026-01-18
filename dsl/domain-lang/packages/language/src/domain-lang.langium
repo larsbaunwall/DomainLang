@@ -62,15 +62,18 @@ Type:
 /**
  * Domain - A sphere of knowledge or activity in DDD.
  * Can be nested via `in` to show subdomain hierarchy.
- * Use `classifier` to indicate Core, Supporting, or Generic.
+ * The `type` property indicates strategic importance (Core, Supporting, Generic) per Bounded Context Canvas.
+ * Body is optional - allows header-only Domain definitions.
  */
 Domain:
     (/** A Domain represents a sphere of knowledge, influence, or activity. In DDD, it is the subject area to which the user applies a program. Example: Sales, Shipping, Accounting. */ 'Domain' | 'dom') name=ID ('in' parent=[Domain:QualifiedName])?
-    '{'
-        ('description' Assignment description=STRING)?
-        ('vision' Assignment vision=STRING)?
-        ('classification' Assignment classification=[Classification])?
-    '}'
+    ('{'
+        (
+            ('description' Assignment description=STRING) |
+            ('vision' Assignment vision=STRING) |
+            ('type' Assignment type=[Classification:QualifiedName]) 
+        )*
+    '}')?
 ;
 
 /**
@@ -78,29 +81,33 @@ Domain:
  * Central pattern in DDD for managing complexity and team boundaries.
  * Belongs to exactly ONE domain (fundamental DDD principle).
  * Body properties can appear in any order. Validation enforces at-most-once constraint.
+ * The `classification` property indicates strategic importance per Bounded Context Canvas.
+ * The `evolution` property indicates maturity stage per Wardley Maps/BC Canvas.
+ * The `archetype` property indicates behavioral role per DDD archetypes (Gateway, Execution, etc).
  */
 BoundedContext:
     (/** A Bounded Context defines the boundary within which a particular domain model is defined and applicable. It is a central pattern in DDD for managing complexity. Example: SalesContext, SupportContext. */ 'BoundedContext' | 'bc') name=ID 
     ('for' domain=[Domain:QualifiedName])?
     (
-        ('as' role+=[Classification:QualifiedName])?
+        ('as' classification+=[Classification:QualifiedName])?
         ('by' team+=[Team:QualifiedName])?
     )?
     ('{' 
         (
             ('description' Assignment description=STRING) |
-            ('role' Assignment role+=[Classification:QualifiedName]) |
-            (TeamAssignment Assignment team+=[Team:QualifiedName]) |
-            (('businessModel' | ('business' 'model')) Assignment businessModel=[Classification:QualifiedName]) |
-            ('lifecycle' Assignment lifecycle=[Classification:QualifiedName]) |
+            ('classification' Assignment classification+=[Classification:QualifiedName]) |
+            ('team' Assignment team+=[Team:QualifiedName]) |
+            ('businessModel' Assignment businessModel=[Classification:QualifiedName]) |
+            ('evolution' Assignment evolution=[Classification:QualifiedName]) |
+            ('archetype' Assignment archetype=[Classification:QualifiedName]) |
             (('metadata' | 'meta') '{' (metadata+=MetadataEntry)* '}') |
-            (('relationships' | 'integrations' | 'connections') '{' 
+            (('relationships' | 'integrations') '{' 
                 (relationships += Relationship ((",")? relationships += Relationship)*)*
             '}') |
-            (('terminology' | 'language' | 'glossary' | ('ubiquitous' 'language')) '{' 
+            (('terminology' | 'glossary') '{' 
                 (terminology += DomainTerm (",")?)* 
             '}') |
-            (('decisions' | 'constraints' | 'rules' | 'policies') '{' 
+            (('decisions' | 'rules') '{' 
                 (decisions += AbstractDecision (',')?)* 
             '}')
         )*
@@ -263,19 +270,19 @@ AbstractDecision:
 ;
 
 Decision:
-    (/** A documented choice or rule that affects the model or process. */ 'decision' | 'Decision') 
+    (/** A documented choice or rule that affects the model or process. */ 'Decision' | 'decision') 
     ('[' classification=[Classification:QualifiedName] ']')?
     name=ID Assignment value=STRING
 ;
 
 Policy:
-    (/** A business rule or guideline that governs behavior within a context. */ 'policy' | 'Policy') 
+    (/** A business rule or guideline that governs behavior within a context. */ 'Policy' | 'policy') 
     ('[' classification=[Classification:QualifiedName] ']')?
     name=ID Assignment value=STRING
 ;
 
 BusinessRule:
-    ('rule' | 'Rule') 
+    (/** A business rule or guideline that governs behavior within a context. */ 'Rule' | 'rule') 
     ('[' classification=[Classification:QualifiedName] ']')?
     name=ID Assignment value=STRING
 ;
@@ -323,14 +330,6 @@ NamespaceDeclaration:
 // ============================================================================
 // SECTION 9: HELPER RULES & FRAGMENTS
 // ============================================================================
-
-/**
- * Assignment fragments for classifier and team blocks.
- */
-RoleAssignment returns string: 'role';
-BusinessModelAssignment returns string: 'businessModel';
-LifecycleAssignment returns string: 'lifecycle';
-TeamAssignment returns string: 'team';
 
 /**
  * Assignment operators - flexible syntax.

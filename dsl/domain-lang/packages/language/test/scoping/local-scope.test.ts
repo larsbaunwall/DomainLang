@@ -62,7 +62,7 @@ describe('Scoping: Local Scope', () => {
             Domain Sales {}
             
             BoundedContext OrderContext for Sales {
-                role: Core
+                classification: Core
             }
         `;
 
@@ -73,8 +73,8 @@ describe('Scoping: Local Scope', () => {
         expectValidDocument(document);
         
         const bc = getFirstBoundedContext(document);
-        const role = bc.role?.[0];
-        expect(role?.ref).toBeDefined();
-        expect(role?.ref?.name).toBe('Core');
+        const classification = bc.classification?.[0];
+        expect(classification?.ref).toBeDefined();
+        expect(classification?.ref?.name).toBe('Core');
     });
 });

@@ -121,7 +121,7 @@ describe('Decision Classification', () => {
         
         // Assert
         expect(bc).toBeDefined();
-        expect(bc!.role?.[0]?.ref?.name).toBe('Core');
+        expect(bc!.classification?.[0]?.ref?.name).toBe('Core');
         const decisions = bc!.decisions ?? [];
         expect(decisions[0].classification?.ref?.name).toBe('Architectural');
         expect(decisions[1].classification?.ref?.name).toBe('Core');

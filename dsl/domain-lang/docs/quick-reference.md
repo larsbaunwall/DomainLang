@@ -58,7 +58,7 @@ The body form is equivalent:
 
 ```dlang
 bc Checkout for Sales {
-    role: CoreDomain
+    classification: CoreDomain
     team: PaymentsTeam
 }
 ```

@@ -87,14 +87,21 @@ Domain Enterprise { description: "Top-level" }
 Domain Sales in Enterprise {
     description: "Revenue generation"
     vision: "Make buying easy"
+    type: Core
 }
 ```
 
 Properties:
 
-- `description` (string)
-- `vision` (string)
-- `classification` (reference to a `Classification`)
+- `description` (string) - Optional description of the domain
+- `vision` (string) - Strategic vision statement
+- `type` (Classification reference) - Domain strategic importance (Core, Supporting, Generic)
+
+The domain body is optional. You can define header-only domains:
+
+```dlang
+Domain Sales
+```
 
 ## Classifications, teams, and metadata keys
 
@@ -119,91 +126,103 @@ Metadata Database
 
 A bounded context defines the boundary within which a domain model is defined and applicable.
 
+This section aligns with the [Bounded Context Canvas](https://github.com/ddd-crew/bounded-context-canvas), a collaborative tool for documenting bounded context design.
+
 Keywords: `BoundedContext`, `bc`.
 
 ```dlang
-Classification CoreDomain
+Classification Core
+Classification Revenue
+Classification Product
 Team SalesTeam
 
 Domain Sales { description: "Sales" }
 
-bc Orders for Sales as CoreDomain by SalesTeam {
+bc Orders for Sales as Core by SalesTeam {
     description: "Order lifecycle"
+    classification: Core
+    businessModel: Revenue
+    evolution: Product
+    archetype: Execution
 }
 ```
 
 ### Header semantics
 
-- `for DomainName` associates the bounded context with a domain
-- `as Classification` assigns one or more roles (Classifications)
-- `by Team` assigns one or more owning teams
+- `for DomainName` - Associates the bounded context with a domain (required per DDD principle)
+- `as Classification` - Assigns strategic classification (from canvas "Strategic Classification: Domain")
+- `by Team` - Assigns one or more owning teams
 
-You can specify multiple roles or teams.
+You can specify multiple classifications or teams:
 
 ```dlang
-Classification CoreDomain
-Classification SupportingDomain
+Classification Core
+Classification Supporting
 Team TeamA
 Team TeamB
 Domain Sales { description: "Sales" }
 
-bc Checkout for Sales as CoreDomain, SupportingDomain by TeamA, TeamB { }
+bc Checkout for Sales as Core, Supporting by TeamA, TeamB { }
 ```
 
 ### Body properties
 
-The bounded context body is optional. If present, it can contain these items (any order; repeat rules enforced by validation):
+The bounded context body is optional. If present, it can contain (in any order):
 
-- `description`
-- `role` (one or more Classification references)
-- `team` (one or more Team references)
-- `businessModel` (Classification reference)
-- `lifecycle` (Classification reference)
+- `description` - Purpose/business value of the context
+- `classification` - Strategic domain importance (Core, Supporting, Generic) - maps to canvas "Strategic Classification: Domain"
+- `businessModel` - Revenue model (Revenue, Engagement, Compliance) - maps to canvas "Strategic Classification: Business Model"
+- `evolution` - Maturity stage (Genesis, Custom, Product, Commodity) - maps to canvas "Strategic Classification: Evolution" from Wardley Maps
+- `archetype` - Behavioral role (Gateway, Execution, Analysis, Engagement, Compliance, Octopus, BubbleContext) - maps to canvas "Domain Roles"
+- `team` - One or more Team references
 - `metadata { Key: "Value" }`
 - `terminology { term ... }`
 - `decisions { decision|policy|rule ... }`
 - `relationships { ... }`
 
-#### Alternative block names
+#### Block name aliases
 
-DomainLang accepts multiple names for some blocks:
+DomainLang minimizes aliases for consistency:
 
 - Metadata: `metadata { ... }` or `meta { ... }`
-- Relationships: `relationships { ... }`, `integrations { ... }`, or `connections { ... }`
-- Terminology: `terminology { ... }`, `language { ... }`, `glossary { ... }`, or `ubiquitous language { ... }`
-- Decisions: `decisions { ... }`, `constraints { ... }`, `rules { ... }`, or `policies { ... }`
+- Relationships: `relationships { ... }` or `integrations { ... }`
+- Terminology: `terminology { ... }` or `glossary { ... }`
+- Decisions: `decisions { ... }` or `rules { ... }`
 
-#### Alternative property names
+### Canvas mapping
 
-- Use `businessModel` or `business model`.
+DomainLang properties map directly to BC Canvas sections for tool generation:
 
-```dlang
-Classification EventSourced
-Domain Sales { description: "Sales" }
-
-bc Orders for Sales {
-    business model: EventSourced
-}
-```
+| Canvas Section | DomainLang Property | Type |
+| --- | --- | --- |
+| Name | `bc.name` | ID |
+| Purpose | `bc.description` | STRING |
+| **Strategic Classification** | | |
+| → Domain importance | `classification` | Core, Supporting, Generic |
+| → Business Model | `businessModel` | Revenue, Engagement, Compliance |
+| → Evolution stage | `evolution` | Genesis, Custom, Product, Commodity |
+| Domain Roles (Archetypes) | `archetype` | Gateway, Execution, Analysis, Engagement, Compliance, Octopus, BubbleContext |
+| Ubiquitous Language | `terminology[]` | DomainTerm[] |
+| Business Decisions | `decisions[]` | Decision[] |
+| Team | `team` | Team reference |
 
 ### Precedence
 
-If you specify both inline header values and body values, inline values take precedence for the SDK's effective values.
+If you specify both inline header values and body values, inline values take precedence:
 
 ```dlang
-Classification CoreDomain
-Classification SupportingDomain
-Team TeamA
-Team TeamB
+Classification Core
+Classification Supporting
 Domain Sales { description: "Sales" }
 
-// Inline values exist alongside body values.
-// The SDK's effective values prefer the inline ones.
-bc Orders for Sales as CoreDomain by TeamA {
-    role: SupportingDomain
-    team: TeamB
+// Inline 'as Core' takes precedence over body 'classification: Supporting'
+// Effective classification will be Core
+bc Orders for Sales as Core {
+    classification: Supporting
 }
 ```
+
+The SDK provides `effectiveClassification()` helper to resolve this precedence.
 
 ## Terminology
 
@@ -243,7 +262,8 @@ The following constructs are equivalent in structure:
 
 They all use: optional category in `[Classification]`, then `Name`, then an assignment operator, then a string.
 
-You can also choose different block keywords: `decisions`, `constraints`, `rules`, or `policies`.
+> [!NOTE]
+> The block keyword is `decisions { ... }` (or `rules { ... }`). Inside the block, you can use `decision`, `policy`, and `rule` items.
 
 ```dlang
 Classification Architectural
@@ -295,7 +315,7 @@ A relationship connects two bounded contexts and can describe both direction and
 Use relationships:
 
 - At the top level inside a `ContextMap`
-- Inside a bounded context `relationships`/`integrations`/`connections` block
+- Inside a bounded context `relationships`/`integrations` block
 
 Syntax:
 

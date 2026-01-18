@@ -33,7 +33,7 @@ import type { DomainLangServices } from '../domain-lang-module.js';
 import { buildIndexes } from './indexes.js';
 import {
     metadataAsMap,
-    effectiveRole,
+    effectiveClassification,
     effectiveTeam,
 } from './resolution.js';
 import { isDownstreamPattern, isUpstreamPattern, matchesPattern } from './patterns.js';
@@ -518,17 +518,17 @@ class BcQueryBuilderImpl extends QueryBuilderImpl<BoundedContext> implements BcQ
         return this.where(bc => effectiveTeam(bc)?.name === teamName);
     }
 
-    withRole(role: string | Classification): BcQueryBuilder {
-        const roleName = typeof role === 'string' ? role : role.name;
+    withClassification(classification: string | Classification): BcQueryBuilder {
+        const classificationName = typeof classification === 'string' ? classification : classification.name;
         
         // Use index for initial filtering if no predicates yet
         if (this.predicateList.length === 0) {
-            const indexed = this.indexes.byRole.get(roleName) ?? [];
+            const indexed = this.indexes.byClassification.get(classificationName) ?? [];
             return new BcQueryBuilderImpl(indexed, this.fqnProvider, this.indexes);
         }
         
         // Add predicate to existing chain
-        return this.where(bc => effectiveRole(bc)?.name === roleName);
+        return this.where(bc => effectiveClassification(bc)?.name === classificationName);
     }
 
     withMetadata(key: string, value?: string): BcQueryBuilder {
@@ -563,7 +563,7 @@ function escapeRegex(str: string): string {
  * 
  * Properties use natural names (not sdk* prefix) per PRS:
  * "Properties are discoverable in IDE autocomplete. The SDK enriches the AST 
- * during load, so `bc.role` just works—no imports needed."
+ * during load, so `bc.classification` just works—no imports needed."
  * 
  * Note: We use getters to avoid computing values until accessed.
  * Note: We use Object.defineProperty to avoid modifying the original interface.
@@ -575,13 +575,13 @@ export function augmentBoundedContext(bc: BoundedContext): void {
     
     // Define computed properties with getters for lazy evaluation
     // Only include properties that add value beyond direct AST access:
-    // - effectiveRole/effectiveTeam: array precedence resolution
+    // - effectiveClassification/effectiveTeam: array precedence resolution
     // - metadataMap: array to Map conversion
     // - fqn: computed qualified name
-    // - helper methods: hasRole, hasTeam, hasMetadata
+    // - helper methods: hasClassification, hasTeam, hasMetadata
     Object.defineProperties(bc, {
-        effectiveRole: {
-            get: () => effectiveRole(bc),
+        effectiveClassification: {
+            get: () => effectiveClassification(bc),
             enumerable: true,
             configurable: true,
         },
@@ -606,13 +606,13 @@ export function augmentBoundedContext(bc: BoundedContext): void {
             configurable: true,
         },
         // Helper methods
-        hasRole: {
+        hasClassification: {
             value: (name: string | Classification): boolean => {
-                const role = effectiveRole(bc);
-                if (!role) return false;
+                const classification = effectiveClassification(bc);
+                if (!classification) return false;
                 const targetName = typeof name === 'string' ? name : name?.name;
                 if (!targetName) return false;
-                return role.name === targetName;
+                return classification.name === targetName;
             },
             enumerable: false,
             configurable: true,
@@ -647,12 +647,12 @@ export function augmentBoundedContext(bc: BoundedContext): void {
  * 
  * Only includes properties that add value beyond direct AST access:
  * - fqn: computed qualified name
- * - hasClassification: helper method
+ * - hasType: helper method
  * 
  * Direct access (no augmentation needed):
  * - domain.description
  * - domain.vision
- * - domain.classification?.ref
+ * - domain.type?.ref
  * 
  * @param domain - Domain to augment
  */
@@ -671,13 +671,13 @@ export function augmentDomain(domain: Domain): void {
             configurable: true,
         },
         // Helper methods
-        hasClassification: {
+        hasType: {
             value: (name: string | Classification): boolean => {
-                const classification = domain.classification?.ref;
-                if (!classification) return false;
+                const type = domain.type?.ref;
+                if (!type) return false;
                 const targetName = typeof name === 'string' ? name : name?.name;
                 if (!targetName) return false;
-                return classification.name === targetName;
+                return type.name === targetName;
             },
             enumerable: false,
             configurable: true,
@@ -790,7 +790,7 @@ function augmentModelInternal(model: Model): void {
  * Augments all AST nodes in a model with SDK-resolved properties.
  * 
  * This function walks the entire AST and adds lazy getters for resolved
- * properties like `effectiveRole`, `effectiveTeam`, etc.
+ * properties like `effectiveClassification`, `effectiveTeam`, etc.
  * 
  * Idempotent - safe to call multiple times on the same model.
  * Automatically called by `fromModel()`, `fromDocument()`, and `fromServices()`.

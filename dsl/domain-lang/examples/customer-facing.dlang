@@ -27,7 +27,7 @@ Namespace CustomerFacing {
 
     BoundedContext Listings for Inventory {
         description: "Customer-facing product discovery and merchandising"
-        role: CoreDomain
+        classification: CoreDomain
         terminology {
             term Product: "An item that can be purchased"
                 examples: "Laptop #12345", "Mouse #67890"

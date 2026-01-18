@@ -266,14 +266,14 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        if (node.role.length === 0) {
+        if (node.classification.length === 0) {
             acceptor(context, {
-                label: '⚡ role',
+                label: '⚡ classification',
                 kind: CompletionItemKind.Snippet,
-                insertText: 'role: ${1:Core}',
+                insertText: 'classification: ${1:Core}',
                 insertTextFormat: InsertTextFormat.Snippet,
-                documentation: '📝 Snippet: Assign the strategic role (Core, Supporting, Generic)',
-                sortText: '0_snippet_role'
+                documentation: '📝 Snippet: Assign the strategic classification (Core, Supporting, Generic)',
+                sortText: '0_snippet_classification'
             });
         }
 
@@ -288,14 +288,14 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        if (!node.lifecycle) {
+        if (!node.evolution) {
             acceptor(context, {
-                label: '⚡ lifecycle',
+                label: '⚡ evolution',
                 kind: CompletionItemKind.Snippet,
-                insertText: 'lifecycle: ${1:Active}',
+                insertText: 'evolution: ${1:Product}',
                 insertTextFormat: InsertTextFormat.Snippet,
-                documentation: '📝 Snippet: Define the lifecycle stage',
-                sortText: '0_snippet_lifecycle'
+                documentation: '📝 Snippet: Define the evolution stage (Genesis, Custom, Product, Commodity)',
+                sortText: '0_snippet_evolution'
             });
         }
 
@@ -390,14 +390,14 @@ export class DomainLangCompletionProvider extends DefaultCompletionProvider {
             });
         }
 
-        if (!node.classification) {
+        if (!node.type) {
             acceptor(context, {
-                label: '⚡ classification',
+                label: '⚡ type',
                 kind: CompletionItemKind.Snippet,
-                insertText: 'classification: ${1:CoreDomain}',
+                insertText: 'type: ${1:Core}',
                 insertTextFormat: InsertTextFormat.Snippet,
-                documentation: '📝 Snippet: Classify as Core, Supporting, or Generic domain',
-                sortText: '0_snippet_classification'
+                documentation: '📝 Snippet: Classify as Core, Supporting, or Generic domain type',
+                sortText: '0_snippet_type'
             });
         }
     }

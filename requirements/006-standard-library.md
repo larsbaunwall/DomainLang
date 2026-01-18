@@ -5,14 +5,27 @@ Priority: Medium
 Target Version: 2.2.0
 Parent: None
 Created: January 11, 2026
+Updated: January 18, 2026
 Effort Estimate: 3-4 weeks
-Dependencies: None
+Dependencies: PRS-007 (Model Query SDK - implemented)
 
 ## Overview
 
 This PRS defines a **DomainLang Standard Library** (stdlib) that provides reusable Classifications, patterns, and conventions for DDD modeling. The stdlib leverages DomainLang's existing git-native import system, requiring no new language features. The IDE/LSP will recognize standard types and provide enhanced validation, warnings, and code intelligence.
 
 This acts as DomainLang's equivalent of a Base Class Library (BCL), establishing conventions and patterns that the community can build upon.
+
+### Key Language Features Leveraged
+
+The stdlib builds on existing DomainLang grammar features:
+
+- **Classification declarations**: `Classification Name` for reusable labels
+- **Metadata declarations**: `Metadata Key` for extensible key-value pairs
+- **Import system**: `import "owner/repo@version" as Alias` with integrity hashes
+- **Named imports**: `import { TypeA, TypeB } from "./file.dlang"`
+- **Namespaces**: `namespace Std { ... }` for hierarchical organization
+- **BC header syntax**: `bc Name for Domain as Role by Team`
+- **BC body properties**: `lifecycle:`, `role:`, `team:`, `metadata { }`
 
 ## Implementation Status Summary
 
@@ -104,13 +117,24 @@ keywords = ["ddd", "patterns", "classifications", "standard-library"]
 // Import entire stdlib
 import "domainlang/stdlib@v1.0.0" as Std
 
-// Use standard Classifications
-bc Orders lifecycle Std.Deprecated { ... }
+// Use standard Classifications with `as` header (for roles) or `lifecycle:` in body
+bc Orders for Sales as Std.Core {
+    lifecycle: Std.Deprecated
+}
 
 // Or import specific modules
 import "domainlang/stdlib/lifecycle@v1.0.0" as Lifecycle
 
-bc Orders lifecycle Lifecycle.Deprecated { ... }
+bc Orders for Sales {
+    lifecycle: Lifecycle.Deprecated
+}
+
+// Named imports for frequently-used Classifications
+import { Deprecated, Stable, CoreDomain } from "domainlang/stdlib@v1.0.0"
+
+bc Orders for Sales as CoreDomain {
+    lifecycle: Deprecated
+}
 ```
 
 **Versioning Strategy**:
@@ -285,21 +309,27 @@ Enable community-contributed pattern libraries following stdlib conventions.
 // E-commerce patterns
 import "ddd-community/ecommerce-patterns@v2.1.0" as ECommerce
 
-bc Checkout lifecycle ECommerce.CheckoutProcess { ... }
+Domain Sales { description: "Sales operations" }
+
+bc Checkout for Sales {
+    lifecycle: ECommerce.CheckoutProcess
+}
 
 // Healthcare patterns (HIPAA compliance)
 import "healthcare/hipaa-patterns@v1.0.0" as HIPAA
 
-bc PatientRecords 
-    for HealthcareDomain
-    as HIPAA.HIPAACompliant { ... }
+Domain Healthcare { description: "Healthcare domain" }
+
+bc PatientRecords for Healthcare as HIPAA.HIPAACompliant {
+    description: "HIPAA-compliant patient records"
+}
 
 // Microservices patterns
 import "microservices/cloud-patterns@v3.0.0" as Cloud
 
-bc OrderService 
-    as Cloud.StatelessService
-    lifecycle Cloud.ContainerReady { ... }
+bc OrderService for Sales as Cloud.StatelessService {
+    lifecycle: Cloud.ContainerReady
+}
 ```
 
 **Registry Concept** (Future):
@@ -470,98 +500,125 @@ Add semantic validation rules that recognize stdlib types and enforce convention
 
 ```typescript
 // validation/stdlib-validator.ts
+import type { ValidationAcceptor } from 'langium';
+import type { BoundedContext, Relationship, Model } from '../generated/ast.js';
+import { AstUtils } from 'langium';
 
-export class StdlibValidator {
+/**
+ * Validates that stable contexts don't reference deprecated contexts.
+ * 
+ * @param bc - The bounded context to validate
+ * @param accept - The validation acceptor for reporting issues
+ */
+function validateStableDoesNotReferenceDeprecated(
+    bc: BoundedContext,
+    accept: ValidationAcceptor
+): void {
+    const lifecycle = bc.lifecycle?.ref?.name;
+    if (lifecycle !== 'Stable') return;
     
-    /**
-     * Rule: Warn when stable context references deprecated context.
-     */
-    @ValidationRule('check-deprecated-references')
-    checkDeprecatedReferences(
-        context: BoundedContext, 
-        accept: ValidationAcceptor
-    ): void {
-        const lifecycle = this.getLifecycle(context);
-        if (lifecycle?.ref?.name === 'Stable') {
-            // Check relationships
-            const relationships = this.getRelationships(context);
-            for (const rel of relationships) {
-                const targetLifecycle = this.getLifecycle(rel.target);
-                if (targetLifecycle?.ref?.name === 'Deprecated') {
-                    accept('warning', 
-                        `Stable context "${context.name}" references deprecated context "${rel.target.name}". ` +
-                        `Consider migrating to an alternative.`,
-                        { node: rel }
-                    );
-                }
-            }
-        }
-    }
-    
-    /**
-     * Rule: Info when experimental context is referenced.
-     */
-    @ValidationRule('check-experimental-usage')
-    checkExperimentalUsage(
-        context: BoundedContext,
-        accept: ValidationAcceptor
-    ): void {
-        const lifecycle = this.getLifecycle(context);
-        if (lifecycle?.ref?.name === 'Experimental') {
-            const referencingContexts = this.findReferencingContexts(context);
-            if (referencingContexts.length > 0) {
-                accept('info',
-                    `Experimental context "${context.name}" is referenced by ${referencingContexts.length} context(s). ` +
-                    `APIs may change without notice.`,
-                    { node: context }
-                );
-            }
-        }
-    }
-    
-    /**
-     * Rule: Error when external system references internal context.
-     */
-    @ValidationRule('check-internal-visibility')
-    checkInternalVisibility(
-        context: BoundedContext,
-        accept: ValidationAcceptor
-    ): void {
-        const lifecycle = this.getLifecycle(context);
-        if (lifecycle?.ref?.name === 'Internal') {
-            // Check if referenced by contexts marked as External
-            const referencingContexts = this.findReferencingContexts(context);
-            for (const ref of referencingContexts) {
-                const refLifecycle = this.getLifecycle(ref);
-                if (refLifecycle?.ref?.name === 'External') {
-                    accept('error',
-                        `Internal context "${context.name}" cannot be referenced by external context "${ref.name}". ` +
-                        `Use an Anti-Corruption Layer or Published Language.`,
-                        { node: ref }
-                    );
-                }
-            }
-        }
-    }
-    
-    /**
-     * Rule: Suggest adding lifecycle if missing.
-     */
-    @ValidationRule('suggest-lifecycle')
-    suggestLifecycle(
-        context: BoundedContext,
-        accept: ValidationAcceptor
-    ): void {
-        const lifecycle = this.getLifecycle(context);
-        if (!lifecycle && this.hasStdlibImport(context)) {
-            accept('hint',
-                `Consider adding a lifecycle classification (e.g., "lifecycle Std.Stable"). ` +
-                `This helps document the maturity and visibility of the context.`,
-                { node: context }
+    // Check relationships for references to deprecated contexts
+    for (const rel of bc.relationships) {
+        const target = rel.right.link?.ref;
+        if (target && target.lifecycle?.ref?.name === 'Deprecated') {
+            accept('warning', 
+                `Stable context "${bc.name}" references deprecated context "${target.name}". ` +
+                `Consider migrating to an alternative.`,
+                { node: rel }
             );
         }
     }
 }
+
+/**
+ * Validates that experimental context usage is visible to users.
+ * 
+ * @param bc - The bounded context to validate  
+ * @param accept - The validation acceptor for reporting issues
+ */
+function validateExperimentalUsage(
+    bc: BoundedContext,
+    accept: ValidationAcceptor
+): void {
+    const lifecycle = bc.lifecycle?.ref?.name;
+    if (lifecycle !== 'Experimental') return;
+    
+    // Check if this experimental context is referenced
+    const model = AstUtils.getContainerOfType(bc, (n): n is Model => n.$type === 'Model');
+    if (!model) return;
+    
+    const referencingContexts = findContextsReferencing(model, bc.name);
+    if (referencingContexts.length > 0) {
+        accept('info',
+            `Experimental context "${bc.name}" is referenced by ${referencingContexts.length} context(s). ` +
+            `APIs may change without notice.`,
+            { node: bc, keyword: 'BoundedContext' }
+        );
+    }
+}
+
+/**
+ * Validates that internal contexts are not referenced by external contexts.
+ * 
+ * @param bc - The bounded context to validate
+ * @param accept - The validation acceptor for reporting issues
+ */
+function validateInternalVisibility(
+    bc: BoundedContext,
+    accept: ValidationAcceptor
+): void {
+    const lifecycle = bc.lifecycle?.ref?.name;
+    if (lifecycle !== 'Internal') return;
+    
+    const model = AstUtils.getContainerOfType(bc, (n): n is Model => n.$type === 'Model');
+    if (!model) return;
+    
+    // Find all contexts that reference this internal context
+    const referencingContexts = findContextsReferencing(model, bc.name);
+    for (const ref of referencingContexts) {
+        if (ref.lifecycle?.ref?.name === 'External') {
+            accept('error',
+                `Internal context "${bc.name}" cannot be referenced by external context "${ref.name}". ` +
+                `Use an Anti-Corruption Layer or Published Language.`,
+                { node: ref, keyword: 'BoundedContext' }
+            );
+        }
+    }
+}
+
+/**
+ * Suggests adding lifecycle when stdlib is imported but lifecycle is missing.
+ * 
+ * @param bc - The bounded context to validate
+ * @param accept - The validation acceptor for reporting issues
+ */
+function validateSuggestLifecycle(
+    bc: BoundedContext,
+    accept: ValidationAcceptor
+): void {
+    if (bc.lifecycle) return;
+    
+    const model = AstUtils.getContainerOfType(bc, (n): n is Model => n.$type === 'Model');
+    const hasStdlibImport = model?.imports.some(imp => 
+        imp.uri?.includes('domainlang/stdlib')
+    );
+    
+    if (hasStdlibImport) {
+        accept('hint',
+            `Consider adding a lifecycle classification (e.g., "lifecycle: Std.Stable"). ` +
+            `This helps document the maturity and visibility of the context.`,
+            { node: bc, keyword: 'BoundedContext' }
+        );
+    }
+}
+
+// Compose into validation check array (Langium 4.x pattern)
+export const stdlibBoundedContextChecks = [
+    validateStableDoesNotReferenceDeprecated,
+    validateExperimentalUsage,
+    validateInternalVisibility,
+    validateSuggestLifecycle,
+];
 ```
 
 **Validation Examples**:
@@ -569,28 +626,32 @@ export class StdlibValidator {
 ```dlang
 import "domainlang/stdlib@v1.0.0" as Std
 
+Domain Sales { description: "Sales domain" }
+Domain Operations { description: "Operations domain" }
+Domain Marketing { description: "Marketing domain" }
+
 // ⚠️ WARNING: Stable context references deprecated context
-bc NewOrders for Sales
-    lifecycle Std.Stable {
+bc NewOrders for Sales {
+    lifecycle: Std.Stable
     
     relationships {
         [OHS] this -> [ACL] LegacyOrders  // LegacyOrders is Deprecated
     }
 }
 
-bc LegacyOrders for Sales
-    lifecycle Std.Deprecated {
+bc LegacyOrders for Sales {
+    lifecycle: Std.Deprecated
     description: "Being replaced by NewOrders"
 }
 
 // ❌ ERROR: Internal context referenced by external context
-bc AdminTools for Operations
-    lifecycle Std.Internal {
+bc AdminTools for Operations {
+    lifecycle: Std.Internal
     description: "Internal admin tooling"
 }
 
-bc PublicAPI for Sales
-    lifecycle Std.External {
+bc PublicAPI for Sales {
+    lifecycle: Std.External
     
     relationships {
         this -> AdminTools  // ERROR: Can't reference Internal from External
@@ -598,8 +659,8 @@ bc PublicAPI for Sales
 }
 
 // ℹ️ INFO: Experimental context is used
-bc AIRecommendations for Marketing
-    lifecycle Std.Experimental {
+bc AIRecommendations for Marketing {
+    lifecycle: Std.Experimental
     description: "Machine learning recommendations"
 }
 
@@ -761,18 +822,24 @@ Allow users to adjust severity levels:
 ## Dependencies
 
 **Requires**:
+
 - Langium 4.x (existing)
 - TypeScript 5.8+ (existing)
 - Git command-line tools (existing for import system)
+- PRS-007: Model Query SDK (implemented) - for programmatic model access
 
 **Blocks**:
+
 - PRS-004: Implementation Bridge (lifecycle markers)
 - Community pattern sharing
 - Ecosystem growth
 
 **Related**:
+
 - PRS-001: Language Design Improvements
 - PRS-004: Implementation Bridge (lifecycle markers depend on stdlib)
+- PRS-007: Model Query SDK (provides SDK infrastructure)
+- PRS-008: Grammar Simplification (defines current syntax)
 
 ## Implementation Phases
 
@@ -881,6 +948,8 @@ Allow users to adjust severity levels:
 ## References
 
 - [PRS-004: Implementation Bridge](./004-implementation-bridge.md) (lifecycle markers)
+- [PRS-007: Model Query SDK](./007-model-query-sdk.md) (SDK infrastructure)
+- [PRS-008: Grammar Simplification](./008-grammar-simplification.md) (current syntax)
 - [Original PRS-001](./001-language-design-improvements.md)
 - [Go Modules](https://go.dev/blog/using-go-modules) - Inspiration for git-native imports
 - [Deno Standard Library](https://deno.land/std) - Versioned stdlib via URLs
@@ -889,7 +958,5 @@ Allow users to adjust severity levels:
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** January 11, 2026  
-**Status:** Planned  
-**Next Review:** After prototype implementation
+**Document Version:** 1.1  
+**Last Updated:** January 18, 2026  

@@ -1,6 +1,6 @@
 /**
  * Index building for O(1) lookups in the Model Query SDK.
- * Builds maps for FQN, name, team, role, and metadata lookups.
+ * Builds maps for FQN, name, team, strategic classification, and metadata lookups.
  * 
  * Indexes are built once during model loading and enable fast queries.
  */
@@ -32,7 +32,7 @@ import { QualifiedNameProvider } from '../lsp/domain-lang-naming.js';
 import type { ModelIndexes } from './types.js';
 import {
     metadataAsMap,
-    effectiveRole,
+    effectiveClassification,
     effectiveTeam,
 } from './resolution.js';
 
@@ -47,7 +47,7 @@ export function buildIndexes(model: Model): ModelIndexes {
     const byFqn = new Map<string, AstNode>();
     const byName = new Map<string, AstNode[]>();
     const byTeam = new Map<string, BoundedContext[]>();
-    const byRole = new Map<string, BoundedContext[]>();
+    const byClassification = new Map<string, BoundedContext[]>();
     const byMetadataKey = new Map<string, BoundedContext[]>();
 
     const fqnProvider = new QualifiedNameProvider();
@@ -72,7 +72,7 @@ export function buildIndexes(model: Model): ModelIndexes {
 
         // BoundedContext-specific indexes
         if (isBoundedContext(node)) {
-            indexBoundedContext(node, byTeam, byRole, byMetadataKey);
+            indexBoundedContext(node, byTeam, byClassification, byMetadataKey);
         }
     }
 
@@ -80,23 +80,23 @@ export function buildIndexes(model: Model): ModelIndexes {
         byFqn,
         byName,
         byTeam,
-        byRole,
+        byClassification,
         byMetadataKey,
     };
 }
 
 /**
- * Indexes a BoundedContext by team, role, and metadata.
+ * Indexes a BoundedContext by team, strategic classification, and metadata.
  * 
  * @param bc - BoundedContext node
  * @param byTeam - Team index map
- * @param byRole - Role index map
+ * @param byClassification - Strategic classification index map
  * @param byMetadataKey - Metadata key index map
  */
 function indexBoundedContext(
     bc: BoundedContext,
     byTeam: Map<string, BoundedContext[]>,
-    byRole: Map<string, BoundedContext[]>,
+    byClassification: Map<string, BoundedContext[]>,
     byMetadataKey: Map<string, BoundedContext[]>
 ): void {
     // Index by team
@@ -107,12 +107,12 @@ function indexBoundedContext(
         byTeam.set(team.name, teamList);
     }
 
-    // Index by role
-    const role = effectiveRole(bc);
-    if (role?.name) {
-        const roleList = byRole.get(role.name) ?? [];
-        roleList.push(bc);
-        byRole.set(role.name, roleList);
+    // Index by strategic classification
+    const classification = effectiveClassification(bc);
+    if (classification?.name) {
+        const classificationList = byClassification.get(classification.name) ?? [];
+        classificationList.push(bc);
+        byClassification.set(classification.name, classificationList);
     }
 
     // Index by metadata keys

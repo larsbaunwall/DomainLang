@@ -54,8 +54,8 @@ export interface Query {
      * @returns QueryBuilder for domains
      * @example
      * ```typescript
-     * const coreDomains = query.domains()
-     *   .where(d => d.classification?.name === 'Core');
+      * const coreDomains = query.domains()
+      *   .where(d => d.type?.ref?.name === 'Core');
      * ```
      */
     domains(): QueryBuilder<Domain>;
@@ -66,7 +66,7 @@ export interface Query {
      * @example
      * ```typescript
      * const contexts = query.boundedContexts()
-     *   .withRole('Core')
+    *   .withClassification('Core')
      *   .withTeam('PaymentTeam');
      * ```
      */
@@ -254,16 +254,16 @@ export interface BcQueryBuilder extends QueryBuilder<BoundedContext> {
     withTeam(team: string | Team): BcQueryBuilder;
 
     /**
-     * Filters contexts with a specific role.
-     * Uses SDK-resolved role property (header inline, block, or classifications).
-     * @param role - Role name or Classification instance
-     * @returns New BcQueryBuilder with role filter
+     * Filters contexts with a specific strategic classification.
+     * Uses SDK-resolved classification precedence (header inline `as` → body `classification:`).
+     * @param classification - Classification name or Classification instance
+     * @returns New BcQueryBuilder with classification filter
      * @example
      * ```typescript
-     * query.boundedContexts().withRole('Core');
+     * query.boundedContexts().withClassification('Core');
      * ```
      */
-    withRole(role: string | Classification): BcQueryBuilder;
+    withClassification(classification: string | Classification): BcQueryBuilder;
 
     /**
      * Filters contexts with specific metadata key-value pair.
@@ -339,8 +339,8 @@ export interface ModelIndexes {
     readonly byName: ReadonlyMap<string, AstNode[]>;
     /** Map from team name to BoundedContexts */
     readonly byTeam: ReadonlyMap<string, BoundedContext[]>;
-    /** Map from role name to BoundedContexts */
-    readonly byRole: ReadonlyMap<string, BoundedContext[]>;
+    /** Map from strategic classification name to BoundedContexts */
+    readonly byClassification: ReadonlyMap<string, BoundedContext[]>;
     /** Map from metadata key to BoundedContexts */
     readonly byMetadataKey: ReadonlyMap<string, BoundedContext[]>;
 }

@@ -42,24 +42,24 @@ function validateBoundedContextHasDomain(
 }
 
 /**
- * Validates conflicts between inline and block role assignment.
- * Warns when both inline ('as') and block ('role:') are used.
+ * Validates conflicts between inline and block classification assignment.
+ * Warns when both inline ('as') and block ('classification:') are used.
  * Inline values take precedence per PRS-008.
  *
- * FR-2.3: Inline/Block Conflict Validation
+ * FR-9.2: Inline/Block Conflict Validation
  */
-function validateBoundedContextRoleConflict(
+function validateBoundedContextClassificationConflict(
     bc: BoundedContext,
     accept: ValidationAcceptor
 ): void {
-    if (bc.role.length > 1) {
-        const inlineRoleName = bc.role[0].ref?.name;
-        const blockRoleName = bc.role[1].ref?.name;
+    if (bc.classification.length > 1) {
+        const inlineClassificationName = bc.classification[0].ref?.name;
+        const blockClassificationName = bc.classification[1].ref?.name;
 
         // Warn if defined multiple times
-        accept('warning', ValidationMessages.BOUNDED_CONTEXT_ROLE_CONFLICT(bc.name, inlineRoleName, blockRoleName), {
+        accept('warning', ValidationMessages.BOUNDED_CONTEXT_CLASSIFICATION_CONFLICT(bc.name, inlineClassificationName, blockClassificationName), {
             node: bc,
-            property: 'role',
+            property: 'classification',
             index: 1,
             codeDescription: buildCodeDescription('language.md', 'bounded-contexts')
         });
@@ -94,6 +94,6 @@ function validateBoundedContextTeamConflict(
 export const boundedContextChecks = [
     validateBoundedContextHasDescription,
     validateBoundedContextHasDomain,
-    validateBoundedContextRoleConflict,
+    validateBoundedContextClassificationConflict,
     validateBoundedContextTeamConflict
-]; 
+];

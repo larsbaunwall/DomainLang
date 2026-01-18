@@ -336,18 +336,18 @@ describe('Classification Reference Linking', () => {
         // Assert
         expectValidDocument(document);
         const bc = getFirstBoundedContext(document);
-        expect(bc.role?.[0]?.ref).toBeDefined();
-        expect(bc.role?.[0]?.ref?.name).toBe('Core');
+        expect(bc.classification?.[0]?.ref).toBeDefined();
+        expect(bc.classification?.[0]?.ref?.name).toBe('Core');
     });
 
-    test('should resolve classification in domain classification block', async () => {
+    test('should resolve type in domain type block', async () => {
         // Arrange
         const input = s`
             Classification Strategic
             
             Domain Sales {
                 vision: "Core sales"
-                classification: Strategic
+                type: Strategic
             }
         `;
 
@@ -358,7 +358,7 @@ describe('Classification Reference Linking', () => {
         expectValidDocument(document);
         const model = document.parseResult.value;
         const domain = model.children.find(c => c.$type === 'Domain') as any;
-        expect(domain.classification?.ref?.name).toBe('Strategic');
+        expect(domain.type?.ref?.name).toBe('Strategic');
     });
 
     test('should resolve classification in decision bracket syntax', async () => {

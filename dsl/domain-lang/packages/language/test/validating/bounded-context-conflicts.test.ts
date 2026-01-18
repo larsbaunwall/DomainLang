@@ -8,7 +8,7 @@ beforeAll(() => {
 });
 
 describe('FR-2.3: Inline/Block Conflict Validation', () => {
-    test('Inline "as" conflicts with block "role"', async () => {
+    test('Inline "as" conflicts with block "classification"', async () => {
         const doc = await testServices.parse(s`
             Domain Sales {}
             Classification Core
@@ -16,12 +16,12 @@ describe('FR-2.3: Inline/Block Conflict Validation', () => {
             Team SalesTeam
             
             BoundedContext OrderManagement for Sales as Core by SalesTeam {
-                role: Supporting
+                classification: Supporting
             }
         `);
-        // Expect a warning for role conflict among all warnings
+        // Expect a warning for classification conflict among all warnings
         const warnings = doc.diagnostics?.filter(d => d.severity === 2) ?? [];
-        expect(warnings.some(w => w.message.includes('Role specified both inline'))).toBe(true);
+        expect(warnings.some(w => w.message.includes('Classification specified both inline'))).toBe(true);
     });
 
     test('Inline "by" conflicts with block "team"', async () => {
@@ -40,7 +40,7 @@ describe('FR-2.3: Inline/Block Conflict Validation', () => {
         expect(warnings.some(w => w.message.includes('Team specified both inline'))).toBe(true);
     });
 
-    test('Multiple conflicts simultaneously (role and team)', async () => {
+    test('Multiple conflicts simultaneously (classification and team)', async () => {
         const doc = await testServices.parse(s`
             Domain Sales {}
             Classification Core
@@ -49,13 +49,13 @@ describe('FR-2.3: Inline/Block Conflict Validation', () => {
             Team PlatformTeam
             
             BoundedContext Payments for Sales as Core by SalesTeam {
-                role: Supporting
+                classification: Supporting
                 team: PlatformTeam
             }
         `);
-        // Expect both role and team conflict warnings among all warnings
+        // Expect both classification and team conflict warnings among all warnings
         const warnings = doc.diagnostics?.filter(d => d.severity === 2) ?? [];
-        expect(warnings.some(w => w.message.includes('Role specified both inline'))).toBe(true);
+        expect(warnings.some(w => w.message.includes('Classification specified both inline'))).toBe(true);
         expect(warnings.some(w => w.message.includes('Team specified both inline'))).toBe(true);
     });
 
@@ -75,13 +75,13 @@ describe('FR-2.3: Inline/Block Conflict Validation', () => {
             
             BoundedContext Inventory for Sales {
                 description: "Handles inventory operations"
-                role: Core
+                classification: Core
                 team: SalesTeam
             }
         `);
         // Ensure no conflict warnings appear
         const warnings = doc.diagnostics?.filter(d => d.severity === 2) ?? [];
-        expect(warnings.some(w => w.message.includes('Role specified both inline'))).toBe(false);
+        expect(warnings.some(w => w.message.includes('Classification specified both inline'))).toBe(false);
         expect(warnings.some(w => w.message.includes('Team specified both inline'))).toBe(false);
         // Also ensure document parsed successfully
         expect(doc.parseResult.parserErrors.length).toBe(0);

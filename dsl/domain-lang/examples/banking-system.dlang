@@ -60,6 +60,10 @@ bc AccountManagement for CustomerAccounts
 
     description: "Manages customer accounts, balances, and account lifecycle"
 
+    archetype: Execution
+
+    evolution: Commodity
+
     terminology {
         term Account: "Customer financial account"
             aka: BankAccount, CustomerAccount
@@ -112,6 +116,10 @@ bc PaymentProcessing for Payments
     by PaymentsTeam {
 
     description: "Processes domestic and international payments"
+
+    evolution: Transition
+
+
 
     terminology {
         term Payment: "Transfer of funds between accounts"

@@ -10,6 +10,7 @@ This directory contains Product Requirement Specifications (PRSs) for DomainLang
 | [003](./003-tactical-ddd-patterns.md) | Tactical DDD Pattern Support | Planned | High | 8 weeks |
 | [004](./004-implementation-bridge.md) | Implementation Bridge | Planned | Medium | 4 weeks |
 | [005](./005-developer-experience.md) | Developer Experience Enhancements | Planned | Medium | 3 weeks |
+| [009](./009-ddd-semantic-alignment.md) | Bounded Context Canvas Alignment | Draft | High | 2-3 weeks |
 | [001](./001-language-design-improvements.md) | Language Design Improvements (2025 Review) | Superseded | - | - |
 
 > [!NOTE]

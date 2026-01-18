@@ -6,7 +6,7 @@ Fluent, type-safe query API for DomainLang models.
 
 The SDK is **read-only and query-focused**. It provides:
 
-- Augmented AST properties (`effectiveRole`, `effectiveTeam`, etc.)
+- Augmented AST properties (`effectiveClassification`, `effectiveTeam`, etc.)
 - Fluent query chains with lazy iteration
 - O(1) indexed lookups by FQN/name
 
@@ -106,9 +106,9 @@ query.contextMaps()
 ### Fluent Chaining
 
 ```typescript
-// Filter by role
+// Filter by strategic classification
 query.boundedContexts()
-  .withRole('Core')
+  .withClassification('Core')
   .withTeam('PaymentTeam')
   .toArray()
 
@@ -120,7 +120,7 @@ query.boundedContexts()
 // Custom predicates
 query.domains()
   .where(d => d.parent !== undefined)
-  .where(d => d.classification?.ref?.name === 'Core')  // Direct reference access
+  .where(d => d.type?.ref?.name === 'Core')  // Direct reference access
 ```
 
 ### Direct Lookups (O(1))
@@ -146,11 +146,11 @@ The SDK augments AST nodes **only for properties that add value beyond direct ac
 **Augmented (precedence resolution, transformation, computed):**
 
 ```typescript
-bc.effectiveRole         // Inline header (`as`) → body (`role:`) precedence
+bc.effectiveClassification // Inline header (`as`) → body (`classification:`) precedence
 bc.effectiveTeam         // Inline header (`by`) → body (`team:`) precedence  
 bc.metadataMap           // Metadata entries as ReadonlyMap<string, string>
 bc.fqn                   // Computed fully qualified name
-bc.hasRole('Core')       // Check if role matches
+bc.hasClassification('Core') // Check if classification matches
 bc.hasTeam('SalesTeam')  // Check if team matches
 bc.hasMetadata('Lang')   // Check if metadata key exists
 ```
@@ -160,7 +160,8 @@ bc.hasMetadata('Lang')   // Check if metadata key exists
 ```typescript
 bc.description           // Direct string property
 bc.businessModel?.ref    // Direct reference to Classification
-bc.lifecycle?.ref        // Direct reference to Classification
+bc.evolution?.ref        // Direct reference to Classification
+bc.archetype?.ref        // Direct reference to Classification
 bc.relationships         // Direct array of Relationship
 bc.terminology           // Direct array of DomainTerm
 bc.decisions             // Direct array of AbstractDecision
@@ -172,7 +173,7 @@ bc.decisions             // Direct array of AbstractDecision
 
 ```typescript
 domain.fqn                    // Computed fully qualified name
-domain.hasClassification('Core')  // Check classification matches
+domain.hasType('Core')         // Check type matches
 ```
 
 **Direct AST access (no augmentation needed):**
@@ -180,7 +181,7 @@ domain.hasClassification('Core')  // Check classification matches
 ```typescript
 domain.description       // Direct string property
 domain.vision            // Direct string property
-domain.classification?.ref  // Direct reference to Classification
+domain.type?.ref         // Direct reference to Classification
 ```
 
 ## Examples
@@ -191,14 +192,14 @@ domain.classification?.ref  // Direct reference to Classification
 const { query } = await loadModel('./banking.dlang');
 
 const results = query.boundedContexts()
-  .withRole('Core')
+  .withClassification('Core')
   .withMetadata('Language', 'CSharp')
   .toArray();
 
 for (const bc of results) {
   console.log(`${bc.fqn}: ${bc.description ?? 'n/a'}`);
   console.log(`  Team: ${bc.effectiveTeam?.name ?? 'unassigned'}`);
-  console.log(`  Lifecycle: ${bc.lifecycle?.ref?.name ?? 'n/a'}`);
+  console.log(`  Evolution: ${bc.evolution?.ref?.name ?? 'n/a'}`);
 }
 ```
 
@@ -242,7 +243,7 @@ The SDK provides precedence resolution **only for properties with multiple assig
 
 | Augmented Property | Precedence | Why Augmented |
 | --- | --- | --- |
-| `bc.effectiveRole` | Header inline (`as`) → body (`role:`) | Array-based precedence |
+| `bc.effectiveClassification` | Header inline (`as`) → body (`classification:`) | Array-based precedence |
 | `bc.effectiveTeam` | Header inline (`by`) → body (`team:`) | Array-based precedence |
 | `bc.metadataMap` | Later entries override earlier | Array to Map conversion |
 
@@ -252,14 +253,15 @@ The SDK provides precedence resolution **only for properties with multiple assig
 | --- | --- | --- |
 | `bc.description` | Direct | Single location |
 | `bc.businessModel?.ref` | Direct reference | Single location |
-| `bc.lifecycle?.ref` | Direct reference | Single location |
+| `bc.evolution?.ref` | Direct reference | Single location |
+| `bc.archetype?.ref` | Direct reference | Single location |
 | `domain.description` | Direct | Single location |
 | `domain.vision` | Direct | Single location |
-| `domain.classification?.ref` | Direct reference | Single location |
+| `domain.type?.ref` | Direct reference | Single location |
 
 ## Performance
 
-- **O(1) lookups**: `byFqn()`, indexed team/role/metadata filters
+- **O(1) lookups**: `byFqn()`, indexed team/classification/metadata filters
 - **Lazy iteration**: QueryBuilder chains don't materialize until consumed
 - **Zero-copy**: `fromModel()` / `fromDocument()` reuse existing AST
 
@@ -288,8 +290,8 @@ packages/language/src/sdk/
 
 **Internal** (not exported):
 
-- `effectiveRole`, `effectiveTeam`, `metadataAsMap`, etc.
+- `effectiveClassification`, `effectiveTeam`, `metadataAsMap`, etc.
 - `buildIndexes`, `buildFqnIndex`, etc.
 - Implementation classes
 
-Use SDK-augmented properties (`bc.effectiveRole`) instead of calling resolution functions directly.
+Use SDK-augmented properties (`bc.effectiveClassification`) instead of calling resolution functions directly.

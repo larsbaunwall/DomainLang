@@ -33,7 +33,7 @@ describe('SDK AST Augmentation', () => {
             expect(bc!.description).toBe('Handles order processing');
         });
         
-        test('effectiveRole returns role from header inline', async () => {
+        test('effectiveClassification returns classification from header inline', async () => {
             const { model } = await loadModelFromText(`
                 Classification Core
                 Domain Sales { vision: "v" }
@@ -42,7 +42,7 @@ describe('SDK AST Augmentation', () => {
             
             const bc = findFirst<BoundedContext>(model, isBoundedContext);
             expect(bc).toBeDefined();
-            expect(bc!.effectiveRole?.name).toBe('Core');
+            expect(bc!.effectiveClassification?.name).toBe('Core');
         });
         
         test('effectiveTeam returns team from header inline', async () => {
@@ -57,7 +57,7 @@ describe('SDK AST Augmentation', () => {
             expect(bc!.effectiveTeam?.name).toBe('SalesTeam');
         });
         
-        test('hasRole() checks role by name', async () => {
+        test('hasClassification() checks classification by name', async () => {
             const { model } = await loadModelFromText(`
                 Classification Core
                 Domain Sales { vision: "v" }
@@ -66,8 +66,8 @@ describe('SDK AST Augmentation', () => {
             
             const bc = findFirst<BoundedContext>(model, isBoundedContext);
             expect(bc).toBeDefined();
-            expect(bc!.hasRole('Core')).toBe(true);
-            expect(bc!.hasRole('Supporting')).toBe(false);
+            expect(bc!.hasClassification('Core')).toBe(true);
+            expect(bc!.hasClassification('Supporting')).toBe(false);
         });
         
         test('hasTeam() checks team by name', async () => {
@@ -141,20 +141,20 @@ describe('SDK AST Augmentation', () => {
             expect(domain!.description).toBe('Sales domain description');
         });
         
-        test('hasClassification() checks domain classification', async () => {
+        test('hasType() checks domain type', async () => {
             const { model } = await loadModelFromText(`
                 Classification CoreDomain
                 Domain Sales {
                     description: "d"
                     vision: "v"
-                    classification: CoreDomain
+                    type: CoreDomain
                 }
             `);
             
             const domain = findFirst<Domain>(model, isDomain);
             expect(domain).toBeDefined();
-            expect(domain!.hasClassification('CoreDomain')).toBe(true);
-            expect(domain!.hasClassification('Supporting')).toBe(false);
+            expect(domain!.hasType('CoreDomain')).toBe(true);
+            expect(domain!.hasType('Supporting')).toBe(false);
         });
         
         test('fqn returns fully qualified name for domain', async () => {
@@ -180,10 +180,10 @@ describe('SDK AST Augmentation', () => {
             expect(bc).toBeDefined();
             
             // Test with undefined Classification object
-            expect(bc!.hasRole(undefined as any)).toBe(false);
+            expect(bc!.hasClassification(undefined as any)).toBe(false);
             
-            // Test when BC has no role set
-            expect(bc!.hasRole('Core')).toBe(false);
+            // Test when BC has no classification set
+            expect(bc!.hasClassification('Core')).toBe(false);
             
             // Test when BC has no team set
             expect(bc!.hasTeam('AnyTeam')).toBe(false);

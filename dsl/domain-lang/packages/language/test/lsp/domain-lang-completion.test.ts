@@ -156,7 +156,7 @@ describe('DomainLangCompletionProvider', () => {
             expect(labels.some(l => l.includes('Domain') || l.includes('BoundedContext'))).toBe(true);
             expect(labels).not.toContain('description');
             expect(labels).not.toContain('team');
-            expect(labels).not.toContain('role');
+            expect(labels).not.toContain('classification');
             expect(labels).not.toContain('vision');
             expect(labels).not.toContain('terminology');
         });
@@ -261,8 +261,8 @@ describe('DomainLangCompletionProvider', () => {
             expect(labels).not.toContain('team');
         });
 
-        test('does not suggest role when set via "as" clause', async () => {
-            // Arrange - BC with role set via "as" clause
+        test('does not suggest classification when set via "as" clause', async () => {
+            // Arrange - BC with classification set via "as" clause
             const input = `
                 Domain Sales {}
                 Classification Core
@@ -272,9 +272,9 @@ describe('DomainLangCompletionProvider', () => {
             // Act - get completions
             const completions = await getCompletions(input, 3);
             
-            // Assert - role is not suggested
+            // Assert - classification is not suggested
             const labels = completions.map(c => c.label);
-            expect(labels).not.toContain('role');
+            expect(labels).not.toContain('classification');
         });
     });
 

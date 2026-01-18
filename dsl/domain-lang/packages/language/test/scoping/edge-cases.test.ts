@@ -92,7 +92,7 @@ describe('Scoping: Edge Cases', () => {
         // Arrange
         const input = s`
             BoundedContext OrderContext for NonExistentDomain {
-                role: NonExistentClassification
+                classification: NonExistentClassification
                 team: NonExistentTeam
             }
         `;

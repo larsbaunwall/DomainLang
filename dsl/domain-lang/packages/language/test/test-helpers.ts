@@ -234,7 +234,7 @@ export const TestFixtures = {
         BoundedContext OrderManagement for Sales {
             description: "Manages customer orders"
             team: SalesTeam
-            role: Core
+            classification: Core
             
             terminology {
                 term Order: "A customer request for products"
