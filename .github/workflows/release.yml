@@ -134,7 +134,7 @@ jobs:
           echo "Publishing to VS Code Marketplace..."
           npx @vscode/vsce publish \
             --pat "${{ secrets.VSCE_PAT }}" \
-            --packagePath "./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
+            "./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
