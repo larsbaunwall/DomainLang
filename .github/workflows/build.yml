@@ -74,8 +74,10 @@ jobs:
       - name: Version All Packages
         run: |
            cd dsl/domain-lang
-           # Bump version across ALL workspaces
-           npm version ${{ steps.get_version.outputs.version }} --workspaces --include-workspace-root --no-git-tag-version
+           # Manually update package.json versions to avoid npm workspace registry lookup issues
+           # We only update the 'version' field, not the dependency links, which is fine for post-build packaging
+           npm pkg set version=${{ steps.get_version.outputs.version }} --workspace=packages/extension
+           npm pkg set version=${{ steps.get_version.outputs.version }} --workspace=packages/language
         shell: bash
 
       - name: Build VSIX
