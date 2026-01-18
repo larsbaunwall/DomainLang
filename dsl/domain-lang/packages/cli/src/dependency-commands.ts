@@ -1,4 +1,4 @@
-import { WorkspaceManager, DependencyAnalyzer, GovernanceValidator, loadGovernancePolicy } from 'domain-lang-language';
+import { WorkspaceManager, DependencyAnalyzer, GovernanceValidator, loadGovernancePolicy } from '@domainlang/language';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';

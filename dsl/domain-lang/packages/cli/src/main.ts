@@ -12,10 +12,10 @@ import {
     auditDependencies,
     checkCompliance
 } from './dependency-commands.js';
-import type { Model } from 'domain-lang-language';
+import type { Model } from '@domainlang/language';
 import chalk from 'chalk';
 import { Command } from 'commander';
-import { DomainLangLanguageMetaData, createDomainLangServices } from 'domain-lang-language';
+import { DomainLangLanguageMetaData, createDomainLangServices } from '@domainlang/language';
 import { extractAstNode } from './cli-util.js';
 import { generateJavaScript } from './generator.js';
 import { NodeFileSystem } from 'langium/node';

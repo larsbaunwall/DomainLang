@@ -1,4 +1,4 @@
-import type { Model } from 'domain-lang-language';
+import type { Model } from '@domainlang/language';
 import { CompositeGeneratorNode, NL, toString } from 'langium/generate';
 import * as fs from 'node:fs';
 import * as path from 'node:path';

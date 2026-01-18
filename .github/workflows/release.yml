@@ -56,8 +56,8 @@ jobs:
 
       - name: Publish to NPM
         run: |
-          npm publish ./artifacts/npm/domain-lang-language-${{ steps.get_info.outputs.version }}.tgz --access public --provenance
-          npm publish ./artifacts/npm/domain-lang-cli-${{ steps.get_info.outputs.version }}.tgz --access public --provenance
+          npm publish ./artifacts/npm/domainlang-language-${{ steps.get_info.outputs.version }}.tgz --access public --provenance
+          npm publish ./artifacts/npm/domainlang-cli-${{ steps.get_info.outputs.version }}.tgz --access public --provenance
         # No NODE_AUTH_TOKEN needed (OIDC)
 
       - name: Tag version
