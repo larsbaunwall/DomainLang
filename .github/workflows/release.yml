@@ -24,17 +24,19 @@ jobs:
           path: ./artifacts
           run_id: ${{ github.event.workflow_run.id }}
 
-      - name: Get version from manifest
-        id: get_version
+      - name: Get version and sha from manifest
+        id: get_info
         run: |
           version=$(grep '^version:' ./artifacts/manifest.yaml | cut -d' ' -f2)
+          sha=$(grep '^commit_sha:' ./artifacts/manifest.yaml | cut -d' ' -f2)
           echo "version=$version" >> $GITHUB_OUTPUT
+          echo "sha=$sha" >> $GITHUB_OUTPUT
 
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: main
+          ref: ${{ steps.get_info.outputs.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -42,20 +44,20 @@ jobs:
           node-version: 20
 
       - name: Publish to VS Code Marketplace
-        run: npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }} --packagePath ./artifacts/domain-lang-${{ steps.get_version.outputs.version }}.vsix
+        run: npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }} --packagePath ./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
 
       - name: Tag version
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git tag "v${{ steps.get_version.outputs.version }}"
-          git push origin "v${{ steps.get_version.outputs.version }}"
+          git tag "v${{ steps.get_info.outputs.version }}"
+          git push origin "v${{ steps.get_info.outputs.version }}"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: Release v${{ steps.get_version.outputs.version }}
+          tag_name: v${{ steps.get_info.outputs.version }}
+          name: Release v${{ steps.get_info.outputs.version }}
           draft: false
           generate_release_notes: true
-          files: ./artifacts/domain-lang-${{ steps.get_version.outputs.version }}.vsix 
+          files: ./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix 

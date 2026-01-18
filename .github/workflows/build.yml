@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -42,18 +42,6 @@ jobs:
         run: npm ci --prefer-offline --no-audit
         working-directory: ./dsl/domain-lang
 
-      - name: Bump Version
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          cd dsl/domain-lang/packages/extension
-          npm version patch --no-git-tag-version
-          cd ../../..
-          git add dsl/domain-lang/packages/extension/package.json
-          git commit -m "chore: bump version [skip ci]"
-          git push origin HEAD:main
-
       - name: Build project
         run: npm run langium:generate && npm run build
         working-directory: ./dsl/domain-lang
@@ -70,9 +58,18 @@ jobs:
         run: npm run test:coverage --workspace packages/language
         working-directory: ./dsl/domain-lang
       
-      - name: Get version
+      - name: Set Release Version
         id: get_version
-        run: echo "version=$(node -p "require('./dsl/domain-lang/packages/extension/package.json').version")" >> $GITHUB_OUTPUT
+        run: |
+          cd dsl/domain-lang/packages/extension
+          # Extract major and minor from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
+          MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+          # Construct new version with run_number as patch
+          NEW_VERSION="${MAJOR}.${MINOR}.${{ github.run_number }}"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Computed version: $NEW_VERSION"
 
       - name: Build VSIX
         run: |
@@ -83,7 +80,12 @@ jobs:
           
           # Package the extension
           cd packages/extension
-          npx @vscode/vsce package --allow-missing-repository --no-update-package-json --no-dependencies
+          # Apply the computed version to package.json (on disk only, not committed)
+          npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
+          
+          # Use --no-prepublish to avoid rebuilding (already built)
+          # Use --no-dependencies to avoid npm install (already installed)
+          npx @vscode/vsce package --allow-missing-repository --no-update-package-json --no-dependencies --no-prepublish
           
           # Move artifact
           mv domain-lang-*.vsix ../../dist/domain-lang-${{ steps.get_version.outputs.version }}.vsix
