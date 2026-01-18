@@ -132,9 +132,13 @@ jobs:
         if: ${{ !inputs.dry_run && !inputs.skip_vsce }}
         run: |
           echo "Publishing to VS Code Marketplace..."
+          # vsce needs to read package.json from the extension directory
+          # Use absolute path to pre-built VSIX
+          VSIX_PATH="$(cd ./artifacts && pwd)/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
+          cd dsl/domain-lang/packages/extension
           npx @vscode/vsce publish \
             --pat "${{ secrets.VSCE_PAT }}" \
-            "./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
+            "$VSIX_PATH"
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
