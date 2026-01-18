@@ -1,22 +1,33 @@
 {
     "name": "@domainlang/language",
     "version": "0.1.0",
-    "displayName": "DomainLang",
-    "description": "A DSL for Domain-Driven Design",
-    "publisher": "thinkability",
+    "displayName": "DomainLang Language",
+    "description": "Core language library for DomainLang - parse, validate, and query Domain-Driven Design models programmatically",
     "author": "larsbaunwall",
-    "license": "Apache License 2.0",
+    "license": "Apache-2.0",
     "icon": "images/icon.png",
     "keywords": [
         "ddd",
         "domain-driven design",
         "langium",
         "dlang",
-        "domainlang"
+        "domainlang",
+        "bounded-context",
+        "context-map",
+        "aggregate",
+        "ubiquitous-language",
+        "dsl",
+        "modeling",
+        "architecture",
+        "strategic-design",
+        "parser",
+        "sdk"
     ],
+    "homepage": "https://github.com/larsbaunwall/DomainLang#readme",
     "repository": {
         "type": "git",
-        "url": "https://github.com/larsbaunwall/DomainLang"
+        "url": "https://github.com/larsbaunwall/DomainLang",
+        "directory": "dsl/domain-lang/packages/language"
     },
     "bugs": {
         "url": "https://github.com/larsbaunwall/DomainLang/issues"

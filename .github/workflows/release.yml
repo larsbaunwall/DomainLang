@@ -94,7 +94,7 @@ jobs:
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git tag -a "v${{ steps.get_info.outputs.version }}" -m "Release v${{ steps.get_info.outputs.version }}" "${{ steps.get_info.outputs.sha }}"
+          git tag -a "v${{ steps.get_info.outputs.version }}" -m "release ${{ steps.get_info.outputs.version }}" "${{ steps.get_info.outputs.sha }}"
           git push origin "v${{ steps.get_info.outputs.version }}"
 
       - name: Create GitHub Release

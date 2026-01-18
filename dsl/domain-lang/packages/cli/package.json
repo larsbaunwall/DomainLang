@@ -1,8 +1,33 @@
 {
     "name": "@domainlang/cli",
-    "description": "The cli specific package",
+    "displayName": "DomainLang CLI",
+    "description": "Command-line interface for DomainLang - validate, analyze, and manage Domain-Driven Design models",
     "version": "0.1.0",
     "type": "module",
+    "author": "larsbaunwall",
+    "license": "Apache-2.0",
+    "keywords": [
+        "ddd",
+        "domain-driven design",
+        "domainlang",
+        "dlang",
+        "bounded-context",
+        "context-map",
+        "cli",
+        "langium",
+        "dsl",
+        "modeling",
+        "architecture"
+    ],
+    "homepage": "https://github.com/larsbaunwall/DomainLang#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/larsbaunwall/DomainLang",
+        "directory": "dsl/domain-lang/packages/cli"
+    },
+    "bugs": {
+        "url": "https://github.com/larsbaunwall/DomainLang/issues"
+    },
     "engines": {
         "node": ">=20.10.0",
         "npm": ">=10.2.3"
