@@ -138,14 +138,90 @@ Every feature flows through three layers:
 2. **ALWAYS** run `langium:generate` after `.langium` changes
 3. **ALWAYS** add tests for new behavior
 4. **ALWAYS** run `npm run lint` and fix violations before committing
-5. Use TypeScript strict mode
-6. Use type guards over assertions
+5. **ALWAYS** add shared types to `services/types.ts` - NEVER scatter type definitions
+6. Use TypeScript strict mode
+7. Use type guards over assertions
 
 **Pre-commit Checklist:**
+
 ```bash
 npm run lint    # 0 errors, 0 warnings required
 npm run build   # Must succeed
 npm test        # Must pass
+```
+
+## Type Organization
+
+**All shared types MUST be centralized in `packages/language/src/services/types.ts`.**
+
+### Why This Matters
+
+Scattered type definitions cause:
+
+- Duplicate/conflicting interfaces for the same concept
+- Import cycles between services
+- Maintenance burden when types need updating
+- Confusion about canonical definitions
+
+### Rules
+
+| Type Category          | Location     | Re-export                     |
+| ---------------------- | ------------ | ----------------------------- |
+| Shared across services | `types.ts`   | Yes, from relevant services   |
+| Service-internal only  | Service file | No                            |
+| AST types              | Generated    | N/A (never edit)              |
+
+### Before Adding Types
+
+```typescript
+// 1. SEARCH FIRST: Check types.ts for similar existing types
+grep -n "interface.*Metadata" src/services/types.ts
+
+// 2. If similar exists, EXTEND or MERGE:
+interface ModelManifest extends PackageInfo { ... }
+
+// 3. If new, ADD to types.ts with JSDoc:
+/**
+ * Represents X for Y purpose.
+ * Used by: ServiceA, ServiceB
+ */
+export interface NewType { ... }
+
+// 4. RE-EXPORT from service for backwards compatibility:
+export type { NewType } from './types.js';
+```
+
+### Type Consolidation Patterns
+
+**Readonly vs Mutable:**
+
+```typescript
+// User-facing schema (readonly)
+interface ModelManifest {
+    readonly name: string;
+    readonly dependencies?: readonly DependencySpec[];
+}
+
+// Internal resolution state (mutable)
+interface PackageMetadata {
+    name: string;           // Needs mutation during resolution
+    resolvedVersion: string;
+}
+```
+
+**Shared base types:**
+
+```typescript
+// Common fields extracted to base
+interface PackageInfo {
+    readonly name: string;
+    readonly version: string;
+}
+
+// Extended for specific purposes
+interface ModelManifest extends PackageInfo {
+    readonly dependencies?: readonly DependencySpec[];
+}
 ```
 
 ## Model Query SDK
