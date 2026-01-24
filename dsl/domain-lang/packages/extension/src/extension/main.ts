@@ -32,9 +32,20 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<La
         debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
     };
 
+    // File watchers for manifest and lock files (PRS-010)
+    // The LSP server will handle these notifications to invalidate caches
+    const fileWatchers = [
+        { globPattern: '**/model.yaml', kind: 7 },  // WatchKind: Create | Change | Delete
+        { globPattern: '**/model.lock', kind: 7 }
+    ];
+
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{ scheme: '*', language: 'domain-lang' }]
+        documentSelector: [{ scheme: '*', language: 'domain-lang' }],
+        synchronize: {
+            // Register file watchers for config files
+            fileEvents: fileWatchers as unknown as vscode.FileSystemWatcher[]
+        }
     };
 
     // Create the language client and start the client.
