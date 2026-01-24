@@ -12,6 +12,7 @@ This directory contains Product Requirement Specifications (PRSs) for DomainLang
 | [005](./005-developer-experience.md) | Developer Experience Enhancements | Planned | Medium | 3 weeks |
 | [009](./009-ddd-semantic-alignment.md) | Bounded Context Canvas Alignment | Draft | High | 2-3 weeks |
 | [010](./010-import-system-redesign.md) | Import System Redesign | Draft | High | 5 weeks |
+| [011](./011-modern-cli-experience.md) | Modern CLI Experience | Draft | High | 4 weeks |
 | [001](./001-language-design-improvements.md) | Language Design Improvements (2025 Review) | Superseded | - | - |
 
 > [!NOTE]
