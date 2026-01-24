@@ -98,16 +98,47 @@ ContextMap System {
 }
 ```
 
+## Step 7: Split into multiple files (optional)
+
+As your model grows, split it across files and use imports.
+
+Create a shared vocabulary file (`shared.dlang`):
+
+```dlang
+Classification CoreDomain
+Classification SupportingDomain
+Team CatalogTeam
+Team OrderTeam
+```
+
+Import it in your main model:
+
+```dlang
+import "./shared.dlang"
+
+Domain Bookstore { description: "Online bookstore" }
+
+bc Catalog for Bookstore as CoreDomain by CatalogTeam { }
+```
+
+For external packages, create a `model.yaml`:
+
+```yaml
+dependencies:
+  acme/ddd-core: "v1.0.0"
+```
+
+Then import them:
+
+```dlang
+import "acme/ddd-core"
+```
+
+> [!TIP]
+> See [imports.md](imports.md) for the complete import system guide.
+
 ## Next steps
 
-- quick-reference.md: keep open while you model
-- language.md: look up exact semantics and edge cases
-
-## Validate
-
-If you are working from source, run:
-
-```bash
-cd dsl/domain-lang
-npm test
-```
+- [quick-reference.md](quick-reference.md): keep open while you model
+- [language.md](language.md): look up exact semantics and edge cases
+- [imports.md](imports.md): learn about multi-file models and dependencies
