@@ -285,8 +285,8 @@ export const TestFixtures = {
      */
     importStatements: () => s`
         import "./shared/types.dlang"
-        import "owner/repo@v1.0.0" as DDD
-        import { OrderContext, PaymentContext } from "./contexts.dlang"
+        import "core" as Core
+        import "patterns/strategic"
         
         Domain Sales {}
     `,

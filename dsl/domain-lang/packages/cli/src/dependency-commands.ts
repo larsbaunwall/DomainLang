@@ -30,7 +30,7 @@ export async function listModels(workspaceRoot: string): Promise<void> {
     }
     console.log('Model dependencies:');
     for (const [name, dep] of Object.entries(lock.dependencies)) {
-        console.log(`  ${name}@${dep.version} (${dep.commit.substring(0, 7)})`);
+        console.log(`  ${name}@${dep.ref} (${dep.commit.substring(0, 7)})`);
     }
 }
 
@@ -203,7 +203,7 @@ export async function showImpactAnalysis(workspaceRoot: string, packageName: str
     console.log(`Packages depending on "${packageName}":`);
     for (const dep of reverseDeps) {
         const typeLabel = dep.type === 'direct' ? '→' : '⇢';
-        console.log(`  ${typeLabel} ${dep.dependentPackage}@${dep.version}`);
+        console.log(`  ${typeLabel} ${dep.dependentPackage}@${dep.ref}`);
     }
 }
 

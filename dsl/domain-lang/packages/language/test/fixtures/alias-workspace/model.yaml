@@ -6,8 +6,8 @@ model:
 dependencies:
   ddd-patterns:
     source: ddd-patterns/core
-    version: v2.1.0
+    ref: v2.1.0
     description: "Reusable DDD architectural patterns"
   reporting-toolkit:
     source: acme/reporting-toolkit
-    version: main
+    ref: main

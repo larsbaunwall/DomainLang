@@ -472,11 +472,9 @@ describe('Grammar Completeness Tests', () => {
                 s`
                     import "./local/file.dlang"
                     import "~/workspace/file.dlang"
-                    import "owner/repo@v1.0.0"
-                    import "https://github.com/owner/repo@v1.0.0"
-                    import "owner/repo@v1.0.0" as Alias
-                    import "owner/repo@v1.0.0" integrity "sha256-abcd1234"
-                    import { Symbol1, Symbol2 } from "./file.dlang"
+                    import "core"
+                    import "patterns/strategic"
+                    import "core" as Core
                     
                     Domain Test {}
                 `,

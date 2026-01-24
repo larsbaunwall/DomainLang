@@ -18,7 +18,8 @@ async function createLockFile() {
         version: "1",
         dependencies: {
             "acme/ddd-patterns": {
-                version: "2.1.0",
+                ref: "2.1.0",
+                refType: "tag",
                 resolved: "https://github.com/acme/ddd-patterns",
                 commit: "abc123",
                 integrity: "sha256-foo"
@@ -88,5 +89,66 @@ describe("WorkspaceManager", () => {
         expect(direct).toBe("ddd-patterns/core@v2.1.0");
         expect(withSubPath).toBe("ddd-patterns/core@v2.1.0/patterns.dlang");
         expect(missing).toBeUndefined();
+    });
+
+    describe("cache invalidation", () => {
+        test("invalidateCache clears both manifest and lock caches", async () => {
+            // Arrange
+            await createLockFile();
+            const manager = new WorkspaceManager({ autoResolve: false });
+            await manager.initialize(TEST_ROOT);
+            
+            // Prime the caches
+            await manager.getManifest();
+            await manager.getLockFile();
+            
+            // Act - invalidate both caches
+            manager.invalidateCache();
+            
+            // Remove the lock file to verify cache was cleared
+            await cleanup();
+            
+            // Assert - getLockFile should now return undefined (not cached)
+            const lock = await manager.getLockFile();
+            expect(lock).toBeUndefined();
+        });
+
+        test("invalidateManifestCache clears only manifest cache", async () => {
+            // Arrange
+            await createLockFile();
+            const manager = new WorkspaceManager({ autoResolve: false });
+            await manager.initialize(TEST_ROOT);
+            
+            // Prime the caches
+            await manager.getManifest();
+            const lockBefore = await manager.getLockFile();
+            
+            // Act - invalidate only manifest cache
+            manager.invalidateManifestCache();
+            
+            // Assert - lock file should still be cached
+            const lockAfter = await manager.getLockFile();
+            expect(lockAfter).toEqual(lockBefore);
+        });
+
+        test("invalidateLockCache clears only lock file cache", async () => {
+            // Arrange
+            await createLockFile();
+            const manager = new WorkspaceManager({ autoResolve: false });
+            await manager.initialize(TEST_ROOT);
+            
+            // Prime the caches
+            await manager.getLockFile();
+            
+            // Act - invalidate only lock cache
+            manager.invalidateLockCache();
+            
+            // Remove the lock file to verify cache was cleared
+            await cleanup();
+            
+            // Assert - getLockFile should now return undefined (not cached)
+            const lock = await manager.getLockFile();
+            expect(lock).toBeUndefined();
+        });
     });
 });

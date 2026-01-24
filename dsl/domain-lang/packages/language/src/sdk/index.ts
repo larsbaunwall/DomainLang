@@ -123,6 +123,4 @@ export type {
     LoadOptions,
     BcQueryBuilder,
     RelationshipView,
-    AugmentedBoundedContext,
-    AugmentedDomain,
 } from './types.js';

@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { PerformanceOptimizer, getGlobalOptimizer, resetGlobalOptimizer } from '../../src/services/performance-optimizer.js';
-import type { LockFile } from '../../src/services/git-url-resolver.js';
+import type { LockFile } from '../../src/services/types.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -40,7 +40,8 @@ describe('PerformanceOptimizer', () => {
                 version: '1',
                 dependencies: {
                     'acme/test': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/test',
                         commit: 'abc123',
                     },

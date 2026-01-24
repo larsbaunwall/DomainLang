@@ -430,28 +430,58 @@ Resolution uses closest-scope-wins.
 
 Imports let you split models across files and reuse shared vocabularies.
 
-An import brings declarations from another `.dlang` file into the current model.
-
-DomainLang supports two forms:
-
-1. Named imports:
-
-```dlang
-import { CoreDomain, SalesTeam } from "./shared.dlang"
-```
-
-1. Module imports with optional integrity and alias:
-
-```dlang
-import "./shared.dlang"
-import "./shared.dlang" as Shared
-import "owner/repo@v1.0.0" as External
-import "owner/repo@v1.0.0" integrity "sha256-..." as Pinned
-```
-
 > [!TIP]
-> Use `~/` in a string to refer to a workspace-relative path.
+> For a complete guide to the import system, see [imports.md](imports.md).
+
+Keywords: `Import`, `import`.
+
+### Syntax
+
+DomainLang uses a simple import syntax:
 
 ```dlang
-import "~/shared/core.dlang"
+import "path/to/file.dlang"
+import "path/to/file.dlang" as Alias
+```
+
+The import specifier (the string) can be:
+
+- **Relative path**: `"./shared.dlang"` - file relative to current file
+- **Root alias**: `"@/shared/core.dlang"` - file relative to workspace root
+- **Path alias**: `"@shared/core.dlang"` - custom alias from `model.yaml`
+- **Package**: `"acme/core"` - external package from `model.yaml` dependencies
+
+### Import aliases
+
+Use `as` to create a namespace for imported declarations:
+
+```dlang
+import "acme/core" as Core
+
+bc Orders for Core.SalesDomain { }
+```
+
+### Package imports
+
+External packages are declared in `model.yaml`:
+
+```yaml
+dependencies:
+  acme/core: "v1.0.0"
+```
+
+Then imported by name:
+
+```dlang
+import "acme/core"
+import "acme/core" as Core
+```
+
+### Local imports
+
+Local file imports resolve using directory-first search:
+
+```dlang
+import "./types"           // → ./types/index.dlang or ./types.dlang
+import "./types.dlang"     // → ./types.dlang (explicit)
 ```

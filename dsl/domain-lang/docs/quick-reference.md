@@ -27,7 +27,7 @@ bc Orders for Sales {
 | Namespace | `Namespace`, `ns` | Creates qualified names |
 | Context map | `ContextMap`, `cmap` | Relationships between contexts |
 | Domain map | `DomainMap`, `dmap` | Portfolio view of domains |
-| Import | `import`, `Import` | Module system |
+| Import | `Import`, `import` | Module system |
 
 ## Assignment operators
 
@@ -117,7 +117,18 @@ Supported patterns: `PL`, `OHS`, `CF`, `ACL`, `P`, `SK`, `BBoM`.
 
 ```dlang
 import "./shared.dlang"
-import "~/shared/core.dlang"
-import "owner/repo@v1.0.0" as External
-import { CoreDomain } from "./classifications.dlang"
+import "@/shared/core.dlang"
+import "acme/core"
+import "acme/core" as Core
 ```
+
+Declare external packages in `model.yaml`:
+
+```yaml
+dependencies:
+  acme/core: "v1.0.0"
+  acme/utils: "main"
+```
+
+See [imports.md](imports.md) for the full import system guide.
+

@@ -62,7 +62,7 @@ describe('Validation Tests', () => {
         });
 
         test('should detect circular domain hierarchy', async () => {
-            // Arrange
+            // Arrange - Circular hierarchy: A → B → C → A
             const input = s`
                 Domain A in B {}
                 Domain B in C {}
@@ -72,9 +72,27 @@ describe('Validation Tests', () => {
             // Act
             const document = await testServices.parse(input);
 
-            // Assert - This validation might not be implemented yet
-            // TODO: Remove this when circular validation is added
-            expectValidDocument(document);
+            // Assert - Each domain in the cycle reports the error
+            expectValidationErrors(document, [
+                'Circular domain hierarchy detected',
+                'Circular domain hierarchy detected',
+                'Circular domain hierarchy detected'
+            ]);
+        });
+
+        test('should detect self-referencing domain', async () => {
+            // Arrange - Domain references itself
+            const input = s`
+                Domain SelfRef in SelfRef {}
+            `;
+
+            // Act
+            const document = await testServices.parse(input);
+
+            // Assert - Should detect circular reference
+            expectValidationErrors(document, [
+                'Circular domain hierarchy detected'
+            ]);
         });
 
         test('accepts valid domain hierarchy', async () => {
@@ -135,21 +153,7 @@ describe('Validation Tests', () => {
             expectValidDocument(document);
         });
 
-        test('should validate team reference exists', async () => {
-            // Arrange
-            const input = s`
-                Domain Sales {}
-                BoundedContext OrderContext for Sales {
-                    team: NonExistentTeam
-                }
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert - TODO: Remove when linking validation works
-            expectValidDocument(document);
-        });
+        // Team reference validation is tested in linking.test.ts (Team Reference Linking)
 
         test('accepts valid team reference', async () => {
             // Arrange
@@ -272,20 +276,9 @@ describe('Validation Tests', () => {
             expectValidDocument(document); // May need to change based on requirements
         });
 
-        test('should validate import references', async () => {
-            // Arrange
-            const input = s`
-                import "./non-existent-file.dlang"
-                Domain Test {}
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should warn about missing import file
-            expectValidDocument(document); // Remove when import validation works
-        });
+        // Import validation is tested in:
+        // - import-resolver.test.ts (file resolution, manifest requirements)
+        // - import-validation-phase3.test.ts (syntax, network boundary)
     });
 
     // ========================================================================
@@ -293,50 +286,10 @@ describe('Validation Tests', () => {
     // ========================================================================
 
     describe('Import Validation', () => {
-        test('should validate import file exists', async () => {
-            // Arrange
-            const input = s`
-                import "./missing-file.dlang"
-                Domain Test {}
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should generate validation error for missing file
-            expectValidDocument(document); // Remove when import validation works properly
-        });
-
-        test('should validate named import symbols exist', async () => {
-            // Arrange
-            const input = s`
-                import { NonExistentSymbol } from "./some-file.dlang"
-                Domain Test {}
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should generate validation error for missing symbols
-            expectValidDocument(document); // Remove when import validation works properly
-        });
-
-        test('should validate import URIs are well-formed', async () => {
-            // Arrange
-            const input = s`
-                import "invalid://not-a-valid-uri@malformed"
-                Domain Test {}
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should generate validation error for malformed URI
-            expectValidDocument(document); // Remove when URI validation is added
-        });
+        // Import file existence and manifest validation are tested in:
+        // - import-resolver.test.ts
+        // - import-validation-phase3.test.ts
+        // - workspace-manager-manifest.test.ts
 
         test('accepts valid local import', async () => {
             // Arrange
@@ -372,53 +325,13 @@ describe('Validation Tests', () => {
     // ========================================================================
 
     describe('Cross-Reference Validation', () => {
-        test('should detect invalid domain reference in bounded context', async () => {
-            // Arrange
-            const input = s`
-                BoundedContext TestBC for NonExistentDomain
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should fail during linking phase
-            expectValidDocument(document); // Remove when linking validation works
-        });
-
-        test('should detect invalid team reference', async () => {
-            // Arrange
-            const input = s`
-                Domain Sales {}
-                BoundedContext TestBC for Sales {
-                    team: NonExistentTeam
-                }
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should fail during linking phase
-            expectValidDocument(document); // Remove when linking validation works
-        });
-
-        test('should detect invalid classification reference', async () => {
-            // Arrange
-            const input = s`
-                Domain Sales {}
-                BoundedContext TestBC for Sales {
-                    classification: NonExistentClassification
-                }
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should fail during linking phase
-            expectValidDocument(document); // Remove when linking validation works
-        });
+        // Note: Unresolved reference detection is tested in linking.test.ts
+        // which verifies that:
+        // - Invalid domain references have .ref undefined and .error defined
+        // - Invalid team references have .ref undefined and .error defined
+        // - Invalid classification references have .ref undefined and .error defined
+        // See: linking.test.ts "Domain Reference Linking", "Team Reference Linking",
+        //      "Classification Reference Linking" describe blocks
 
         test('accepts valid cross-references', async () => {
             // Arrange
@@ -446,44 +359,9 @@ describe('Validation Tests', () => {
     // ========================================================================
 
     describe('Relationship Validation', () => {
-        test('should detect invalid bounded context reference in relationship', async () => {
-            // Arrange
-            const input = s`
-                Domain Sales {}
-                BoundedContext ValidBC for Sales
-                
-                ContextMap TestMap {
-                    contains ValidBC
-                    ValidBC -> NonExistentBC
-                }
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should fail during linking phase
-            expectValidDocument(document); // Remove when linking validation works
-        });
-
-        test('should validate "this" reference context', async () => {
-            // Arrange
-            const input = s`
-                Domain Sales {}
-                BoundedContext TestBC for Sales {
-                    relationships {
-                        this -> NonExistentBC
-                    }
-                }
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should fail during linking phase
-            expectValidDocument(document); // Remove when linking validation works
-        });
+        // Note: Unresolved bounded context references in relationships are tested in
+        // linking.test.ts "ContextMap Relationship Linking" and "This Reference Linking"
+        // which verify .ref and .error properties on relationship links
 
         test('accepts valid relationships', async () => {
             // Arrange
@@ -528,23 +406,9 @@ describe('Validation Tests', () => {
             expectValidDocument(document);
         });
 
-        test('should detect invalid qualified name', async () => {
-            // Arrange
-            const input = s`
-                Namespace com.example {
-                    Domain Sales {}
-                }
-                
-                BoundedContext TestBC for com.invalid.Sales
-            `;
-
-            // Act
-            const document = await testServices.parse(input);
-
-            // Assert
-            // Should fail during linking phase
-            expectValidDocument(document); // Remove when qualified name validation works
-        });
+        // Note: Qualified name resolution is tested in linking.test.ts
+        // "Complex Linking Scenarios" > "should resolve nested Namespace qualified names"
+        // which verifies .ref resolution for qualified paths
 
         test('should validate nested Namespace access', async () => {
             // Arrange

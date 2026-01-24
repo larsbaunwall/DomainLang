@@ -2,8 +2,9 @@ import { type Module, inject } from 'langium';
 import type { 
     DefaultSharedModuleContext, 
     LangiumServices, 
-    LangiumSharedServices, 
-    PartialLangiumServices 
+    LangiumSharedServices,
+    PartialLangiumServices,
+    PartialLangiumSharedServices 
 } from 'langium/lsp';
 import { createDefaultModule, createDefaultSharedModule } from 'langium/lsp';
 import { DomainLangGeneratedModule, DomainLangGeneratedSharedModule } from './generated/module.js';
@@ -13,8 +14,10 @@ import { DomainLangScopeComputation } from './lsp/domain-lang-scope.js';
 import { DomainLangFormatter } from './lsp/domain-lang-formatter.js';
 import { DomainLangHoverProvider } from './lsp/hover/domain-lang-hover.js';
 import { DomainLangCompletionProvider } from './lsp/domain-lang-completion.js';
+import { DomainLangCodeActionProvider } from './lsp/domain-lang-code-actions.js';
 import { ImportResolver } from './services/import-resolver.js';
 import { WorkspaceManager } from './services/workspace-manager.js';
+import { DomainLangWorkspaceManager } from './lsp/domain-lang-workspace-manager.js';
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -30,7 +33,8 @@ export type DomainLangAddedServices = {
     lsp: {
         Formatter: DomainLangFormatter,
         HoverProvider: DomainLangHoverProvider,
-        CompletionProvider: DomainLangCompletionProvider
+        CompletionProvider: DomainLangCompletionProvider,
+        CodeActionProvider: DomainLangCodeActionProvider
     }
 }
 
@@ -40,6 +44,12 @@ export type DomainLangAddedServices = {
  */
 export type DomainLangServices = LangiumServices & DomainLangAddedServices
 
+const DomainLangSharedModule: Module<LangiumSharedServices, PartialLangiumSharedServices> = {
+    workspace: {
+        WorkspaceManager: (services: LangiumSharedServices) => new DomainLangWorkspaceManager(services)
+    }
+};
+
 /**
  * Dependency injection module that overrides Langium default services and contributes the
  * declared custom services. The Langium defaults can be partially specified to override only
@@ -48,7 +58,7 @@ export type DomainLangServices = LangiumServices & DomainLangAddedServices
 export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices & DomainLangAddedServices> = {
     imports: {
         ImportResolver: (services) => new ImportResolver(services),
-        WorkspaceManager: () => new WorkspaceManager()
+        WorkspaceManager: () => new WorkspaceManager({ autoResolve: false, allowNetwork: false })
     },
     references: {
         ScopeComputation: (services) => new DomainLangScopeComputation(services),
@@ -57,7 +67,8 @@ export const DomainLangModule: Module<DomainLangServices, PartialLangiumServices
     lsp: {
         Formatter: () => new DomainLangFormatter(),
         HoverProvider: (services) => new DomainLangHoverProvider(services),
-        CompletionProvider: (services) => new DomainLangCompletionProvider(services)
+        CompletionProvider: (services) => new DomainLangCompletionProvider(services),
+        CodeActionProvider: () => new DomainLangCodeActionProvider()
     },
 };
 
@@ -82,7 +93,8 @@ export function createDomainLangServices(context: DefaultSharedModuleContext): {
 } {
     const shared = inject(
         createDefaultSharedModule(context),
-        DomainLangGeneratedSharedModule
+        DomainLangGeneratedSharedModule,
+        DomainLangSharedModule
     );
     const DomainLang = inject(
         createDefaultModule({ shared }),

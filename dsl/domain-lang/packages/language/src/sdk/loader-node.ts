@@ -25,14 +25,16 @@ import { isModel } from '../generated/ast.js';
 import { createDomainLangServices } from '../domain-lang-module.js';
 import type { LoadOptions, QueryContext } from './types.js';
 import { fromModel, augmentModel } from './query.js';
+import { ensureImportGraphFromDocument } from '../utils/import-utils.js';
 
 /**
  * Loads a DomainLang model from a file on disk.
  * 
  * **Node.js only** - uses file system APIs.
  * 
- * Note: This loads a single file. For multi-file models with imports,
- * consider using the WorkspaceManager or hosting an LSP server.
+ * Supports multi-file models with imports: all imported files are
+ * automatically loaded and linked. Use `documents` in the result
+ * to see all loaded files.
  * 
  * @param entryFile - Path to the entry .dlang file
  * @param options - Optional load configuration
@@ -43,13 +45,16 @@ import { fromModel, augmentModel } from './query.js';
  * ```typescript
  * import { loadModel } from '@domainlang/language/sdk/loader-node';
  * 
- * const { query, model } = await loadModel('./domains.dlang', {
+ * const { query, model, documents } = await loadModel('./domains.dlang', {
  *   workspaceDir: process.cwd()
  * });
  * 
+ * // Query spans all imported files
  * for (const bc of query.boundedContexts()) {
  *   console.log(bc.name);
  * }
+ * 
+ * console.log(`Loaded ${documents.length} files`);
  * ```
  */
 export async function loadModel(
@@ -89,9 +94,19 @@ export async function loadModel(
     
     // Register document and build it
     shared.workspace.LangiumDocuments.addDocument(document);
-    await shared.workspace.DocumentBuilder.build([document], { validation: true });
+    await shared.workspace.DocumentBuilder.build([document], { validation: false });
     
-    // Wait for document to be fully processed
+    // Traverse import graph to load all imported files
+    const importedUris = await ensureImportGraphFromDocument(
+        document, 
+        shared.workspace.LangiumDocuments
+    );
+    
+    // Build all imported documents with validation
+    const allDocuments = Array.from(shared.workspace.LangiumDocuments.all);
+    await shared.workspace.DocumentBuilder.build(allDocuments, { validation: true });
+    
+    // Wait for entry document to be fully processed
     if (document.state < DocumentState.Validated) {
         throw new Error(`Document not fully processed: ${absolutePath}`);
     }
@@ -112,11 +127,16 @@ export async function loadModel(
         throw new Error(`Document root is not a Model: ${entryFile}`);
     }
     
-    // Augment AST nodes with SDK properties
-    augmentModel(model);
+    // Augment AST nodes with SDK properties for all loaded models
+    for (const doc of allDocuments) {
+        const docModel = doc.parseResult.value;
+        if (isModel(docModel)) {
+            augmentModel(docModel);
+        }
+    }
     
-    // Collect all document URIs
-    const documentUris: URI[] = Array.from(shared.workspace.LangiumDocuments.all).map(doc => doc.uri);
+    // Collect all document URIs from the import graph
+    const documentUris: URI[] = Array.from(importedUris).map(uriStr => URI.parse(uriStr));
     
     return {
         model,

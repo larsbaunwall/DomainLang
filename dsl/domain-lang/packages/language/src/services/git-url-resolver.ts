@@ -13,65 +13,12 @@
 import { URI } from 'langium';
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import os from 'node:os';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import YAML from 'yaml';
+import type { GitImportInfo, ResolvingPackage, LockFile } from './types.js';
 
 const execAsync = promisify(exec);
-
-/**
- * Parsed git import with repository-level information.
- */
-export interface GitImportInfo {
-    /** Original import string */
-    original: string;
-    /** Git platform (github, gitlab, bitbucket, or generic) */
-    platform: 'github' | 'gitlab' | 'bitbucket' | 'generic';
-    /** Repository owner/organization */
-    owner: string;
-    /** Repository name */
-    repo: string;
-    /** Version (tag, branch, or commit hash) */
-    version: string;
-    /** Full git repository URL */
-    repoUrl: string;
-    /** Package main entry point (from dlang.toml or default index.dlang) */
-    entryPoint: string;
-}
-
-/**
- * Package metadata from model.yaml
- */
-export interface PackageMetadata {
-    name?: string;
-    version?: string;
-    main?: string; // Entry point file (legacy field name for compatibility)
-    entry?: string; // Entry point file (preferred field name)
-    exports?: Record<string, string>;
-    dependencies?: Record<string, string>; // name → version constraint
-}
-
-/**
- * Lock file format (dlang.lock)
- * 
- * Pins exact versions and commit hashes for all dependencies
- * in the dependency tree. Ensures reproducible builds.
- */
-export interface LockFile {
-    version: string; // Lock file format version (currently "1")
-    dependencies: Record<string, LockedDependency>; // package name → locked info
-}
-
-/**
- * A single locked dependency with pinned version and commit.
- */
-export interface LockedDependency {
-    version: string; // Resolved semantic version
-    resolved: string; // Full git URL
-    commit: string; // Exact commit hash (content-addressable)
-    integrity?: string; // Optional SHA-256 hash for verification
-}
 
 /**
  * Parses import URLs into structured git import information.
@@ -121,7 +68,10 @@ export class GitUrlParser {
             return this.parseFullUrl(importStr);
         }
 
-        throw new Error(`Invalid git import URL: ${importStr}`);
+        throw new Error(
+            `Invalid git import URL: '${importStr}'.\n` +
+            `Hint: Use 'owner/repo' or 'owner/repo@version' format (e.g., 'domainlang/core@v1.0.0').`
+        );
     }
 
     /**
@@ -137,7 +87,10 @@ export class GitUrlParser {
     private static parseGitHubShorthand(importStr: string): GitImportInfo {
         const match = importStr.match(/^([a-zA-Z0-9-]+)\/([a-zA-Z0-9-_.]+)(?:@([^/]+))?$/);
         if (!match) {
-            throw new Error(`Invalid GitHub shorthand format: ${importStr}`);
+            throw new Error(
+                `Invalid GitHub shorthand format: '${importStr}'.\n` +
+                `Hint: Use 'owner/repo' or 'owner/repo@version' format.`
+            );
         }
 
         const [, owner, repo, version] = match;
@@ -150,7 +103,7 @@ export class GitUrlParser {
             repo,
             version: resolvedVersion,
             repoUrl: `https://github.com/${owner}/${repo}`,
-            entryPoint: 'index.dlang', // Default, will be resolved from dlang.toml
+            entryPoint: 'index.dlang', // Default, will be resolved from model.yaml
         };
     }
 
@@ -231,7 +184,14 @@ export class GitUrlParser {
             };
         }
 
-        throw new Error(`Unsupported git URL format: ${importStr}`);
+        throw new Error(
+            `Unsupported git URL format: '${importStr}'.\n` +
+            `Supported formats:\n` +
+            `  • owner/repo (GitHub shorthand)\n` +
+            `  • owner/repo@version\n` +
+            `  • https://github.com/owner/repo\n` +
+            `  • https://gitlab.com/owner/repo`
+        );
     }
 }
 
@@ -239,18 +199,25 @@ export class GitUrlParser {
  * Resolves git repository imports to local entry point files.
  * 
  * Implements a content-addressable cache:
- * - Cache location: ~/.dlang/cache/
- * - Cache key: platform/owner/repo/commit-hash
+ * - Cache location: .dlang/packages/ (project-local, per PRS-010)
+ * - Cache key: {owner}/{repo}/{commit-hash}
  * - Downloads entire repository on first use
- * - Reads dlang.toml to find entry point
+ * - Reads model.yaml to find entry point
  * - Returns URI to entry point file
  */
 export class GitUrlResolver {
     private cacheDir: string;
     private lockFile?: LockFile;
 
-    constructor(cacheDir?: string) {
-        this.cacheDir = cacheDir || path.join(os.homedir(), '.dlang', 'cache');
+    /**
+     * Creates a GitUrlResolver with a project-local cache directory.
+     * 
+     * @param cacheDir - The cache directory path. Per PRS-010, this should be
+     *                   the project's `.dlang/packages/` directory for isolation
+     *                   and reproducibility (like node_modules).
+     */
+    constructor(cacheDir: string) {
+        this.cacheDir = cacheDir;
     }
 
     /**
@@ -275,13 +242,13 @@ export class GitUrlResolver {
      * 3. Resolve version to commit hash (if not locked)
      * 4. Check cache
      * 5. Download repository if not cached
-     * 6. Read dlang.toml to find entry point
+     * 6. Read model.yaml to find entry point
      * 7. Return URI to entry point file
      * 
      * @param importUrl - The git import URL
      * @returns URI to the package's entry point file
      */
-    async resolve(importUrl: string): Promise<URI> {
+    async resolve(importUrl: string, options: { allowNetwork?: boolean } = {}): Promise<URI> {
         const gitInfo = GitUrlParser.parse(importUrl);
 
         // Check lock file for pinned version (handles transitive dependencies)
@@ -292,7 +259,15 @@ export class GitUrlResolver {
             // Use locked commit hash (reproducible build)
             commitHash = this.lockFile.dependencies[packageKey].commit;
         } else {
-            // Resolve version dynamically (development mode or missing lock)
+            // No lock file entry - need to resolve dynamically
+            if (options.allowNetwork === false) {
+                // LSP mode: cannot perform network operations
+                throw new Error(
+                    `Dependency '${packageKey}' not installed.\n` +
+                    `Hint: Run 'dlang install' to fetch dependencies and generate model.lock.`
+                );
+            }
+            // CLI/dev mode: resolve version via network
             commitHash = await this.resolveCommit(gitInfo);
         }
 
@@ -300,6 +275,13 @@ export class GitUrlResolver {
         const cachedPath = this.getCachePath(gitInfo, commitHash);
 
         if (!(await this.existsInCache(cachedPath))) {
+            if (options.allowNetwork === false) {
+                throw new Error(
+                    `Dependency '${packageKey}' not installed.\n` +
+                    `Hint: Run 'dlang install' to fetch dependencies.`
+                );
+            }
+
             // Download repository
             await this.downloadRepo(gitInfo, commitHash, cachedPath);
         }
@@ -311,7 +293,8 @@ export class GitUrlResolver {
         // Verify entry point exists
         if (!(await this.existsInCache(entryFile))) {
             throw new Error(
-                `Entry point not found: ${entryPoint} in ${gitInfo.repoUrl}@${gitInfo.version}`
+                `Entry point '${entryPoint}' not found in package '${gitInfo.owner}/${gitInfo.repo}@${gitInfo.version}'.\n` +
+                `Hint: Ensure the package has an entry point file (default: index.dlang).`
             );
         }
 
@@ -328,8 +311,7 @@ export class GitUrlResolver {
         try {
             const yamlContent = await fs.readFile(yamlPath, 'utf-8');
             const metadata = this.parseYaml(yamlContent);
-            // Prefer 'entry' field, fallback to 'main' for backward compatibility
-            return metadata.entry || metadata.main || 'index.dlang';
+            return metadata.entry ?? 'index.dlang';
         } catch {
             // No model.yaml or parse error, use default
             return 'index.dlang';
@@ -343,19 +325,17 @@ export class GitUrlResolver {
      * model:
      *   entry: index.dlang
      */
-    private parseYaml(content: string): PackageMetadata {
+    private parseYaml(content: string): ResolvingPackage {
         const parsed = YAML.parse(content) as {
             model?: {
                 name?: string;
                 version?: string;
                 entry?: string;
-                main?: string;
             };
         };
 
         return {
             entry: parsed.model?.entry,
-            main: parsed.model?.main,
             name: parsed.model?.name,
             version: parsed.model?.version,
         };
@@ -381,10 +361,15 @@ export class GitUrlResolver {
                 return gitInfo.version;
             }
 
-            throw new Error(`Could not resolve version: ${gitInfo.version}`);
+            throw new Error(
+                `Could not resolve version '${gitInfo.version}' for ${gitInfo.repoUrl}.\n` +
+                `Hint: Check that the version (tag, branch, or commit) exists in the repository.`
+            );
         } catch (error) {
             throw new Error(
-                `Failed to resolve git version ${gitInfo.version} for ${gitInfo.repoUrl}: ${error}`
+                `Failed to resolve git version '${gitInfo.version}' for ${gitInfo.repoUrl}.\n` +
+                `Error: ${error}\n` +
+                `Hint: Verify the repository URL is correct and accessible.`
             );
         }
     }
@@ -392,12 +377,14 @@ export class GitUrlResolver {
     /**
      * Gets the local cache path for a git repository.
      * 
-     * Format: ~/.dlang/cache/{platform}/{owner}/{repo}/{commit-hash}/
+     * Format: .dlang/packages/{owner}/{repo}/{version}/
+     * 
+     * Per PRS-010: Project-local cache structure mirrors the Design Considerations
+     * section showing `.dlang/packages/{owner}/{repo}/{version}/` layout.
      */
     private getCachePath(gitInfo: GitImportInfo, commitHash: string): string {
         return path.join(
             this.cacheDir,
-            gitInfo.platform,
             gitInfo.owner,
             gitInfo.repo,
             commitHash
@@ -448,7 +435,9 @@ export class GitUrlResolver {
             await fs.rm(targetDir, { recursive: true, force: true });
             const message = error instanceof Error ? error.message : String(error);
             throw new Error(
-                `Failed to download git repository ${gitInfo.repoUrl}@${gitInfo.version}: ${message}`
+                `Failed to download package '${gitInfo.owner}/${gitInfo.repo}@${gitInfo.version}'.\n` +
+                `Error: ${message}\n` +
+                `Hint: Check your network connection and verify the repository URL is correct.`
             );
         }
     }
@@ -462,6 +451,8 @@ export class GitUrlResolver {
 
     /**
      * Gets cache statistics (size, number of cached repos, etc.).
+     * 
+     * Cache structure: .dlang/packages/{owner}/{repo}/{version}/
      */
     async getCacheStats(): Promise<{
         totalSize: number;
@@ -472,22 +463,24 @@ export class GitUrlResolver {
         let repoCount = 0;
 
         try {
-            const platforms = await fs.readdir(this.cacheDir);
-            for (const platform of platforms) {
-                const platformPath = path.join(this.cacheDir, platform);
-                const owners = await fs.readdir(platformPath);
-                for (const owner of owners) {
-                    const ownerPath = path.join(platformPath, owner);
-                    const repos = await fs.readdir(ownerPath);
-                    for (const repo of repos) {
-                        const repoPath = path.join(ownerPath, repo);
-                        const commits = await fs.readdir(repoPath);
-                        repoCount += commits.length;
+            const owners = await fs.readdir(this.cacheDir);
+            for (const owner of owners) {
+                const ownerPath = path.join(this.cacheDir, owner);
+                const ownerStat = await fs.stat(ownerPath);
+                if (!ownerStat.isDirectory()) continue;
+                
+                const repos = await fs.readdir(ownerPath);
+                for (const repo of repos) {
+                    const repoPath = path.join(ownerPath, repo);
+                    const repoStat = await fs.stat(repoPath);
+                    if (!repoStat.isDirectory()) continue;
+                    
+                    const versions = await fs.readdir(repoPath);
+                    repoCount += versions.length;
 
-                        for (const commit of commits) {
-                            const commitPath = path.join(repoPath, commit);
-                            totalSize += await this.getDirectorySize(commitPath);
-                        }
+                    for (const version of versions) {
+                        const versionPath = path.join(repoPath, version);
+                        totalSize += await this.getDirectorySize(versionPath);
                     }
                 }
             }

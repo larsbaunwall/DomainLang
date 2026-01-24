@@ -1,5 +1,6 @@
 import type { ValidationChecks } from 'langium';
 import type { Metadata, DomainLangAstType } from '../generated/ast.js';
+import { ValidationMessages, buildCodeDescription } from './constants.js';
 
 /**
  * Validation checks for Metadata elements.
@@ -8,7 +9,10 @@ import type { Metadata, DomainLangAstType } from '../generated/ast.js';
 export const metadataChecks: ValidationChecks<DomainLangAstType> = {
     Metadata(metadata: Metadata, accept) {
         if (!metadata.name) {
-            accept('error', 'Metadata must have a name', { node: metadata });
+            accept('error', ValidationMessages.METADATA_MISSING_NAME(), { 
+                node: metadata,
+                codeDescription: buildCodeDescription('language.md', 'metadata')
+            });
         }
     },
 };

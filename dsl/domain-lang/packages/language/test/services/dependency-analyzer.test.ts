@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { DependencyAnalyzer } from '../../src/services/dependency-analyzer.js';
-import type { LockFile } from '../../src/services/git-url-resolver.js';
+import type { LockFile } from '../../src/services/types.js';
 import { join } from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -34,7 +34,8 @@ describe('DependencyAnalyzer', () => {
                 version: '1',
                 dependencies: {
                     'acme/patterns': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/patterns',
                         commit: 'abc123',
                     },
@@ -67,7 +68,7 @@ describe('DependencyAnalyzer', () => {
             // Arrange
             const tree = [{
                 packageKey: 'acme/patterns',
-                version: '1.0.0',
+                ref: '1.0.0',
                 commit: 'abc123',
                 dependencies: [],
                 depth: 0,
@@ -84,11 +85,11 @@ describe('DependencyAnalyzer', () => {
             // Arrange
             const tree = [{
                 packageKey: 'acme/patterns',
-                version: '1.0.0',
+                ref: '1.0.0',
                 commit: 'abc123',
                 dependencies: [{
                     packageKey: 'acme/core',
-                    version: '2.0.0',
+                    ref: '2.0.0',
                     commit: 'def456',
                     dependencies: [],
                     depth: 1,
@@ -109,7 +110,7 @@ describe('DependencyAnalyzer', () => {
             // Arrange
             const tree = [{
                 packageKey: 'acme/patterns',
-                version: '1.0.0',
+                ref: '1.0.0',
                 commit: 'abc123def',
                 dependencies: [],
                 depth: 0,
@@ -130,7 +131,8 @@ describe('DependencyAnalyzer', () => {
                 version: '1',
                 dependencies: {
                     'acme/patterns': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/patterns',
                         commit: 'abc123',
                     },
@@ -152,51 +154,51 @@ describe('DependencyAnalyzer', () => {
     describe('resolveVersionPolicy', () => {
         test('should resolve "latest" policy', async () => {
             // Arrange
-            const versions = ['v1.0.0', 'v2.0.0', 'v1.5.0'];
+            const refs = ['v1.0.0', 'v2.0.0', 'v1.5.0'];
 
             // Act
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'latest',
-                versions
+                refs
             );
 
             // Assert
             expect(result.policy).toBe('latest');
-            expect(result.version).toBe('v2.0.0');
-            expect(result.availableVersions).toContain('v2.0.0');
+            expect(result.ref).toBe('v2.0.0');
+            expect(result.availableRefs).toContain('v2.0.0');
         });
 
         test('should resolve "stable" policy excluding pre-releases', async () => {
             // Arrange
-            const versions = ['v1.0.0', 'v2.0.0-beta', 'v1.5.0'];
+            const refs = ['v1.0.0', 'v2.0.0-beta', 'v1.5.0'];
 
             // Act
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'stable',
-                versions
+                refs
             );
 
             // Assert
             expect(result.policy).toBe('stable');
-            expect(result.version).toBe('v1.5.0'); // Excludes beta
+            expect(result.ref).toBe('v1.5.0'); // Excludes beta
         });
 
-        test('should resolve pinned version', async () => {
+        test('should resolve pinned ref', async () => {
             // Arrange
-            const versions = ['v1.0.0', 'v1.2.3', 'v2.0.0'];
+            const refs = ['v1.0.0', 'v1.2.3', 'v2.0.0'];
 
             // Act
             const result = await analyzer.resolveVersionPolicy(
                 'acme/test',
                 'v1.2.3',
-                versions
+                refs
             );
 
             // Assert
             expect(result.policy).toBe('pinned');
-            expect(result.version).toBe('v1.2.3');
+            expect(result.ref).toBe('v1.2.3');
         });
     });
 
@@ -220,12 +222,14 @@ describe('DependencyAnalyzer', () => {
                 version: '1',
                 dependencies: {
                     'acme/a': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/a',
                         commit: 'aaa',
                     },
                     'acme/b': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/b',
                         commit: 'bbb',
                     },
@@ -245,12 +249,14 @@ describe('DependencyAnalyzer', () => {
                 version: '1',
                 dependencies: {
                     'acme/a': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/a',
                         commit: 'aaa111',
                     },
                     'acme/b': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/b',
                         commit: 'bbb222',
                     },

@@ -58,6 +58,7 @@ npm test                  # Run tests
 | LSP Features | `packages/language/src/lsp/` | Hover, completion, formatting |
 | Validation | `packages/language/src/validation/` | Domain rules, BC checks |
 | Services | `packages/language/src/services/` | Import resolution, workspace |
+| Shared Types | `packages/language/src/services/types.ts` | **Single source of truth** for shared types |
 | Model Query SDK | `packages/language/src/sdk/` | Programmatic model queries |
 | Tests | `packages/language/test/` | Parsing, linking, validation tests |
 
@@ -77,6 +78,14 @@ npm test                  # Run tests
 3. **ALWAYS** run `npm run build` to compile TypeScript
 4. **ALWAYS** add test cases for parsing changes
 5. **ALWAYS** update documentation for new keywords/constructs (see below)
+
+### 📦 Type Organization
+
+**All shared types MUST go in `packages/language/src/services/types.ts`:**
+- Search `types.ts` before creating new interfaces
+- Consolidate similar types (don't create `PackageInfo`, `PackageMetadata`, `PackageSpec` separately)
+- Re-export from services for backwards API compatibility
+- See lead-engineer SKILL.md for detailed type organization patterns
 
 ### 📚 Documentation Requirements
 
@@ -106,6 +115,13 @@ npm run lint              # Must report: 0 errors, 0 warnings
 npm run build             # Must succeed
 npm test                  # Must pass
 ```
+
+**If working on a PRS implementation:**
+- Ask questions if any requirements are unclear or ambiguous
+- Use your plan feature to structure the implementation
+- Ensure all acceptance criteria are covered by tests
+- Track progress in the PRS document in `requirements/`
+
 
 ### Code Standards
 

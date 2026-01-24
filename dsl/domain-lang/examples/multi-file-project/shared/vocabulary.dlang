@@ -1,0 +1,42 @@
+// ============================================================================
+// Shared Vocabulary
+// ============================================================================
+// Common classifications and teams used across the project.
+// Import this file to get consistent terminology.
+
+// ============================================================================
+// Strategic Classifications
+// ============================================================================
+
+Classification CoreDomain
+Classification SupportingDomain
+Classification GenericDomain
+
+// Business model classifications (from BC Canvas)
+Classification Revenue
+Classification Engagement
+Classification Compliance
+
+// Evolution stages (from Wardley Maps)
+Classification Genesis
+Classification Custom
+Classification Product
+Classification Commodity
+
+// ============================================================================
+// Teams
+// ============================================================================
+
+Team SalesTeam
+Team MarketingTeam
+Team PlatformTeam
+Team ComplianceTeam
+
+// ============================================================================
+// Metadata Keys
+// ============================================================================
+
+Metadata Language
+Metadata Database
+Metadata MessageBroker
+Metadata DeploymentTarget

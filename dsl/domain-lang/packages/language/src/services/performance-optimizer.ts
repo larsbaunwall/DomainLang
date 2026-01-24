@@ -8,7 +8,7 @@
  * - Stale cache detection
  */
 
-import type { LockFile } from './git-url-resolver.js';
+import type { LockFile } from './types.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 

@@ -113,6 +113,67 @@ import { AstUtils } from 'langium';
 import { parse } from './parser.js';
 ```
 
+## Type Organization
+
+### Centralize Shared Types
+
+**Shared types MUST be defined in a single canonical location** to prevent type proliferation and maintain consistency.
+
+```typescript
+// ✅ Correct: Import from centralized types module
+import type { PackageMetadata, ModelManifest, LockFile } from '../services/types.js';
+
+// ❌ Avoid: Defining types inline in service files
+interface PackageMetadata { /* duplicate definition */ }
+```
+
+**Location:** `packages/language/src/services/types.ts`
+
+**Rules:**
+- All types shared across multiple services → `types.ts`
+- Service-specific internal types → can stay in service file (but consider centralizing)
+- Re-export from service files for backwards API compatibility
+
+### Before Adding a New Type
+
+1. **Search first:** Check if a similar type already exists in `types.ts`
+2. **Consolidate:** If similar, extend or merge with existing type
+3. **Document:** Add JSDoc explaining the type's purpose
+4. **Export:** Export from `types.ts` and re-export from relevant services
+
+### Type vs Interface Decisions
+
+```typescript
+// ✅ Use interface for user-facing data shapes (extensible)
+interface ModelManifest {
+    readonly name: string;
+    readonly version: string;
+    readonly dependencies?: readonly DependencySpec[];
+}
+
+// ✅ Use interface for internal mutable state
+interface PackageMetadata {
+    name: string;           // Mutable during resolution
+    resolvedVersion: string;
+}
+
+// ✅ Use type for unions, computed types, or discriminated unions
+type RefType = 'branch' | 'tag' | 'commit' | 'semver' | 'range' | 'latest';
+```
+
+### Avoid Type Proliferation
+
+Signs of problematic type proliferation:
+- Same concept defined with different names (`PackageInfo`, `PackageMetadata`, `PackageSpec`)
+- Types with 80%+ field overlap
+- Import cycles caused by scattered type definitions
+
+**When you find scattered types:**
+1. Identify the canonical location (`types.ts`)
+2. Consolidate into single definition
+3. Update all imports
+4. Add re-exports for backwards compatibility
+
 ## Functions
 
 ### Arrow Functions for Simple Operations

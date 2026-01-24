@@ -292,23 +292,18 @@ BusinessRule:
 // ============================================================================
 
 /**
- * Import Statement - Git-native import system inspired by Go modules and Deno.
+ * Import Statement - Manifest-centric import system per PRS-010.
  * 
- * Supported formats:
+ * Simplified syntax where import statements use short specifiers:
+ *   - External dependencies (from manifest): import "core" as Core
  *   - Local files: import "./shared/types.dlang"
  *   - Workspace-relative: import "~/contexts/sales.dlang"
- *   - GitHub packages: import "owner/repo@v1.0.0"
- *   - GitLab/Git URLs: import "https://gitlab.com/owner/repo@v1.0.0"
- *   - With aliases: import "ddd-patterns/core@v2.1.0" as DDD
- *   - Named imports: import { OrderContext } from "./contexts.dlang"
+ * 
+ * All resolution details (source, version, integrity) live in model.yaml manifest.
+ * Named imports and inline integrity checks have been removed per PRS-010.
  */
 ImportStatement:
-    /** Imports types or namespaces from another file or module, enabling reuse and modularity. */ ('Import' | 'import') (
-        '{' symbols+=ID (',' symbols+=ID)* '}' 'from' uri=STRING
-        | uri=STRING
-        ('integrity' integrity=STRING)?
-        ('as' alias=ID)?
-    )
+    /** Imports types or namespaces from another file or module, enabling reuse and modularity. */ ('Import' | 'import') uri=STRING ('as' alias=ID)?
 ;
 
 /**

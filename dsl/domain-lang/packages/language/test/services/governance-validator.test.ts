@@ -1,7 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { GovernanceValidator, loadGovernancePolicy } from '../../src/services/governance-validator.js';
-import type { LockFile } from '../../src/services/git-url-resolver.js';
-import type { GovernancePolicy } from '../../src/services/governance-validator.js';
+import type { LockFile, GovernancePolicy } from '../../src/services/types.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -16,7 +15,8 @@ describe('GovernanceValidator', () => {
                 version: '1',
                 dependencies: {
                     'acme/patterns': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/patterns',
                         commit: 'abc123',
                     },
@@ -40,7 +40,8 @@ describe('GovernanceValidator', () => {
                 version: '1',
                 dependencies: {
                     'evil/malware': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/evil/malware',
                         commit: 'xxx',
                     },
@@ -66,7 +67,8 @@ describe('GovernanceValidator', () => {
                 version: '1',
                 dependencies: {
                     'acme/patterns': {
-                        version: '1.0.0-beta',
+                        ref: '1.0.0-beta',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/patterns',
                         commit: 'abc',
                     },
@@ -92,7 +94,8 @@ describe('GovernanceValidator', () => {
                 version: '1',
                 dependencies: {
                     'acme/patterns': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/patterns',
                         commit: 'abc',
                     },
@@ -116,7 +119,8 @@ describe('GovernanceValidator', () => {
                 version: '1',
                 dependencies: {
                     'evil/malware': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/evil/malware',
                         commit: 'xxx',
                     },
@@ -141,7 +145,8 @@ describe('GovernanceValidator', () => {
                 version: '1',
                 dependencies: {
                     'acme/patterns': {
-                        version: '1.0.0',
+                        ref: '1.0.0',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/patterns',
                         commit: 'abc123',
                     },
@@ -167,7 +172,8 @@ describe('GovernanceValidator', () => {
                 version: '1',
                 dependencies: {
                     'acme/patterns': {
-                        version: '1.0.0-alpha',
+                        ref: '1.0.0-alpha',
+                        refType: 'tag',
                         resolved: 'https://github.com/acme/patterns',
                         commit: 'abc',
                     },

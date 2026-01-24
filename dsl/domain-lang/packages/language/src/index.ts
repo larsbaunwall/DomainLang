@@ -6,6 +6,9 @@ export * from './generated/module.js';
 // and creates a connection when imported, which breaks CLI/SDK standalone usage
 export * from './ast-augmentation.js';
 
+// Export centralized types (canonical source for all service types)
+export * from './services/types.js';
+
 // Export services
 export * from './services/workspace-manager.js';
 export * from './services/dependency-resolver.js';
@@ -15,3 +18,7 @@ export * from './services/import-resolver.js';
 export * from './services/relationship-inference.js';
 export * from './services/git-url-resolver.js';
 export * from './services/performance-optimizer.js';
+export * from './services/semver.js';
+
+// Export LSP services
+export * from './lsp/manifest-diagnostics.js';

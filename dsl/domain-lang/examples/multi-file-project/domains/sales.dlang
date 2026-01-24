@@ -1,0 +1,82 @@
+// ============================================================================
+// Sales Domain Model
+// ============================================================================
+// This file defines the Sales domain and its bounded contexts.
+
+// Import shared vocabulary using path alias
+import "@shared/vocabulary.dlang"
+
+// ============================================================================
+// Domain Definition
+// ============================================================================
+
+Domain Sales {
+    description: "Revenue generation through product sales"
+    vision: "Make buying easy and delightful"
+    type: CoreDomain
+}
+
+// ============================================================================
+// Classification for Decisions
+// ============================================================================
+
+Classification Architectural
+Classification Business
+
+// ============================================================================
+// Bounded Contexts
+// ============================================================================
+
+bc Orders for Sales as CoreDomain by SalesTeam {
+    description: "Order lifecycle from cart to fulfillment"
+    businessModel: Revenue
+    evolution: Product
+    
+    metadata {
+        Language: "TypeScript"
+        Database: "PostgreSQL"
+        MessageBroker: "RabbitMQ"
+    }
+    
+    terminology {
+        term Order: "A customer's request to purchase products"
+            aka PurchaseOrder
+            examples "Order #12345"
+        
+        term OrderLine: "A single product entry within an order"
+            examples "2x Widget @ $10.00"
+        
+        term Cart: "Temporary collection of items before checkout"
+    }
+    
+    decisions {
+        decision [Architectural] EventSourcing: "Capture every state change for audit"
+        policy [Business] Cancellation: "Orders can be cancelled within 24 hours"
+        rule [Business] MinimumOrder: "Minimum order value is $10"
+    }
+}
+
+bc Checkout for Sales as CoreDomain by SalesTeam {
+    description: "Payment processing and checkout orchestration"
+    businessModel: Revenue
+    evolution: Product
+    
+    metadata {
+        Language: "TypeScript"
+        DeploymentTarget: "AWS Lambda"
+    }
+    
+    relationships {
+        [OHS] this -> [ACL] Orders : UpstreamDownstream
+    }
+}
+
+bc Catalog for Sales as SupportingDomain by PlatformTeam {
+    description: "Product catalog and inventory management"
+    evolution: Commodity
+    
+    metadata {
+        Language: "Go"
+        Database: "PostgreSQL"
+    }
+}

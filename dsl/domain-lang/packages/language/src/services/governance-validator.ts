@@ -19,45 +19,11 @@
  * ```
  */
 
-import type { LockFile } from './git-url-resolver.js';
+import type { LockFile, GovernancePolicy, GovernanceMetadata, GovernanceViolation } from './types.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import YAML from 'yaml';
-
-export interface GovernancePolicy {
-    /** Allowed git domains (e.g., ['github.com/acme']) */
-    allowedSources?: string[];
-    /** Blocked packages or patterns */
-    blockedPackages?: string[];
-    /** Require stable versions only (no pre-release) */
-    requireStableVersions?: boolean;
-    /** Require team ownership metadata */
-    requireTeamOwnership?: boolean;
-    /** Allowed licenses */
-    allowedLicenses?: string[];
-}
-
-export interface GovernanceMetadata {
-    /** Team responsible for the model */
-    team?: string;
-    /** Contact email */
-    contact?: string;
-    /** Business domain */
-    domain?: string;
-    /** Compliance tags */
-    compliance?: string[];
-}
-
-export interface GovernanceViolation {
-    /** Type of violation */
-    type: 'blocked-source' | 'unstable-version' | 'missing-metadata' | 'license-violation';
-    /** Package that violates the policy */
-    packageKey: string;
-    /** Violation message */
-    message: string;
-    /** Severity: error or warning */
-    severity: 'error' | 'warning';
-}
+import { isPreRelease } from './semver.js';
 
 /**
  * Validates dependencies against organizational governance policies.
@@ -107,11 +73,11 @@ export class GovernanceValidator {
 
             // Check version stability
             if (this.policy.requireStableVersions) {
-                if (this.isPreReleaseVersion(locked.version)) {
+                if (isPreRelease(locked.ref)) {
                     violations.push({
                         type: 'unstable-version',
                         packageKey,
-                        message: `Pre-release version not allowed: ${locked.version}`,
+                        message: `Pre-release ref not allowed: ${locked.ref}`,
                         severity: 'error',
                     });
                 }
@@ -170,7 +136,7 @@ export class GovernanceValidator {
         lines.push('Dependencies:');
 
         for (const [packageKey, locked] of Object.entries(lockFile.dependencies)) {
-            lines.push(`  - ${packageKey}@${locked.version}`);
+            lines.push(`  - ${packageKey}@${locked.ref}`);
             lines.push(`    Source: ${locked.resolved}`);
             lines.push(`    Commit: ${locked.commit}`);
         }
@@ -187,14 +153,6 @@ export class GovernanceValidator {
         }
 
         return lines.join('\n');
-    }
-
-    /**
-     * Checks if a version is a pre-release.
-     */
-    private isPreReleaseVersion(version: string): boolean {
-        const clean = version.replace(/^v/, '');
-        return /-(alpha|beta|rc|pre|dev|snapshot)/.test(clean);
     }
 }
 
