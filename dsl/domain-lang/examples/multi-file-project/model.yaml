@@ -1,0 +1,39 @@
+# Package manifest for multi-file-project example
+# See: docs/imports.md for full documentation
+
+# Package identity (required for publishing)
+model:
+  name: examples/multi-file-project
+  version: 1.0.0
+  entry: index.dlang
+
+# Path aliases for @ imports
+paths:
+  "@/": "./"
+  "@shared/": "./shared/"
+  "@domains/": "./domains/"
+
+# External package dependencies
+dependencies:
+  # Short form: package-key: "git-ref"
+  acme/ddd-core: "v1.0.0"
+  
+  # Extended form with additional options
+  acme/compliance:
+    source: acme/compliance
+    ref: v2.0.0
+    description: "Compliance classifications for regulated domains"
+
+# Override transitive dependency refs when conflicts occur
+overrides:
+  acme/utils: "v3.0.0"
+
+# Governance policies (optional)
+governance:
+  # Only allow packages from trusted sources
+  allowedSources:
+    - github.com/acme
+    - github.com/examples
+  
+  # Require stable versions (no pre-release tags)
+  requireStableVersions: true

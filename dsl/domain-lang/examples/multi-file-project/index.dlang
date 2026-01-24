@@ -1,0 +1,26 @@
+// ============================================================================
+// Multi-File Project - Entry Point
+// ============================================================================
+// This is the main entry point that aggregates all domain models.
+// See model.yaml for project configuration.
+
+// Import shared vocabulary
+import "@shared/vocabulary.dlang"
+
+// Import domain models
+import "@domains/sales.dlang"
+
+// ============================================================================
+// Context Map - System Architecture View
+// ============================================================================
+
+ContextMap SalesSystem {
+    contains Orders, Checkout, Catalog
+    
+    // Checkout orchestrates orders
+    [OHS] Checkout -> [ACL] Orders
+    
+    // Catalog provides product data
+    Catalog -> Orders
+    Catalog -> Checkout
+}
