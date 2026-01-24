@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="images/logo-with-text-light-thin@2x.png">
   <source media="(prefers-color-scheme: light)" srcset="images/logo-with-text-thin@2x.png">
-  <img alt="DomainLang Logo" src="images/logo-with-text-thin@2x.png">
+  <img alt="DomainLang Logo" style="max-width:50%" src="images/logo-with-text-thin@2x.png">
 </picture>
 
 # A DSL for Domain Driven Design
