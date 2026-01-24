@@ -1,6 +1,10 @@
-<img src="images/icon.png" width="100" />
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="images/logo-with-text-light-thin@2x.png">
+  <source media="(prefers-color-scheme: light)" srcset="images/logo-with-text-thin@2x.png">
+  <img alt="DomainLang Logo" src="images/logo-with-text-thin@2x.png">
+</picture>
 
-# DomainLang
+# A DSL for Domain Driven Design
 
 [![Build](https://github.com/larsbaunwall/DomainLang/actions/workflows/build.yml/badge.svg)](https://github.com/larsbaunwall/DomainLang/actions/workflows/build.yml)
 [![VS Marketplace](https://vsmarketplacebadges.dev/version/thinkability.domain-lang.svg)](https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang)
