@@ -7,7 +7,7 @@
 
 import { describe, test, expect } from 'vitest';
 import { loadModelFromText } from '../../src/sdk/loader.js';
-import type { AugmentedBoundedContext } from '../../src/sdk/types.js';
+import type { BoundedContext } from '../../src/generated/ast.js';
 
 describe('SDK Standalone Usage', () => {
     describe('loadModelFromText', () => {
@@ -44,7 +44,7 @@ describe('SDK Standalone Usage', () => {
             const { query } = await loadModelFromText(text);
             
             // Assert
-            const bcs = [...query.boundedContexts()] as AugmentedBoundedContext[];
+            const bcs = [...query.boundedContexts()] as BoundedContext[];
             expect(bcs.length).toBe(1);
             expect(bcs[0].name).toBe('OrderContext');
             expect(bcs[0].description).toBe('Order processing');
@@ -101,7 +101,7 @@ describe('SDK Standalone Usage', () => {
             
             // Act
             const { query } = await loadModelFromText(text);
-            const allBcs = [...query.boundedContexts()] as AugmentedBoundedContext[];
+            const allBcs = [...query.boundedContexts()] as BoundedContext[];
             const coreBcs = allBcs.filter(bc => bc.description?.includes('Core'));
             const analyticsBcs = allBcs.filter(bc => bc.description?.includes('Analytics'));
             

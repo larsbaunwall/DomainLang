@@ -306,29 +306,6 @@ export interface RelationshipView {
 }
 
 /**
- * Augmented BoundedContext with SDK-resolved properties.
- * These properties are computed during model loading using precedence rules.
- * 
- * Property names follow the PRS design: natural names that "just work" with
- * IDE autocomplete. Use `resolved*` prefix to avoid conflicts with existing
- * AST properties while maintaining discoverability.
- * 
- * @deprecated Since SDK now uses module augmentation in ast-augmentation.ts,
- * this type alias is only kept for backwards compatibility. Use BoundedContext
- * directly after importing the SDK.
- */
-export type AugmentedBoundedContext = BoundedContext;
-
-/**
- * Augmented Domain with SDK-resolved properties.
- * 
- * @deprecated Since SDK now uses module augmentation in ast-augmentation.ts,
- * this type alias is only kept for backwards compatibility. Use Domain
- * directly after importing the SDK.
- */
-export type AugmentedDomain = Domain;
-
-/**
  * Internal index structure for O(1) lookups.
  * Not exported from public API.
  */
