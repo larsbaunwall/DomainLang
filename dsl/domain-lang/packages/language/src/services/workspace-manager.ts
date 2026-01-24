@@ -4,7 +4,15 @@ import YAML from 'yaml';
 import { DependencyResolver } from './dependency-resolver.js';
 import { GitUrlResolver } from './git-url-resolver.js';
 import { getGlobalOptimizer } from './performance-optimizer.js';
-import type { LockFile, LockedDependency } from './git-url-resolver.js';
+import type { 
+    LockFile, 
+    LockedDependency, 
+    ModelManifest, 
+    DependencySpec, 
+    ExtendedDependencySpec, 
+    PathAliases,
+    WorkspaceManagerOptions 
+} from './types.js';
 
 const DEFAULT_MANIFEST_FILES = [
     'model.yaml'
@@ -15,30 +23,6 @@ const DEFAULT_LOCK_FILES = [
 ] as const;
 
 const JSON_SPACE = 2;
-
-export interface WorkspaceManagerOptions {
-    readonly autoResolve?: boolean;
-    readonly manifestFiles?: readonly string[];
-    readonly lockFiles?: readonly string[];
-}
-
-interface ManifestDependency {
-    readonly source?: string;      // Git coordinates (owner/repo) - mutually exclusive with path
-    readonly version?: string;     // Pinned version (tag, branch, or commit SHA)
-    readonly path?: string;        // Local path for monorepo/workspace dependencies - mutually exclusive with source
-    readonly integrity?: string;   // Optional SHA-256 hash for verification
-    readonly description?: string; // Optional human-readable description
-}
-
-interface ModelManifest {
-    readonly model?: {
-        readonly name?: string;      // Package name (required for publishable packages)
-        readonly version?: string;   // SemVer (required for publishable packages)
-        readonly namespace?: string; // Root namespace this package exports (optional)
-        readonly entry?: string;     // Entry point file (default: index.dlang)
-    };
-    readonly dependencies?: Record<string, ManifestDependency>;
-}
 
 interface ManifestCache {
     readonly manifest: ModelManifest;
@@ -112,6 +96,15 @@ export class WorkspaceManager {
     }
 
     /**
+     * Returns the parsed manifest when present, otherwise undefined.
+     * Uses cached contents when unchanged on disk.
+     */
+    async getManifest(): Promise<ModelManifest | undefined> {
+        await this.ensureInitialized();
+        return this.loadManifest();
+    }
+
+    /**
      * Returns the cached lock file or triggers resolution when missing.
      */
     async ensureLockFile(): Promise<LockFile> {
@@ -125,12 +118,21 @@ export class WorkspaceManager {
             if (cached) {
                 this.lockFile = cached;
             } else {
+                if (this.options.allowNetwork === false) {
+                    throw new Error(
+                        'Lock file (model.lock) not found and network access is disabled.\n' +
+                        'Hint: Run \'dlang install\' to generate the lock file.'
+                    );
+                }
                 await this.generateLockFile();
             }
         }
 
         if (!this.lockFile) {
-            throw new Error('Unable to resolve workspace lock file.');
+            throw new Error(
+                'Unable to resolve workspace lock file.\n' +
+                'Hint: Ensure model.yaml exists and run \'dlang install\' to generate model.lock.'
+            );
         }
 
         return this.lockFile;
@@ -152,6 +154,41 @@ export class WorkspaceManager {
         const loaded = await this.loadLockFileFromDisk();
         this.applyLockFile(loaded);
         return this.lockFile;
+    }
+
+    /**
+     * Invalidates all cached data (manifest and lock file).
+     * Call this when config files change externally (e.g., from CLI commands).
+     * 
+     * After invalidation, the next call to getManifest() or getLockFile()
+     * will re-read from disk.
+     */
+    invalidateCache(): void {
+        this.manifestCache = undefined;
+        this.lockFile = undefined;
+        // Re-apply undefined to git resolver to clear its lock file
+        if (this.gitResolver) {
+            this.gitResolver.setLockFile(undefined);
+        }
+    }
+
+    /**
+     * Invalidates only the manifest cache.
+     * Call this when model.yaml changes.
+     */
+    invalidateManifestCache(): void {
+        this.manifestCache = undefined;
+    }
+
+    /**
+     * Invalidates only the lock file cache.
+     * Call this when model.lock changes.
+     */
+    invalidateLockCache(): void {
+        this.lockFile = undefined;
+        if (this.gitResolver) {
+            this.gitResolver.setLockFile(undefined);
+        }
     }
 
     /**
@@ -178,12 +215,44 @@ export class WorkspaceManager {
     }
 
     /**
-     * Resolves a manifest dependency alias to its git import string.
-     *
-     * @param aliasPath - Alias from import statement (may include subpaths)
-     * @returns Resolved git import string or undefined when alias is unknown
+     * Returns the path aliases from the manifest, if present.
      */
-    async resolveDependencyImport(aliasPath: string): Promise<string | undefined> {
+    async getPathAliases(): Promise<PathAliases | undefined> {
+        const manifest = await this.getManifest();
+        return manifest?.paths;
+    }
+
+    /**
+     * Normalizes a dependency entry to its extended form.
+     * Handles both short form (string version) and extended form (object).
+     * 
+     * In the new format, the key IS the owner/package, so source is derived from key
+     * ONLY for git dependencies (not for path-based local dependencies).
+     */
+    private normalizeDependency(key: string, dep: DependencySpec): ExtendedDependencySpec {
+        if (typeof dep === 'string') {
+            // Short form: "owner/package": "v1.0.0" or "main"
+            // Key is the source (owner/package format)
+            return { source: key, ref: dep };
+        }
+        // Extended form:
+        // - If has source: use as-is
+        // - If has path: it's a local dep, don't set source
+        // - If neither: derive source from key (owner/package becomes source)
+        if (dep.source || dep.path) {
+            return dep;
+        }
+        return { ...dep, source: key };
+    }
+
+    /**
+     * Resolves a manifest dependency to its git import string.
+     * 
+     * NEW FORMAT (PRS-010): Dependencies are keyed by owner/package directly
+     * @param specifier - Import specifier (owner/package format, may include subpaths)
+     * @returns Resolved git import string or undefined when not found
+     */
+    async resolveDependencyImport(specifier: string): Promise<string | undefined> {
         await this.ensureInitialized();
         const manifest = await this.loadManifest();
         const dependencies = manifest?.dependencies;
@@ -192,18 +261,28 @@ export class WorkspaceManager {
             return undefined;
         }
 
-        for (const [alias, dep] of Object.entries(dependencies)) {
-            if (!dep?.source) {
+        // NEW: Dependencies are keyed by owner/package (e.g., "domainlang/core")
+        // Import specifier is also owner/package, potentially with subpath
+        for (const [key, dep] of Object.entries(dependencies)) {
+            const normalized = this.normalizeDependency(key, dep);
+            
+            // Skip path-based dependencies (handled by path aliases)
+            if (normalized.path) {
                 continue;
             }
 
-            if (aliasPath === alias || aliasPath.startsWith(`${alias}/`)) {
-                const suffix = aliasPath.slice(alias.length);
-                const version = dep.version ?? '';
-                const versionSegment = version
-                    ? (version.startsWith('@') ? version : `@${version}`)
+            if (!normalized.source) {
+                continue;
+            }
+
+            // Match if specifier equals key or starts with key/
+            if (specifier === key || specifier.startsWith(`${key}/`)) {
+                const suffix = specifier.slice(key.length);
+                const ref = normalized.ref ?? '';
+                const refSegment = ref
+                    ? (ref.startsWith('@') ? ref : `@${ref}`)
                     : '';
-                return `${dep.source}${versionSegment}${suffix}`;
+                return `${normalized.source}${refSegment}${suffix}`;
             }
         }
 
@@ -211,16 +290,15 @@ export class WorkspaceManager {
     }
 
     private async performInitialization(startPath: string): Promise<void> {
-        this.workspaceRoot = await this.findWorkspaceRoot(startPath);
-        if (!this.workspaceRoot) {
-            throw new Error('Workspace root (directory with model.yaml) not found.');
-        }
+        this.workspaceRoot = await this.findWorkspaceRoot(startPath) ?? path.resolve(startPath);
 
-        this.gitResolver = new GitUrlResolver();
+        // Per PRS-010: Project-local cache at .dlang/packages/ (like node_modules)
+        const cacheDir = path.join(this.workspaceRoot, '.dlang', 'packages');
+        this.gitResolver = new GitUrlResolver(cacheDir);
         const loaded = await this.loadLockFileFromDisk();
         this.applyLockFile(loaded);
 
-        if (!this.lockFile && this.options.autoResolve !== false) {
+        if (!this.lockFile && this.options.autoResolve !== false && this.options.allowNetwork !== false) {
             await this.generateLockFile();
         }
     }
@@ -258,8 +336,8 @@ export class WorkspaceManager {
         }
 
         const lockFile = await resolver.resolveDependencies();
-    this.lockFile = lockFile;
-    this.gitResolver.setLockFile(lockFile);
+        this.lockFile = lockFile;
+        this.gitResolver.setLockFile(lockFile);
 
         // Write JSON lock file
         await this.writeJsonLockFile(lockFile);
@@ -358,39 +436,73 @@ export class WorkspaceManager {
     /**
      * Validates manifest structure and dependency configurations.
      * Throws detailed errors for invalid manifests.
+     * 
+     * Supports both new format (owner/package: version) and extended format.
      */
     private validateManifest(manifest: ModelManifest, manifestPath: string): void {
+        // Validate path aliases
+        if (manifest.paths) {
+            this.validatePathAliases(manifest.paths, manifestPath);
+        }
+
         if (!manifest.dependencies) {
             return; // No dependencies to validate
         }
 
-        for (const [alias, dep] of Object.entries(manifest.dependencies)) {
+        for (const [key, dep] of Object.entries(manifest.dependencies)) {
+            const normalized = this.normalizeDependency(key, dep);
+
             // Validate mutually exclusive source and path
-            if (dep.source && dep.path) {
+            if (normalized.source && normalized.path) {
                 throw new Error(
-                    `Invalid manifest at ${manifestPath}: Dependency '${alias}' cannot have both 'source' and 'path'. ` +
-                    `Use 'source' for git dependencies or 'path' for local dependencies, not both.`
+                    `Invalid dependency '${key}' in ${manifestPath}:\n` +
+                    `Cannot specify both 'source' and 'path'.\n` +
+                    `Hint: Use 'source' for git dependencies or 'path' for local workspace dependencies.`
                 );
             }
 
-            // Validate at least one of source or path is specified
-            if (!dep.source && !dep.path) {
+            // For string format, source is always derived from key (valid)
+            // For extended format without source or path, error
+            if (typeof dep !== 'string' && !normalized.source && !normalized.path) {
                 throw new Error(
-                    `Invalid manifest at ${manifestPath}: Dependency '${alias}' must have either 'source' (for git dependencies) or 'path' (for local dependencies).`
+                    `Invalid dependency '${key}' in ${manifestPath}:\n` +
+                    `Must specify either 'source' or 'path'.\n` +
+                    `Hint: Add 'source: owner/repo' for git dependencies, or 'path: ./local/path' for local packages.`
                 );
             }
 
             // Validate path is relative and within workspace
-            if (dep.path) {
-                this.validateLocalPath(dep.path, alias, manifestPath);
+            if (normalized.path) {
+                this.validateLocalPath(normalized.path, key, manifestPath);
             }
 
-            // Validate source has version when specified
-            if (dep.source && !dep.version) {
+            // Validate source has ref when specified
+            if (normalized.source && !normalized.ref) {
                 throw new Error(
-                    `Invalid manifest at ${manifestPath}: Git dependency '${alias}' must specify a 'version' (tag, branch, or commit SHA).`
+                    `Invalid dependency '${key}' in ${manifestPath}:\n` +
+                    `Git dependencies must specify a 'ref' (git reference).\n` +
+                    `Hint: Add 'ref: v1.0.0' (tag), 'ref: main' (branch), or a commit SHA.`
                 );
             }
+        }
+    }
+
+    /**
+     * Validates path aliases for security and correctness.
+     */
+    private validatePathAliases(paths: PathAliases, manifestPath: string): void {
+        for (const [alias, targetPath] of Object.entries(paths)) {
+            // Validate alias starts with @
+            if (!alias.startsWith('@')) {
+                throw new Error(
+                    `Invalid path alias '${alias}' in ${manifestPath}:\n` +
+                    `Path aliases must start with '@'.\n` +
+                    `Hint: Rename to '@${alias}' in your model.yaml paths section.`
+                );
+            }
+
+            // Validate target path doesn't escape workspace
+            this.validateLocalPath(targetPath, alias, manifestPath);
         }
     }
 
@@ -402,8 +514,9 @@ export class WorkspaceManager {
         // Reject absolute paths
         if (path.isAbsolute(localPath)) {
             throw new Error(
-                `Invalid manifest at ${manifestPath}: Local path dependency '${alias}' cannot use absolute path '${localPath}'. ` +
-                `Use relative paths (e.g., '../shared', './lib') for local dependencies.`
+                `Invalid local path '${alias}' in ${manifestPath}:\n` +
+                `Cannot use absolute path '${localPath}'.\n` +
+                `Hint: Use relative paths (e.g., './lib', '../shared') for local dependencies.`
             );
         }
 
@@ -416,9 +529,11 @@ export class WorkspaceManager {
         const relativePath = path.relative(workspaceRoot, resolvedPath);
         if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
             throw new Error(
-                `Invalid manifest at ${manifestPath}: Local path dependency '${alias}' escapes workspace boundary. ` +
-                `Path '${localPath}' resolves to '${resolvedPath}' which is outside workspace '${workspaceRoot}'. ` +
-                `Local dependencies must remain within the workspace.`
+                `Invalid local path '${alias}' in ${manifestPath}:\n` +
+                `Path '${localPath}' resolves outside workspace boundary.\n` +
+                `Resolved: ${resolvedPath}\n` +
+                `Workspace: ${workspaceRoot}\n` +
+                `Hint: Local dependencies must be within the workspace. Consider moving the dependency or using a git-based source.`
             );
         }
     }
@@ -432,11 +547,12 @@ export class WorkspaceManager {
         const dependencies: Record<string, LockedDependency> = {};
 
         for (const [key, value] of Object.entries(parsed.dependencies ?? {})) {
-            if (!value || typeof value.version !== 'string' || typeof value.resolved !== 'string' || typeof value.commit !== 'string') {
+            if (!value || typeof value.ref !== 'string' || typeof value.resolved !== 'string' || typeof value.commit !== 'string') {
                 continue;
             }
             dependencies[key] = {
-                version: value.version,
+                ref: value.ref,
+                refType: value.refType ?? 'commit', // Default to commit for backwards compatibility
                 resolved: value.resolved,
                 commit: value.commit,
                 integrity: value.integrity,
