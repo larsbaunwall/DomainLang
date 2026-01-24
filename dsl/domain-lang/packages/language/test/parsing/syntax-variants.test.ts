@@ -107,6 +107,9 @@ describe('Team Keyword', () => {
 
         // Assert
         expectValidDocument(document);
+        const teams = document.parseResult.value.children.filter(c => c.$type === 'Team');
+        expect(teams).toHaveLength(1);
+        expect(teams[0].name).toBe('SalesTeam');
     });
 });
 
@@ -126,6 +129,9 @@ describe('Classification Keyword', () => {
 
         // Assert
         expectValidDocument(document);
+        const classifications = document.parseResult.value.children.filter(c => c.$type === 'Classification');
+        expect(classifications).toHaveLength(1);
+        expect(classifications[0].name).toBe('Core');
     });
 });
 
@@ -150,6 +156,10 @@ describe('ContextMap Keyword Variants', () => {
 
         // Assert
         expectValidDocument(document);
+        const contextMaps = document.parseResult.value.children.filter(c => c.$type === 'ContextMap');
+        expect(contextMaps).toHaveLength(1);
+        expect(contextMaps[0].name).toBe('SalesMap');
+        expect(contextMaps[0].boundedContexts).toHaveLength(1);
     });
 
     // NOTE: contextmap (lowercase, concatenated) alias removed - use ContextMap
@@ -177,6 +187,10 @@ describe('DomainMap Keyword Variants', () => {
 
         // Assert
         expectValidDocument(document);
+        const domainMaps = document.parseResult.value.children.filter(c => c.$type === 'DomainMap');
+        expect(domainMaps).toHaveLength(1);
+        expect(domainMaps[0].name).toBe('BusinessMap');
+        expect(domainMaps[0].domains).toHaveLength(1);
     });
 
     test('should parse dmap shorthand', async () => {
@@ -196,6 +210,9 @@ describe('DomainMap Keyword Variants', () => {
 
         // Assert
         expectValidDocument(document);
+        const domainMaps = document.parseResult.value.children.filter(c => c.$type === 'DomainMap');
+        expect(domainMaps).toHaveLength(1);
+        expect(domainMaps[0].name).toBe('BusinessMap');
     });
 });
 
@@ -219,6 +236,10 @@ describe('Namespace Keyword Variants', () => {
 
         // Assert
         expectValidDocument(document);
+        const namespaces = document.parseResult.value.children.filter(c => c.$type === 'NamespaceDeclaration');
+        expect(namespaces).toHaveLength(1);
+        expect(namespaces[0].name).toBe('sales');
+        expect(namespaces[0].children).toHaveLength(1);
     });
 
     test('should parse Namespace with capital N', async () => {
@@ -236,6 +257,9 @@ describe('Namespace Keyword Variants', () => {
 
         // Assert
         expectValidDocument(document);
+        const namespaces = document.parseResult.value.children.filter(c => c.$type === 'NamespaceDeclaration');
+        expect(namespaces).toHaveLength(1);
+        expect(namespaces[0].name).toBe('sales');
     });
 });
 
@@ -333,23 +357,8 @@ describe('bc Documentation Block Variants', () => {
 
         // Assert
         expectValidDocument(document);
-    });
-
-    test('should parse businessModel keyword', async () => {
-        // Arrange
-        const input = s`
-            Classification SaaS
-            Domain Sales {}
-            bc OrderContext for Sales {
-                businessModel: SaaS
-            }
-        `;
-
-        // Act
-        const document = await testServices.parse(input);
-
-        // Assert
-        expectValidDocument(document);
+        const bc = getFirstBoundedContext(document);
+        expect(bc.businessModel?.ref?.name).toBe('SaaS');
     });
 
     test('should parse evolution keyword', async () => {
