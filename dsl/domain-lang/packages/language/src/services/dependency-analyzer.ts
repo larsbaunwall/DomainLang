@@ -8,42 +8,12 @@
  * - Version policy enforcement
  */
 
-import type { LockFile } from './git-url-resolver.js';
+import type { LockFile, DependencyTreeNode, ReverseDependency, VersionPolicy } from './types.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import YAML from 'yaml';
-
-export interface DependencyTreeNode {
-    /** Package identifier */
-    packageKey: string;
-    /** Locked version */
-    version: string;
-    /** Commit hash */
-    commit: string;
-    /** Direct dependencies */
-    dependencies: DependencyTreeNode[];
-    /** Depth in tree (0 = root) */
-    depth: number;
-}
-
-export interface ReverseDependency {
-    /** Package that depends on the target */
-    dependentPackage: string;
-    /** Version of the dependent package */
-    version: string;
-    /** Type: direct or transitive */
-    type: 'direct' | 'transitive';
-}
-
-export interface VersionPolicy {
-    /** Policy name: latest, stable, or specific version */
-    policy: 'latest' | 'stable' | 'pinned';
-    /** Resolved version */
-    version: string;
-    /** Available versions for policy */
-    availableVersions?: string[];
-}
+import { sortVersionsDescending, isPreRelease } from './semver.js';
 
 /**
  * Analyzes dependency relationships and provides visualization/analysis tools.
@@ -109,7 +79,7 @@ export class DependencyAnalyzer {
         if (visited.has(packageKey)) {
             return {
                 packageKey,
-                version: locked.version,
+                ref: locked.ref,
                 commit: locked.commit,
                 dependencies: [], // Don't recurse into already visited
                 depth,
@@ -133,7 +103,7 @@ export class DependencyAnalyzer {
 
         return {
             packageKey,
-            version: locked.version,
+            ref: locked.ref,
             commit: locked.commit,
             dependencies: children,
             depth,
@@ -168,7 +138,7 @@ export class DependencyAnalyzer {
                     if (dep.source === targetPackage) {
                         reverseDeps.push({
                             dependentPackage: 'root',
-                            version: 'workspace',
+                            ref: 'workspace',
                             type: 'direct',
                         });
                     }
@@ -190,7 +160,7 @@ export class DependencyAnalyzer {
             if (packageDeps[targetPackage]) {
                 reverseDeps.push({
                     dependentPackage: packageKey,
-                    version: locked.version,
+                    ref: locked.ref,
                     type: 'direct',
                 });
             }
@@ -207,11 +177,11 @@ export class DependencyAnalyzer {
 
         const formatNode = (node: DependencyTreeNode, prefix: string, isLast: boolean): void => {
             const branch = isLast ? '└── ' : '├── ';
-            const versionStr = options.showCommits
-                ? `${node.version} (${node.commit.substring(0, 7)})`
-                : node.version;
+            const refStr = options.showCommits
+                ? `${node.ref} (${node.commit.substring(0, 7)})`
+                : node.ref;
             
-            lines.push(`${prefix}${branch}${node.packageKey}@${versionStr}`);
+            lines.push(`${prefix}${branch}${node.packageKey}@${refStr}`);
 
             const childPrefix = prefix + (isLast ? '    ' : '│   ');
             node.dependencies.forEach((child, index) => {
@@ -273,38 +243,38 @@ export class DependencyAnalyzer {
     }
 
     /**
-     * Resolves version policies (latest, stable) to concrete versions.
+     * Resolves ref policies (latest, stable) to concrete refs.
      */
     async resolveVersionPolicy(
-        packageKey: string,
+        _packageKey: string,
         policy: string,
-        availableVersions: string[]
+        availableRefs: string[]
     ): Promise<VersionPolicy> {
         if (policy === 'latest') {
-            // Return the most recent version
-            const sorted = this.sortVersions(availableVersions);
+            // Return the most recent ref
+            const sorted = sortVersionsDescending(availableRefs);
             return {
                 policy: 'latest',
-                version: sorted[0] || 'main',
-                availableVersions: sorted,
+                ref: sorted[0] || 'main',
+                availableRefs: sorted,
             };
         }
 
         if (policy === 'stable') {
-            // Return the most recent stable version (exclude pre-release)
-            const stable = availableVersions.filter(v => !this.isPreRelease(v));
-            const sorted = this.sortVersions(stable);
+            // Return the most recent stable ref (exclude pre-release)
+            const stable = availableRefs.filter(v => !isPreRelease(v));
+            const sorted = sortVersionsDescending(stable);
             return {
                 policy: 'stable',
-                version: sorted[0] || 'main',
-                availableVersions: sorted,
+                ref: sorted[0] || 'main',
+                availableRefs: sorted,
             };
         }
 
-        // Pinned version
+        // Pinned ref
         return {
             policy: 'pinned',
-            version: policy,
+            ref: policy,
         };
     }
 
@@ -347,35 +317,5 @@ export class DependencyAnalyzer {
         } catch {
             return {};
         }
-    }
-
-    /**
-     * Sorts versions in descending order (newest first).
-     */
-    private sortVersions(versions: string[]): string[] {
-        return versions.sort((a, b) => {
-            // Simple lexicographic sort (good enough for basic semver)
-            // Production: use semver library
-            const aParts = a.replace(/^v/, '').split('.').map(Number);
-            const bParts = b.replace(/^v/, '').split('.').map(Number);
-
-            for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-                const aNum = aParts[i] || 0;
-                const bNum = bParts[i] || 0;
-                if (aNum !== bNum) {
-                    return bNum - aNum; // Descending
-                }
-            }
-
-            return 0;
-        });
-    }
-
-    /**
-     * Checks if a version is a pre-release.
-     */
-    private isPreRelease(version: string): boolean {
-        const clean = version.replace(/^v/, '');
-        return /-(alpha|beta|rc|pre|dev)/.test(clean);
     }
 }
