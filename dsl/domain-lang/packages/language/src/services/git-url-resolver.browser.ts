@@ -1,14 +1,10 @@
 // Browser stub for GitUrlResolver
+// Git operations are not available in the browser environment
 
-export interface GitImportInfo {
-    original: string;
-    platform: 'github' | 'gitlab' | 'bitbucket' | 'generic';
-    owner: string;
-    repo: string;
-    version: string;
-    repoUrl: string;
-    entryPoint: string;
-}
+import type { GitImportInfo } from './types.js';
+
+// Re-export the type for API consistency
+export type { GitImportInfo } from './types.js';
 
 export class GitUrlResolver {
     constructor() {
@@ -16,9 +12,11 @@ export class GitUrlResolver {
     }
 }
 
-
 export const GitUrlParser = {
-    parse() {
+    parse(_importStr: string): GitImportInfo {
+        throw new Error('GitUrlParser is not available in the browser.');
+    },
+    isGitUrl(_importStr: string): boolean {
         throw new Error('GitUrlParser is not available in the browser.');
     }
 };
@@ -26,6 +24,3 @@ export const GitUrlParser = {
 export function loadLockFile(): void {
     throw new Error('loadLockFile is not available in the browser.');
 }
-
-export type LockFile = unknown;
-export type LockedDependency = unknown;
