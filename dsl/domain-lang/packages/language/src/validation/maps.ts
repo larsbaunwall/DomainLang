@@ -1,5 +1,6 @@
 import type { ValidationAcceptor } from 'langium';
 import type { ContextMap, DomainMap } from '../generated/ast.js';
+import { ValidationMessages, buildCodeDescription } from './constants.js';
 
 /**
  * Validates that a context map contains at least one bounded context.
@@ -13,9 +14,10 @@ function validateContextMapHasContexts(
     accept: ValidationAcceptor
 ): void {
     if (!map.boundedContexts || map.boundedContexts.length === 0) {
-        accept('warning', `Context Map '${map.name}' contains no bounded contexts`, {
+        accept('warning', ValidationMessages.CONTEXT_MAP_NO_CONTEXTS(map.name), {
             node: map,
-            keyword: 'contains'
+            keyword: 'contains',
+            codeDescription: buildCodeDescription('language.md', 'context-maps')
         });
     }
 }
@@ -36,9 +38,10 @@ function validateContextMapHasRelationships(
     
     // Only warn if multiple contexts exist without relationships
     if (contextCount > 1 && relationshipCount === 0) {
-        accept('info', `Context Map '${map.name}' contains ${contextCount} contexts but no documented relationships`, {
+        accept('info', ValidationMessages.CONTEXT_MAP_NO_RELATIONSHIPS(map.name, contextCount), {
             node: map,
-            keyword: 'ContextMap'
+            keyword: 'ContextMap',
+            codeDescription: buildCodeDescription('language.md', 'context-maps')
         });
     }
 }
@@ -55,9 +58,10 @@ function validateDomainMapHasDomains(
     accept: ValidationAcceptor
 ): void {
     if (!map.domains || map.domains.length === 0) {
-        accept('warning', `Domain Map '${map.name}' contains no domains`, {
+        accept('warning', ValidationMessages.DOMAIN_MAP_NO_DOMAINS(map.name), {
             node: map,
-            keyword: 'contains'
+            keyword: 'contains',
+            codeDescription: buildCodeDescription('language.md', 'domain-maps')
         });
     }
 }
