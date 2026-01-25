@@ -36,7 +36,7 @@ site/
 
 The site is automatically deployed to GitHub Pages when changes are pushed to the `main` branch via the `.github/workflows/deploy-docs.yml` workflow.
 
-The live site is available at: https://larsbaunwall.github.io/DomainLang/
+The live site is available at: https://domainlang.net
 
 ## Adding Content
 
