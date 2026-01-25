@@ -19,7 +19,7 @@ DomainLang accepts aliases for common constructs:
 | Context map | `ContextMap`, `cmap` |
 | Domain map | `DomainMap`, `dmap` |
 | Namespace | `Namespace`, `ns` |
-| Import | `import`, `Import` |
+| Import | `Import`, `import` |
 | Classification | `Classification` |
 | Team | `Team` |
 | Metadata key | `Metadata` |
