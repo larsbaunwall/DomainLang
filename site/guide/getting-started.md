@@ -2,6 +2,10 @@
 
 Build a small DomainLang model that includes a domain, bounded contexts, ownership, terminology, and a context map.
 
+::: warning 🚧 Prerelease
+DomainLang is in active development and has not reached v1.0 yet. The language syntax may evolve. See the [roadmap](/roadmap) for planned features.
+:::
+
 ## Prerequisites
 
 - VS Code with the [DomainLang extension](https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang)

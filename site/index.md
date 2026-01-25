@@ -37,6 +37,10 @@ features:
     details: Split models across files with imports, namespaces, and dependencies for large codebases.
 ---
 
+::: warning 🚧 Prerelease Software
+DomainLang is in active development and has not reached v1.0 yet. The language syntax and tooling may change. We welcome feedback and contributions—see the [roadmap](/roadmap) for planned features.
+:::
+
 ## Quick Example
 
 ```dlang

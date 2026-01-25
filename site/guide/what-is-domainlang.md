@@ -2,6 +2,10 @@
 
 DomainLang is a **domain-specific language (DSL)** for expressing Domain-Driven Design (DDD) architecture models. It provides a clean, readable syntax for defining domains, bounded contexts, context maps, teams, and ubiquitous language—all in plain text files that live in your repository.
 
+::: warning 🚧 Prerelease
+DomainLang is in active development and has not reached v1.0 yet. The language syntax may evolve. See the [roadmap](/roadmap) for planned features.
+:::
+
 ## Why DomainLang?
 
 ### The Problem
