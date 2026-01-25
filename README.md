@@ -13,6 +13,8 @@ A small DSL for Domain-Driven Design (DDD) architecture models, with first-class
 
 Use DomainLang to keep domains, bounded contexts, ownership, terminology, and context maps close to the codebase (and easy to review in pull requests).
 
+<img alt="DomainLang CLI" src="images/terminal-window.png">
+
 ## Quick start
 
 1. Install the VS Code extension: <https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang>
