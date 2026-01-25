@@ -1,5 +1,5 @@
 # Workflow for building and deploying the VitePress documentation site to GitHub Pages
-name: Deploy Documentation Site
+name: Deploy domainlang.net site
 
 on:
   # Runs on pushes targeting the main branch when site files change

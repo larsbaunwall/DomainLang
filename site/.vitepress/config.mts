@@ -144,18 +144,18 @@ export default defineConfig({
     
     // Social links
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/larsbaunwall/DomainLang' }
+      { icon: 'github', link: 'https://github.com/DomainLang/DomainLang' }
     ],
     
     // Footer
     footer: {
       message: 'Released under the Apache 2.0 License.',
-      copyright: 'Copyright © 2024-present DomainLang Contributors'
+      copyright: 'Copyright © 2024-present <a href="https://github.com/larsbaunwall">Lars Baunwall</a>. Built with ❤️ in Denmark.'
     },
     
     // Edit link
     editLink: {
-      pattern: 'https://github.com/larsbaunwall/DomainLang/edit/main/site/:path',
+      pattern: 'https://github.com/DomainLang/DomainLang/edit/main/site/:path',
       text: 'Edit this page on GitHub'
     },
     
