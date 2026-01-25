@@ -18,6 +18,17 @@ bc Orders for Sales {
 
 The `for` keyword links the bounded context to its parent domain.
 
+::: tip Optional Body
+The body `{ ... }` is optional. For quick declarations, you can write:
+
+```dlang
+bc Orders for Sales
+bc Shipping for Sales as Supporting by ShippingTeam
+```
+
+This is useful for sketching out your context landscape before adding details.
+:::
+
 ## Full Syntax
 
 ```dlang

@@ -17,6 +17,16 @@ Domain Sales {
 }
 ```
 
+::: tip Optional Body
+The body `{ ... }` is optional. For simple declarations, you can write:
+
+```dlang
+Domain Sales
+```
+
+This is useful when you only need to declare the domain exists, without adding properties.
+:::
+
 ## Properties
 
 | Property | Required | Description |
