@@ -573,7 +573,7 @@ Use Unicode emoji consistently for visual scanning:
 | Search | 🔍 | `🔍 Resolving dependencies...` |
 | File | 📄 | `📄 Created model.yaml` |
 | Folder | 📁 | `📁 Created domains/` |
-| Link | 🔗 | `🔗 https://domainlang.dev/docs` |
+| Link | 🔗 | `🔗 https://domainlang.net/docs` |
 | Tip | 💡 | `💡 Run 'dlang help' for more commands` |
 | Rocket | 🚀 | `🚀 Project initialized!` |
 
@@ -718,7 +718,7 @@ Spinners for long-running operations:
    --no-color        Disable colors
 
 🔗 DOCUMENTATION
-   https://domainlang.dev/docs
+   https://domainlang.net/docs
 
 💡 EXAMPLES
    $ dlang init

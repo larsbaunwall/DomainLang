@@ -1,0 +1,48 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`KeyValue > renders key-value pairs from data object 1`] = `
+"Version:            1.0.0
+Status:             Active"
+`;
+
+exports[`KeyValue > renders with custom label width 1`] = `
+"Name:                         Test
+Type:                         Core"
+`;
+
+exports[`List > renders ordered list 1`] = `
+"   1. First item
+   2. Second item
+   3. Third item"
+`;
+
+exports[`List > renders unordered list 1`] = `
+"   • Apple
+   • Banana
+   • Cherry"
+`;
+
+exports[`List > renders with custom bullet 1`] = `
+"   → Item 1
+   → Item 2"
+`;
+
+exports[`Table > renders empty table 1`] = `
+"╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Name                                                                                             │
+│                                                                                                  │
+│ ──────                                                                                           │
+│                                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯"
+`;
+
+exports[`Table > renders table with headers and rows 1`] = `
+"╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Name     Type                                                                                    │
+│                                                                                                  │
+│ ───────────────────────────                                                                      │
+│                                                                                                  │
+│ Sales    Domain                                                                                  │
+│ Billing  Bounded Context                                                                         │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯"
+`;

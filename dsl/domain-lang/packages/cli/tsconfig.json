@@ -3,7 +3,8 @@
     "compilerOptions": {
         "rootDir": "src",
         "outDir": "out",
-        "declarationDir": "out"
+        "declarationDir": "out",
+        "jsx": "react-jsx"
     },
     "references": [
         {
@@ -11,6 +12,7 @@
         }
     ],
     "include": [
-        "src/**/*.ts"
+        "src/**/*.ts",
+        "src/**/*.tsx"
     ]
 }

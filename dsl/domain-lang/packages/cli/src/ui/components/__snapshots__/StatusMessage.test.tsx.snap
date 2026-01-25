@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Shorthand status components > renders ErrorMessage 1`] = `"❌ File not found"`;
+
+exports[`Shorthand status components > renders InfoMessage 1`] = `"ℹ️ Press Ctrl+C to exit"`;
+
+exports[`Shorthand status components > renders SuccessMessage 1`] = `"✅ All tests passed!"`;
+
+exports[`Shorthand status components > renders WarningMessage 1`] = `"⚠️ Deprecated syntax detected"`;
+
+exports[`StatusMessage > renders error type 1`] = `"❌ Something failed"`;
+
+exports[`StatusMessage > renders info type 1`] = `"ℹ️ For your information"`;
+
+exports[`StatusMessage > renders success type 1`] = `"✅ Operation completed"`;
+
+exports[`StatusMessage > renders warning type 1`] = `"⚠️ Proceed with caution"`;

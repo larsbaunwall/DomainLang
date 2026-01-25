@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Footer > renders with all props 1`] = `" /path/to/project [generate]                                                           dlang v2.1.0"`;
+
+exports[`Footer > renders with command indicator 1`] = `" [validate]                                                        dlang v1.0.0"`;
+
+exports[`Footer > renders with version only 1`] = `"                                                                   dlang v1.0.0"`;
+
+exports[`Footer > renders with working directory 1`] = `" /Users/test/project                                               dlang v1.0.0"`;
+
+exports[`MinimalFooter > renders version only 1`] = `"                                                                                       dlang v1.0.0"`;

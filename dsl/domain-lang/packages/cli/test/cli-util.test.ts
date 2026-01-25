@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import path from 'node:path';
-import { extractDestinationAndName } from '../../src/cli/cli-util.js';
+import { extractDestinationAndName } from '../src/cli-util.js';
 
 describe('extractDestinationAndName', () => {
     it('derives default destination from source directory', () => {

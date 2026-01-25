@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Validate result display > renders error display snapshot 1`] = `"Validation failed: 1 errors, 1 warnings"`;
+
+exports[`Validate result display > renders success display snapshot 1`] = `"Model validated: 2 domains, 3 BCs"`;
