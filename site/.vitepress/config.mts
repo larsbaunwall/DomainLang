@@ -89,7 +89,15 @@ export default defineConfig({
         text: 'Resources',
         items: [
           { text: 'Examples', link: '/examples/' },
+          { text: 'Roadmap', link: '/roadmap' },
           { text: 'VS Code Extension', link: 'https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang' },
+          {
+            text: 'npm Packages',
+            items: [
+              { text: '@domainlang/cli', link: 'https://www.npmjs.com/package/@domainlang/cli' },
+              { text: '@domainlang/language', link: 'https://www.npmjs.com/package/@domainlang/language' },
+            ]
+          }
         ]
       }
     ],

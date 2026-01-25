@@ -14,7 +14,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://domainlang.net
+      link: https://github.com/DomainLang/DomainLang
 
 features:
   - icon: 🎯
