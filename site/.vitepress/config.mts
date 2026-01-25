@@ -52,9 +52,9 @@ export default defineConfig({
   title: 'DomainLang',
   description: 'A DSL for Domain-Driven Design modeling',
   
-  // Base URL for GitHub Pages deployment
-  // Set to '/<repo-name>/' for project pages, or '/' for user/org pages
-  base: '/DomainLang/',
+  // Base URL - use '/' for custom domain (domainlang.net)
+  // Change to '/DomainLang/' if deploying to GitHub Pages project site
+  base: '/',
   
   // Clean URLs without .html extension
   cleanUrls: true,
@@ -64,12 +64,12 @@ export default defineConfig({
   
   // Head tags for metadata
   head: [
-    ['link', { rel: 'icon', href: '/DomainLang/favicon.ico' }],
+    ['link', { rel: 'icon', href: '/favicon.ico' }],
     ['meta', { name: 'theme-color', content: '#027fff' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'DomainLang' }],
     ['meta', { property: 'og:description', content: 'A DSL for Domain-Driven Design modeling' }],
-    ['meta', { property: 'og:url', content: 'https://larsbaunwall.github.io/DomainLang/' }],
+    ['meta', { property: 'og:url', content: 'https://domainlang.net/' }],
   ],
   
   // Theme configuration
