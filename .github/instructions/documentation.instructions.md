@@ -86,13 +86,16 @@ Domain:
 
 ## Documentation Locations
 
-| Type | Location | Purpose |
-|------|----------|---------|
-| API docs | JSDoc in source | IDE hover tooltips |
-| User guides | `dsl/domain-lang/docs/` | Language documentation |
-| Examples | `dsl/domain-lang/examples/` | `.dlang` patterns |
-| ADRs | `adr/` | Architecture decisions |
-| Changelog | `dsl/domain-lang/CHANGELOG.md` (create if missing) | Version history |
+| Type          | Location                                            | Purpose                      |
+|---------------|-----------------------------------------------------|------------------------------|
+| Public site   | `/site/` → <https://domainlang.net>                 | User-facing documentation    |
+| API docs      | JSDoc in source                                     | IDE hover tooltips           |
+| User guides   | `dsl/domain-lang/docs/`                             | Internal language docs       |
+| Examples      | `dsl/domain-lang/examples/`                         | `.dlang` patterns            |
+| ADRs          | `adr/`                                              | Architecture decisions       |
+| Changelog     | `dsl/domain-lang/CHANGELOG.md` (create if missing) | Version history              |
+
+**⚠️ When documenting new language features:** Update both the public site (`/site/`) AND internal docs. See `.github/skills/site-maintainer/SKILL.md` for site-specific guidelines.
 
 ## Formatting Guidelines
 

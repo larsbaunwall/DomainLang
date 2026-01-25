@@ -18,6 +18,7 @@
 When a user request clearly matches one of the skill areas below, you MUST consult and follow the corresponding skill file before making changes.
 
 - Documentation work (docs, READMEs, examples-as-docs, JSDoc, grammar hover text) → `.github/skills/technical-writer/SKILL.md`
+- **Website work** (VitePress pages in `/site/`, site config, deployment, user-facing docs at domainlang.net) → `.github/skills/site-maintainer/SKILL.md`
 - Language design work (syntax/semantics decisions, grammar authoring strategy, notations/aliases, DDD expressiveness trade-offs) → `.github/skills/language-expert/SKILL.md`
 - Implementation work (TypeScript/Langium code, LSP features, validators, services, SDK, performance) → `.github/skills/lead-engineer/SKILL.md`
 - Testing work (Vitest tests, test strategy, coverage, edge cases) → `.github/skills/tester/SKILL.md`
@@ -34,7 +35,8 @@ If a request spans multiple areas, apply the primary skill first, then the secon
 
 ## Canonical Docs (Start Here)
 
-- User documentation hub: `dsl/domain-lang/docs/README.md`
+- **Public website:** https://domainlang.net (source: `/site/`)
+- Internal docs hub: `dsl/domain-lang/docs/README.md`
 - Examples: `dsl/domain-lang/examples/`
 
 ## Essential Commands

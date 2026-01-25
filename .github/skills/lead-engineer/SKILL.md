@@ -104,18 +104,21 @@ Every feature flows through three layers:
 ### Code Review Checklist
 
 **Before approving:**
+
 - [ ] Linting passes: `npm run lint` shows 0 errors, 0 warnings
 - [ ] Follows `.github/instructions/` standards
 - [ ] Tests are comprehensive (happy path + edge cases)
-- [ ] Documentation updated
+- [ ] Documentation updated (site + internal docs for public features)
 - [ ] No breaking changes (or documented with migration path)
 - [ ] Performance implications considered
 - [ ] Error messages are user-friendly
 
 **For grammar changes:**
+
 - [ ] `npm run langium:generate` executed
 - [ ] Generated files committed
 - [ ] Tests updated
+- [ ] Site docs updated (`/site/guide/` and `/site/reference/`)
 
 ### Code Review Responses
 

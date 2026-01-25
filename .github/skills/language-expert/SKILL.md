@@ -176,9 +176,21 @@ Domain Orders in Sales {}
 ✅ "Domain 'Sales' is missing a vision statement. Add: vision: \"your vision\""
 ```
 
+## Documentation Requirements
+
+**When designing new language features, ensure documentation is planned:**
+
+1. **Grammar hover text:** JSDoc comment on the grammar rule
+2. **Public site:** Update `/site/guide/` and `/site/reference/` pages
+3. **Internal docs:** Update `dsl/domain-lang/docs/` as needed
+4. **Examples:** Add `.dlang` examples to `dsl/domain-lang/examples/`
+
+See `.github/skills/site-maintainer/SKILL.md` for site documentation guidelines.
+
 ## Reference
 
 Always consult `.github/instructions/langium.instructions.md` for:
+
 - Current grammar structure
 - Document lifecycle constraints
 - Implementation feasibility
