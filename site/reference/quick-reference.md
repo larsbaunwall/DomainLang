@@ -19,7 +19,7 @@ bc Orders for Sales {
 ## Declarations
 
 | Concept | Keywords | Notes |
-|---------|----------|-------|
+| ------- | -------- | ----- |
 | Domain | `Domain`, `dom` | Use `in` for subdomains |
 | Bounded context | `BoundedContext`, `bc` | Use `for` to link domain |
 | Team | `Team` | Ownership via `by` |
@@ -28,7 +28,18 @@ bc Orders for Sales {
 | Namespace | `Namespace`, `ns` | Qualified names |
 | Context map | `ContextMap`, `cmap` | Context relationships |
 | Domain map | `DomainMap`, `dmap` | Domain portfolio |
-| Import | `import` | Module system |
+| Import | `import`, `Import` | Module system |
+
+## Block Aliases
+
+Inside bounded contexts:
+
+| Block | Alias |
+| ----- | ----- |
+| `terminology` | `glossary` |
+| `metadata` | `meta` |
+| `decisions` | `rules` |
+| `relationships` | `integrations` |
 
 ## Assignment Operators
 
@@ -119,7 +130,7 @@ ContextMap System {
 ## Namespaces
 
 ```dlang
-namespace Acme.Sales {
+Namespace Acme.Sales {
     bc Orders for Sales { }
 }
 
@@ -152,9 +163,8 @@ Domain Marketing in Retail { }
 ```dlang
 terminology {
     term Order: "A purchase request"
-        aka PurchaseOrder
-        synonyms "Buy order", "Purchase"
-        examples "Order #12345"
+        aka PurchaseOrder, BuyOrder
+        examples "Order #12345", "Purchase #67890"
 }
 ```
 

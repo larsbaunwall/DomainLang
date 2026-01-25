@@ -2,10 +2,16 @@
 
 Namespaces organize your model into logical groups and create qualified names for elements. They're essential for large models and multi-team environments.
 
+## Keywords
+
+| Keyword | Alias |
+| ------- | ----- |
+| `Namespace` | `ns` |
+
 ## Basic Syntax
 
 ```dlang
-namespace Acme.Sales {
+Namespace Acme.Sales {
     Domain Sales { }
     
     bc Orders for Sales { }
@@ -29,7 +35,7 @@ Elements inside the namespace get qualified names like `Acme.Sales.Orders`.
 Use simple names:
 
 ```dlang
-namespace Acme.Sales {
+Namespace Acme.Sales {
     bc Orders for Sales { }
     bc Billing for Sales { }
     
@@ -44,11 +50,11 @@ namespace Acme.Sales {
 Use fully qualified names:
 
 ```dlang
-namespace Acme.Sales {
+Namespace Acme.Sales {
     bc Orders for Sales { }
 }
 
-namespace Acme.Shipping {
+Namespace Acme.Shipping {
     bc Delivery for Logistics { }
 }
 
@@ -63,12 +69,12 @@ ContextMap Integration {
 Namespaces can be nested:
 
 ```dlang
-namespace Acme {
-    namespace Sales {
+Namespace Acme {
+    Namespace Sales {
         bc Orders for Sales { }
     }
     
-    namespace Shipping {
+    Namespace Shipping {
         bc Delivery for Logistics { }
     }
 }
@@ -77,11 +83,11 @@ namespace Acme {
 Or use dot notation:
 
 ```dlang
-namespace Acme.Sales {
+Namespace Acme.Sales {
     bc Orders for Sales { }
 }
 
-namespace Acme.Shipping {
+Namespace Acme.Shipping {
     bc Delivery for Logistics { }
 }
 ```
@@ -91,7 +97,7 @@ namespace Acme.Shipping {
 Define reusable elements at a higher namespace level:
 
 ```dlang
-namespace Acme {
+Namespace Acme {
     // Shared across all Acme namespaces
     Classification CoreDomain
     Classification SupportingDomain
@@ -99,13 +105,13 @@ namespace Acme {
     Team PlatformTeam
 }
 
-namespace Acme.Sales {
+Namespace Acme.Sales {
     Team SalesTeam
     
     bc Orders for Sales as Acme.CoreDomain by SalesTeam { }
 }
 
-namespace Acme.Platform {
+Namespace Acme.Platform {
     bc Auth for Platform as Acme.SupportingDomain by Acme.PlatformTeam { }
 }
 ```
@@ -128,14 +134,14 @@ For small models, namespaces add complexity without benefit. Start without them 
 
 ```dlang
 // Shared definitions
-namespace Acme.Shared {
+Namespace Acme.Shared {
     Classification CoreDomain
     Classification SupportingDomain
     Classification GenericSubdomain
 }
 
 // Sales division
-namespace Acme.Sales {
+Namespace Acme.Sales {
     Team OrderTeam
     Team PricingTeam
     
@@ -151,7 +157,7 @@ namespace Acme.Sales {
 }
 
 // Platform division
-namespace Acme.Platform {
+Namespace Acme.Platform {
     Team PlatformTeam
     
     Domain Platform { description: "Shared infrastructure" }
@@ -162,7 +168,7 @@ namespace Acme.Platform {
 }
 
 // Integration map at company level
-namespace Acme {
+Namespace Acme {
     ContextMap CompanyWide {
         contains Sales.Orders, Sales.Pricing, Platform.Identity
         
@@ -175,4 +181,7 @@ namespace Acme {
 ## Next Steps
 
 - [Import System](/guide/imports) — split models across multiple files
-- [Language Reference](/reference/language) — complete syntax details
+
+## See Also
+
+- [Namespaces Reference](/reference/language#namespaces) — complete syntax details

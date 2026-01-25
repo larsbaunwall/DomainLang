@@ -5,10 +5,61 @@ Build a small DomainLang model that includes a domain, bounded contexts, ownersh
 ## Prerequisites
 
 - VS Code with the [DomainLang extension](https://marketplace.visualstudio.com/items?itemName=thinkability.domain-lang)
-- (Optional) Node.js 20+ if building from source
+- (Optional) Node.js 20+ for CLI and programmatic access
 
 ::: tip
 Use the VS Code extension for syntax highlighting, validation, and navigation while you learn the language.
+:::
+
+## Installation
+
+DomainLang is available as npm packages for different use cases:
+
+### CLI (Command Line)
+
+Install globally to use `dlang` commands from your terminal:
+
+```bash
+npm install -g @domainlang/cli
+```
+
+Then validate and query your models:
+
+```bash
+dlang validate mymodel.dlang
+dlang query mymodel.dlang --domains
+```
+
+### Language Library
+
+For programmatic access—parse, validate, and query DomainLang models in your code:
+
+```bash
+npm install @domainlang/language
+```
+
+Use the Model Query SDK:
+
+```typescript
+import { loadModelFromText } from '@domainlang/language/sdk';
+
+const { query } = await loadModelFromText(`
+  Domain Sales { vision: "Sell things" }
+  bc Orders for Sales as Core
+`);
+
+const coreContexts = query.boundedContexts()
+  .withRole('Core')
+  .toArray();
+```
+
+::: info npm Packages
+
+| Package                                                                      | Description                                                               |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [@domainlang/cli](https://www.npmjs.com/package/@domainlang/cli)             | Command-line interface for validating, analyzing, and managing models     |
+| [@domainlang/language](https://www.npmjs.com/package/@domainlang/language)   | Core library with parser, validator, and Model Query SDK                  |
+
 :::
 
 ## Step 1: Define a Domain
@@ -107,21 +158,21 @@ ContextMap BookstoreSystem {
 
 Common patterns:
 
-| Pattern | Meaning |
-|---------|---------|
-| `[OHS]` | Open Host Service |
-| `[CF]`  | Conformist |
+| Pattern | Meaning               |
+| ------- | --------------------- |
+| `[OHS]` | Open Host Service     |
+| `[CF]`  | Conformist            |
 | `[ACL]` | Anti-Corruption Layer |
-| `[PL]`  | Published Language |
-| `[SK]`  | Shared Kernel |
-| `[P]`   | Partnership |
+| `[PL]`  | Published Language    |
+| `[SK]`  | Shared Kernel         |
+| `[P]`   | Partnership           |
 
 ## Step 7: Organize with Namespaces (Optional)
 
 As your model grows, use namespaces:
 
 ```dlang
-namespace Bookstore.Core {
+Namespace Bookstore.Core {
     bc Catalog for Bookstore { }
     bc Orders for Bookstore { }
 }

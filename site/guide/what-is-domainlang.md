@@ -71,7 +71,7 @@ Scale to large systems with imports and namespaces:
 import "./shared/teams.dlang"
 import "./shared/classifications.dlang"
 
-namespace Acme.Sales {
+Namespace Acme.Sales {
     bc Orders for Sales { }
 }
 ```

@@ -2,6 +2,12 @@
 
 A **bounded context** is a concrete boundary within which a particular domain model applies. It's the primary organizational unit in DDD—where your ubiquitous language lives.
 
+## Keywords
+
+| Keyword | Alias |
+| ------- | ----- |
+| `BoundedContext` | `bc` |
+
 ## Basic Syntax
 
 ```dlang
@@ -25,6 +31,17 @@ bc Orders for Sales as CoreDomain by SalesTeam {
 }
 ```
 
+## Properties
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `description` | string | Purpose and business value of the context |
+| `classification` | Classification | Strategic importance (alternative to `as` in header) |
+| `team` | Team | Owning team (alternative to `by` in header) |
+| `businessModel` | Classification | Business model type (Revenue, Engagement, Compliance) |
+| `evolution` | Classification | Maturity stage (Genesis, Custom, Product, Commodity) |
+| `archetype` | Classification | Domain role (Gateway, Execution, Analysis, etc.) |
+
 ## Header Options
 
 Use the short form in the header for common attributes:
@@ -42,6 +59,10 @@ bc Orders for Sales as CoreDomain by SalesTeam { }
 ## Body Properties
 
 ```dlang
+// Declare metadata keys first
+Metadata Status
+Metadata Language
+
 bc Orders for Sales {
     description: "Order lifecycle"
     
@@ -53,11 +74,22 @@ bc Orders for Sales {
     }
     
     metadata {
-        status: "Production"
-        language: "TypeScript"
+        Status: "Production"
+        Language: "TypeScript"
     }
 }
 ```
+
+## Block Aliases
+
+Blocks inside bounded contexts have aliases for readability:
+
+| Block | Alias |
+| ----- | ----- |
+| `terminology` | `glossary` |
+| `metadata` | `meta` |
+| `decisions` | `rules` |
+| `relationships` | `integrations` |
 
 ## Terminology
 
@@ -79,18 +111,28 @@ The terminology block captures your ubiquitous language—the precise definition
 
 ## Metadata
 
-Add custom key-value pairs:
+Add custom key-value annotations by first declaring metadata keys:
 
 ```dlang
+// Declare metadata keys first
+Metadata Status
+Metadata Language
+Metadata Repository
+Metadata Oncall
+
 bc Orders for Sales {
     metadata {
-        status: "Production"
-        language: "TypeScript"
-        repository: "github.com/acme/orders"
-        oncall: "#orders-team"
+        Status: "Production"
+        Language: "TypeScript"
+        Repository: "github.com/acme/orders"
+        Oncall: "#orders-team"
     }
 }
 ```
+
+::: tip
+Metadata keys must be declared before use. Put shared metadata definitions in a common file and import them. See [Imports](/guide/imports) for file organization.
+:::
 
 ## Best Practices
 
@@ -144,3 +186,9 @@ bc Shipping for Logistics as CoreDomain by ShippingTeam {
 
 - [Context Maps](/guide/context-maps) — define relationships between bounded contexts
 - [Teams & Classifications](/guide/teams-classifications) — organize ownership and strategy
+
+## See Also
+
+- [Bounded Contexts Reference](/reference/language#bounded-contexts) — complete syntax details
+- [Terminology Reference](/reference/language#terminology) — ubiquitous language syntax
+- [Metadata Reference](/reference/language#metadata) — metadata key-value annotations

@@ -2,6 +2,13 @@
 
 Teams and classifications provide organizational context for your domain model—who owns what, and how strategically important each piece is.
 
+## Keywords
+
+| Keyword | Description |
+| ------- | ----------- |
+| `Classification` | Declares a reusable classification label |
+| `Team` | Declares a team for ownership |
+
 ## Classifications
 
 Classifications indicate the strategic importance of a bounded context:
@@ -86,33 +93,6 @@ bc Authentication for Platform as GenericSubdomain by PlatformTeam {
 }
 ```
 
-## Team Metadata
-
-Add details about teams:
-
-```dlang
-Team OrderTeam {
-    metadata {
-        slack: "#order-team"
-        oncall: "order-oncall@company.com"
-        lead: "Jane Smith"
-    }
-}
-```
-
-## Classification Metadata
-
-Add details about classifications:
-
-```dlang
-Classification CoreDomain {
-    metadata {
-        investment: "High"
-        strategy: "Build custom, hire best talent"
-    }
-}
-```
-
 ## Best Practices
 
 ::: tip Start Simple
@@ -174,3 +154,8 @@ bc EmailService for Platform as GenericSubdomain by PlatformTeam {
 
 - [Namespaces](/guide/namespaces) — organize large models
 - [Import System](/guide/imports) — split models across files
+
+## See Also
+
+- [Classifications Reference](/reference/language#classifications) — complete syntax details
+- [Teams Reference](/reference/language#teams) — team declaration syntax

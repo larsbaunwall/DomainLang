@@ -24,6 +24,14 @@ Classification GenericDomain
 Classification HighlyRegulated
 Classification MissionCritical
 
+// BC Canvas: Evolution stage (from Wardley Maps)
+Classification Commodity
+Classification Product
+
+// BC Canvas: Archetype (domain role)
+Classification Execution
+Classification Gateway
+
 // ============================================================================
 // Teams
 // ============================================================================
@@ -41,22 +49,22 @@ Team FraudDetectionTeam
 Domain Banking {
     description: "Core banking operations and services"
     vision: "Provide secure, reliable, and compliant banking services"
-    classification: CoreDomain
+    type: CoreDomain
 }
 
 Domain CustomerAccounts in Banking {
     description: "Customer account management and transactions"
-    classification: CoreDomain
+    type: CoreDomain
 }
 
 Domain Payments in Banking {
     description: "Payment processing and transfers"
-    classification: CoreDomain
+    type: CoreDomain
 }
 
 Domain Compliance in Banking {
     description: "Regulatory compliance and reporting"
-    classification: SupportingDomain
+    type: SupportingDomain
 }
 
 // ============================================================================

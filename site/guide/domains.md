@@ -2,6 +2,12 @@
 
 A **domain** represents a sphere of knowledge, influence, or activity in your organization. In DDD, domains are the highest-level grouping for your business capabilities.
 
+## Keywords
+
+| Keyword | Alias |
+| ------- | ----- |
+| `Domain` | `dom` |
+
 ## Basic Syntax
 
 ```dlang
@@ -17,6 +23,7 @@ Domain Sales {
 |----------|----------|-------------|
 | `description` | No | Brief explanation of what the domain covers |
 | `vision` | No | The strategic goal or aspiration for this domain |
+| `type` | No | Strategic importance (Core, Supporting, Generic) — see [Classifications](/guide/teams-classifications) |
 
 ## Subdomains
 
@@ -36,21 +43,27 @@ Domain Marketing in Retail {
 }
 ```
 
-## Metadata
+## Domain Types
 
-Add custom metadata to domains:
+Classify domain strategic importance using the `type` property:
 
 ```dlang
+Classification Core
+Classification Supporting
+Classification Generic
+
 Domain Sales {
     description: "Revenue generation"
-    
-    metadata {
-        status: "Active"
-        owner: "VP of Sales"
-        budget: "High"
-    }
+    type: Core
+}
+
+Domain Notifications {
+    description: "Email and push notifications"
+    type: Generic
 }
 ```
+
+See [Teams & Classifications](/guide/teams-classifications) for more on strategic importance.
 
 ## Best Practices
 
@@ -101,3 +114,7 @@ Domain Administration {
 
 - [Learn about Bounded Contexts](/guide/bounded-contexts) — the concrete implementations within domains
 - [Teams & Classifications](/guide/teams-classifications) — assign ownership and strategic importance
+
+## See Also
+
+- [Domains Reference](/reference/language#domains) — complete syntax details

@@ -43,22 +43,22 @@ Team PharmacyTeam
 Domain Healthcare {
     description: "Hospital and healthcare management"
     vision: "Deliver exceptional patient care through integrated systems"
-    classification: CoreDomain
+    type: CoreDomain
 }
 
 Domain PatientCare in Healthcare {
     description: "Direct patient care and treatment"
-    classification: CoreDomain
+    type: CoreDomain
 }
 
 Domain Administration in Healthcare {
     description: "Hospital administration and operations"
-    classification: SupportingDomain
+    type: SupportingDomain
 }
 
 Domain Pharmacy in Healthcare {
     description: "Medication management and dispensing"
-    classification: CoreDomain
+    type: CoreDomain
 }
 
 // ============================================================================

@@ -2,6 +2,12 @@
 
 A **context map** visualizes the relationships between bounded contexts. It shows how contexts integrate and which patterns govern their interactions.
 
+## Keywords
+
+| Keyword | Alias |
+| ------- | ----- |
+| `ContextMap` | `cmap` |
+
 ## Basic Syntax
 
 ```dlang
@@ -9,6 +15,15 @@ ContextMap SalesSystem {
     contains Orders, Billing, Shipping
 }
 ```
+
+## Relationship Arrows
+
+| Arrow | Meaning |
+| ----- | ------- |
+| `->` | Upstream to downstream (left provides, right consumes) |
+| `<-` | Downstream to upstream (right provides, left consumes) |
+| `<->` | Bidirectional / Partnership |
+| `><` | Separate Ways (no integration) |
 
 ## Relationships
 
@@ -148,4 +163,8 @@ ContextMap MicroservicesMap {
 
 - [Teams & Classifications](/guide/teams-classifications) — assign ownership and strategic importance
 - [Namespaces](/guide/namespaces) — organize large models
-- [Language Reference](/reference/language) — complete syntax details
+
+## See Also
+
+- [Context Maps Reference](/reference/language#context-maps) — complete syntax details
+- [Relationships Reference](/reference/language#relationships) — integration patterns and arrows

@@ -2,6 +2,12 @@
 
 The import system lets you split your DomainLang model across multiple files, making large models manageable and enabling code reuse.
 
+## Keywords
+
+| Keyword | Alias |
+| ------- | ----- |
+| `Import` | `import` |
+
 ## Basic Import
 
 Import another `.dlang` file:
@@ -28,7 +34,7 @@ import "acme/shared-definitions@1.0.0"
 
 A typical multi-file project structure:
 
-```
+```text
 my-project/
 ├── model.yaml           # Project manifest
 ├── index.dlang          # Main entry point
@@ -136,7 +142,7 @@ Use an `index.dlang` as the main entry point that imports all other files and de
 
 ## Example: Large Enterprise Model
 
-```
+```text
 enterprise-model/
 ├── model.yaml
 ├── index.dlang
@@ -169,7 +175,7 @@ description: Enterprise-wide domain model
 entry: index.dlang
 ```
 
-### index.dlang
+### Enterprise index.dlang
 
 ```dlang
 import "./shared/teams.dlang"
@@ -182,5 +188,8 @@ import "./maps/enterprise-map.dlang"
 
 ## Next Steps
 
-- [Language Reference](/reference/language) — complete syntax documentation
-- [Examples](/examples/) — see multi-file projects in action
+- [Browse Examples](/examples/) — see multi-file projects in action
+
+## See Also
+
+- [Imports Reference](/reference/language#imports) — complete syntax details

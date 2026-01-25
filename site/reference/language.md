@@ -10,14 +10,37 @@ New to DomainLang? Start with the [Getting Started](/guide/getting-started) guid
 
 DomainLang accepts aliases for common constructs:
 
+### Top-Level Keywords
+
 | Concept | Keywords |
-|---------|----------|
+| ------- | -------- |
 | Domain | `Domain`, `dom` |
 | Bounded context | `BoundedContext`, `bc` |
 | Context map | `ContextMap`, `cmap` |
 | Domain map | `DomainMap`, `dmap` |
 | Namespace | `Namespace`, `ns` |
 | Import | `import`, `Import` |
+| Classification | `Classification` |
+| Team | `Team` |
+| Metadata key | `Metadata` |
+
+### Block Keywords (inside Bounded Contexts)
+
+| Block | Alias |
+| ----- | ----- |
+| `terminology` | `glossary` |
+| `metadata` | `meta` |
+| `decisions` | `rules` |
+| `relationships` | `integrations` |
+
+### Item Keywords (inside blocks)
+
+| Item | Alias |
+| ---- | ----- |
+| `term` | `Term` |
+| `decision` | `Decision` |
+| `policy` | `Policy` |
+| `rule` | `Rule` |
 
 ## Comments and Strings
 
@@ -110,6 +133,8 @@ A bounded context defines a model boundary.
 ### Full Syntax
 
 ```dlang
+Metadata Language
+
 bc Orders for Sales as CoreDomain by SalesTeam {
     description: "Order lifecycle"
     
@@ -161,7 +186,7 @@ bc Orders for Sales as CoreDomain by SalesTeam {
 
 ## Terminology
 
-Document ubiquitous language:
+Document ubiquitous language. Use `terminology` (or `glossary`) blocks with `term` (or `Term`) entries:
 
 ```dlang
 terminology {
@@ -173,9 +198,16 @@ terminology {
 }
 ```
 
+### Term Properties
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `aka` / `synonyms` | ID list | Alternative names (identifiers, not strings) |
+| `examples` | string list | Example values |
+
 ## Decisions, Policies, Rules
 
-Record governance and constraints:
+Record governance and constraints. Use `decisions` (or `rules`) blocks with `decision`, `policy`, or `rule` entries:
 
 ```dlang
 Classification Architectural
@@ -187,6 +219,14 @@ decisions {
     rule [Business] MinOrder: "Minimum order is $10"
 }
 ```
+
+### Decision Keywords
+
+| Keyword | Alias | Description |
+| ------- | ----- | ----------- |
+| `decision` | `Decision` | A documented choice |
+| `policy` | `Policy` | A business guideline |
+| `rule` | `Rule` | A business constraint |
 
 ## Metadata
 
@@ -276,7 +316,7 @@ DomainMap Portfolio {
 Create hierarchical scopes:
 
 ```dlang
-namespace Acme.Sales {
+Namespace Acme.Sales {
     Domain Sales { }
     bc Orders for Sales { }
 }
