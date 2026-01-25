@@ -19,14 +19,14 @@
         "modeling",
         "architecture"
     ],
-    "homepage": "https://github.com/larsbaunwall/DomainLang#readme",
+    "homepage": "https://domainlang.net",
     "repository": {
         "type": "git",
-        "url": "https://github.com/larsbaunwall/DomainLang",
+        "url": "https://github.com/DomainLang/DomainLang",
         "directory": "dsl/domain-lang/packages/cli"
     },
     "bugs": {
-        "url": "https://github.com/larsbaunwall/DomainLang/issues"
+        "url": "https://github.com/DomainLang/DomainLang/issues"
     },
     "engines": {
         "node": ">=20.10.0",

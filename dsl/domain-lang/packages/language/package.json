@@ -23,14 +23,14 @@
         "parser",
         "sdk"
     ],
-    "homepage": "https://github.com/larsbaunwall/DomainLang#readme",
+    "homepage": "https://domainlang.net",
     "repository": {
         "type": "git",
-        "url": "https://github.com/larsbaunwall/DomainLang",
+        "url": "https://github.com/DomainLang/DomainLang",
         "directory": "dsl/domain-lang/packages/language"
     },
     "bugs": {
-        "url": "https://github.com/larsbaunwall/DomainLang/issues"
+        "url": "https://github.com/DomainLang/DomainLang/issues"
     },
     "type": "module",
     "engines": {

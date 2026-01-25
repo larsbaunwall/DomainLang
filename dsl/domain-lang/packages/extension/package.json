@@ -3,8 +3,9 @@
     "version": "0.1.0",
     "displayName": "DomainLang",
     "description": "A DSL for Domain-Driven Design",
-    "publisher": "thinkability",
+    "publisher": "DomainLang",
     "author": "larsbaunwall",
+    "homepage": "https://domainlang.net",
     "license": "Apache License 2.0",
     "icon": "images/icon.png",
     "keywords": [
@@ -16,10 +17,10 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/larsbaunwall/DomainLang"
+        "url": "https://github.com/DomainLang/DomainLang"
     },
     "bugs": {
-        "url": "https://github.com/larsbaunwall/DomainLang/issues"
+        "url": "https://github.com/DomainLang/DomainLang/issues"
     },
     "engines": {
         "vscode": "^1.67.0"
