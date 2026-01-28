@@ -1,10 +1,10 @@
 {
     "private": true,
-    "name": "domain-lang",
+    "name": "domainlang",
     "version": "0.1.0",
     "displayName": "DomainLang",
     "description": "A DSL for Domain-Driven Design",
-    "publisher": "thinkability",
+    "publisher": "DomainLang",
     "author": "larsbaunwall",
     "license": "Apache License 2.0",
     "icon": "images/icon.png",
