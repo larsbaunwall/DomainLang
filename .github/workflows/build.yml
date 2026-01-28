@@ -99,7 +99,7 @@ jobs:
           npx @vscode/vsce package --allow-missing-repository --no-update-package-json --no-dependencies
           
           # Move artifact
-          mv domain-lang-*.vsix ../../dist/domain-lang-${{ steps.get_version.outputs.version }}.vsix
+          mv domainlang-*.vsix ../../dist/domainlang-${{ steps.get_version.outputs.version }}.vsix
         working-directory: ./dsl/domain-lang
         shell: bash
 
