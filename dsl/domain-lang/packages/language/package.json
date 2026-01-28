@@ -52,10 +52,10 @@
             "types": "./out/sdk/index.d.ts",
             "default": "./out/sdk/index.js"
         },
-            "./main-browser": {
-                "types": "./out/main-browser.d.ts",
-                "default": "./out/main-browser.js"
-            },
+        "./main-browser": {
+            "types": "./out/main-browser.d.ts",
+            "default": "./out/main-browser.js"
+        },
         "./syntaxes/domain-lang.monarch.js": {
             "types": "./out/syntaxes/domain-lang.monarch.d.ts",
             "default": "./out/syntaxes/domain-lang.monarch.js"
@@ -87,12 +87,14 @@
     },
     "dependencies": {
         "langium": "~4.1.0",
+        "monaco-editor": "0.55.1",
+        "vite": "6.4.1",
         "yaml": "^2.5.0"
     },
     "devDependencies": {
         "@types/node": "~20.17.48",
         "@vitest/coverage-v8": "^3.1.4",
-        "langium-cli": "~4.1.0",
+        "langium-cli": "^4.2.0",
         "shx": "~0.4.0",
         "typescript": "~5.8.3",
         "vitest": "~3.1.3"
