@@ -54,7 +54,7 @@ jobs:
           ls -la ./artifacts/
           ls -la ./artifacts/npm/
           
-          [ -f "./artifacts/domain-lang-${VERSION}.vsix" ] || { echo "VSIX not found"; exit 1; }
+          [ -f "./artifacts/domainlang-${VERSION}.vsix" ] || { echo "VSIX not found"; exit 1; }
           [ -f "./artifacts/npm/domainlang-language-${VERSION}.tgz" ] || { echo "Language package not found"; exit 1; }
           [ -f "./artifacts/npm/domainlang-cli-${VERSION}.tgz" ] || { echo "CLI package not found"; exit 1; }
           echo "All artifacts validated"
@@ -77,7 +77,7 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: |
           npx @vscode/vsce publish \
-            --packagePath "./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix"
+            --packagePath "./artifacts/domainlang-${{ steps.get_info.outputs.version }}.vsix"
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
@@ -106,7 +106,7 @@ jobs:
           target_commitish: ${{ steps.get_info.outputs.sha }}
           generate_release_notes: true
           files: |
-            ./artifacts/domain-lang-${{ steps.get_info.outputs.version }}.vsix
+            ./artifacts/domainlang-${{ steps.get_info.outputs.version }}.vsix
             ./artifacts/npm/*.tgz
 
       - name: Summary
