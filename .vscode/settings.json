@@ -1,7 +1,0 @@
-{
-    "langium.config": "packages/language/langium-config.json",
-    "sonarlint.connectedMode.project": {
-        "connectionId": "domainlang",
-        "projectKey": "DomainLang_DomainLang"
-    }
-}
